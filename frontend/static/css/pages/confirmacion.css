@@ -1,0 +1,83 @@
+.confirmacion-section {
+	min-height: calc(100vh - 120px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem 1rem;
+	background: var(--color-light);
+}
+
+.confirmacion-container {
+	width: 100%;
+	max-width: 640px;
+}
+
+.confirmacion-card {
+	background: #ffffff;
+	border-radius: 18px;
+	padding: 2.5rem 2rem;
+	box-shadow: 0 12px 32px rgba(51, 51, 51, 0.10);
+	text-align: center;
+}
+
+.confirmacion-icon {
+	width: 64px;
+	height: 64px;
+	background: #e8f5e9;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 1rem;
+	font-size: 1.8rem;
+	color: #2e7d32;
+}
+
+.confirmacion__title {
+	margin: 0 0 0.3rem 0;
+	font-size: 1.8rem;
+	color: var(--color-dark);
+}
+
+.confirmacion__numero,
+.confirmacion__entrega {
+	margin: 0 0 0.4rem 0;
+	color: #555;
+	font-size: 0.97rem;
+}
+
+.confirmacion-tabla {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 1.5rem 0;
+	text-align: left;
+	font-size: 0.93rem;
+}
+
+.confirmacion-tabla th {
+	padding: 0.5rem 0.7rem;
+	border-bottom: 2px solid #ececec;
+	color: #666;
+	font-weight: 600;
+}
+
+.confirmacion-tabla td {
+	padding: 0.5rem 0.7rem;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.confirmacion-tabla__total td {
+	padding-top: 0.8rem;
+	border-top: 2px solid var(--color-primary);
+	border-bottom: none;
+	font-weight: 700;
+	color: var(--color-primary);
+}
+
+.confirmacion__acciones {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+	margin-top: 0.5rem;
+	flex-wrap: wrap;
+}

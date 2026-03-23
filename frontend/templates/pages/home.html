@@ -1,0 +1,83 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+	{% include "components/hero.html" %}
+
+	<section class="home-section" aria-labelledby="categorias-title">
+		<div class="section-heading">
+			<h2 id="categorias-title">Categorias destacadas</h2>
+		</div>
+		<div class="category-grid">
+			<article class="category-card">
+				<img class="category-card__img" src="https://copilot.microsoft.com/th/id/BCO.de71dd7e-2a66-4a73-87b8-6e6877d254bf.png" alt="Herramientas">
+				<h3 class="category-card__name">🔧 Herramientas</h3>
+			</article>
+			<article class="category-card">
+				<img class="category-card__img" src="https://copilot.microsoft.com/th/id/BCO.bc58fe18-321b-4813-84a2-b7cab88b3e23.png" alt="Pinturas">
+				<h3 class="category-card__name">🎨 Pinturas</h3>
+			</article>
+			<article class="category-card">
+				<img class="category-card__img" src="https://copilot.microsoft.com/th/id/BCO.b9ecc998-a4e8-47c0-a0b3-a3c7b71f1280.png" alt="Materiales Eléctricos">
+				<h3 class="category-card__name">⚡ Materiales Eléctricos</h3>
+			</article>
+			<article class="category-card">
+				<img class="category-card__img" src="https://copilot.microsoft.com/th/id/BCO.810f1fd0-9b83-4028-be29-5351bf261788.png" alt="Seguridad">
+				<h3 class="category-card__name">🦺 Seguridad</h3>
+			</article>
+		</div>
+	</section>
+
+	<section class="home-section" id="catalogo" aria-labelledby="productos-title">
+		<div class="section-heading">
+			<h2 id="productos-title">Productos destacados</h2>
+		</div>
+
+		{% if messages %}
+		<div class="home-messages">
+			{% for message in messages %}
+			<p class="alert alert--{{ message.tags }}">{{ message }}</p>
+			{% endfor %}
+		</div>
+		{% endif %}
+
+		<div class="product-grid">
+			{% for producto in productos_destacados %}
+				{% include "components/product-card.html" with producto=producto %}
+			{% empty %}
+				<p>No hay productos destacados disponibles en este momento.</p>
+			{% endfor %}
+		</div>
+	</section>
+
+	<section class="home-section" aria-labelledby="beneficios-title">
+		<div class="section-heading">
+			<h2 id="beneficios-title">Por que comprar en FERREMAX</h2>
+		</div>
+
+		<div class="benefits-grid">
+			<article class="benefit-card">
+				<h3>Despacho a domicilio</h3>
+				<p>Entrega segura en todo Chile para tus compras online.</p>
+			</article>
+			<article class="benefit-card">
+				<h3>Retiro en tienda</h3>
+				<p>Compra online y retira en sucursal de forma rapida.</p>
+			</article>
+			<article class="benefit-card">
+				<h3>Multiples medios de pago</h3>
+				<p>Paga con tarjetas, transferencia y opciones digitales.</p>
+			</article>
+		</div>
+	</section>
+
+	<section class="promo-banner" id="promociones" aria-label="Promociones destacadas">
+		<p class="promo-banner__eyebrow">Promociones</p>
+		<h2>Semana constructor: descuentos exclusivos en herramientas electricas</h2>
+		<a href="#catalogo" class="promo-banner__link">Aprovechar ofertas</a>
+	</section>
+{% endblock %}
+
+{% block page_scripts %}
+	<script src="{% static 'js/pages/home.js' %}"></script>
+{% endblock %}

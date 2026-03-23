@@ -1,0 +1,94 @@
+{% extends "base/base.html" %}
+{% load ecommerce_tags static %}
+
+{% block content %}
+<section class="checkout-section">
+    <div class="checkout-container">
+
+        <h1 class="checkout__title">Checkout</h1>
+
+        {% if messages %}
+        <div class="checkout-messages">
+            {% for message in messages %}
+            <p class="alert alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if items %}
+        <div class="checkout-layout">
+
+            <div class="checkout-resumen">
+                <h2 class="checkout-resumen__title">Resumen del pedido</h2>
+                <table class="checkout-tabla">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cant.</th>
+                            <th>Precio unit.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.producto.nombre }}</td>
+                            <td>{{ item.cantidad }}</td>
+                            <td>${{ item.producto.precio|formato_moneda }}</td>
+                            <td>${{ item.subtotal|formato_moneda }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="checkout-tabla__total">
+                            <td colspan="3"><strong>Total</strong></td>
+                            <td><strong>${{ total|formato_moneda }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="checkout-form-container">
+                <form class="checkout-form" method="post" action="{% url 'checkout' %}">
+                    {% csrf_token %}
+
+                    <fieldset class="checkout-entrega">
+                        <legend class="checkout-entrega__legend">Tipo de entrega</legend>
+
+                        <label class="checkout-entrega__opcion">
+                            <input type="radio" name="tipo_entrega" value="retiro" checked>
+                            <span>
+                                <strong>Retiro en tienda</strong>
+                                <small>Disponible en nuestras sucursales</small>
+                            </span>
+                        </label>
+
+                        <label class="checkout-entrega__opcion">
+                            <input type="radio" name="tipo_entrega" value="despacho">
+                            <span>
+                                <strong>Despacho a domicilio</strong>
+                                <small>Recibe en tu direccion</small>
+                            </span>
+                        </label>
+                    </fieldset>
+
+                    <button type="submit" class="btn btn--primary btn--lg btn--full">Generar pedido</button>
+                </form>
+                <a href="{% url 'carrito' %}" class="btn btn--link">&#8592; Volver al carrito</a>
+            </div>
+
+        </div>
+        {% else %}
+        <div class="checkout-empty">
+            <p>No hay productos en el carrito para procesar.</p>
+            <a href="{% url 'catalogo' %}" class="btn btn--primary">Ver catalogo</a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/pages/checkout.js' %}"></script>
+{% endblock %}

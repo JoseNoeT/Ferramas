@@ -1,0 +1,44 @@
+{% load ecommerce_tags %}
+
+<article class="product-card">
+	<div class="product-card__media">
+		{% if producto.imagen %}
+			<img src="{{ producto.imagen }}" alt="{{ producto.nombre }}" loading="lazy">
+		{% else %}
+			<div class="product-card__placeholder" aria-hidden="true">FERREMAX</div>
+		{% endif %}
+	</div>
+
+	<div class="product-card__body">
+		{% if producto.categoria %}
+		<p class="product-card__category">{{ producto.categoria.nombre }}</p>
+		{% endif %}
+		<h3>{{ producto.nombre }}</h3>
+		<p class="product-card__price">${{ producto.precio|formato_moneda }}</p>
+		<p class="product-card__stock{% if producto.stock == 0 %} product-card__stock--agotado{% endif %}">
+			{% if producto.stock > 0 %}Stock: {{ producto.stock }}{% else %}Agotado{% endif %}
+		</p>
+		<div class="product-card__actions">
+			{% if user.is_authenticated %}
+			<a href="{% url 'producto_detalle' producto.slug %}" class="product-card__link">Ver detalle producto</a>
+			{% else %}
+			<a href="{% url 'login' %}?next={% url 'producto_detalle' producto.slug %}" class="product-card__link">Inicia sesion para ver detalle</a>
+			{% endif %}
+			{% if user.is_authenticated %}
+				{% if producto.stock > 0 %}
+				<form method="post" action="{% url 'agregar_al_carrito' %}" class="product-card__form">
+					{% csrf_token %}
+					<input type="hidden" name="producto_id" value="{{ producto.pk }}">
+					<input type="hidden" name="cantidad" value="1">
+					<input type="hidden" name="next" value="carrito">
+					<button type="submit" class="product-card__button">Agregar al carrito</button>
+				</form>
+				{% else %}
+				<span class="product-card__hint">Producto sin stock disponible</span>
+				{% endif %}
+			{% else %}
+				<a href="{% url 'registro' %}?next={% url 'producto_detalle' producto.slug %}" class="product-card__button product-card__button--link">Registrate para comprar</a>
+			{% endif %}
+		</div>
+	</div>
+</article>

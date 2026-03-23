@@ -1,0 +1,39 @@
+{% extends "base/base.html" %}
+{% load ecommerce_tags static %}
+
+{% block content %}
+<section class="catalogo-section">
+    <div class="catalogo-container">
+
+        <header class="catalogo-header">
+            <h1 class="catalogo-header__title">Catalogo de Productos</h1>
+            <p class="catalogo-header__sub">Encuentra todo lo que necesitas para tu proyecto</p>
+        </header>
+
+        {% if messages %}
+        <div class="catalogo-messages">
+            {% for message in messages %}
+            <p class="alert alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if productos %}
+        <div class="catalogo-grid">
+            {% for producto in productos %}
+            {% include "components/product-card.html" with producto=producto %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="catalogo-empty">
+            <p>No hay productos disponibles en este momento.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/pages/catalogo.js' %}"></script>
+{% endblock %}

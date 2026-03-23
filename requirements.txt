@@ -1,0 +1,2 @@
+# Dependencia principal del proyecto FERREMAS
+Django==5.2.4

@@ -1,0 +1,55 @@
+{% extends "base/base.html" %}
+{% load ecommerce_tags static %}
+
+{% block content %}
+<section class="confirmacion-section">
+    <div class="confirmacion-container">
+        <div class="confirmacion-card">
+
+            <div class="confirmacion-icon">&#10003;</div>
+            <h1 class="confirmacion__title">Pedido generado</h1>
+            <p class="confirmacion__numero">Pedido <strong>#{{ pedido.pk }}</strong></p>
+            <p class="confirmacion__entrega">
+                Tipo de entrega: <strong>{{ pedido.get_tipo_entrega_display }}</strong>
+            </p>
+
+            <table class="confirmacion-tabla">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cant.</th>
+                        <th>Precio unit.</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pedido.items.all %}
+                    <tr>
+                        <td>{{ item.producto.nombre }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>${{ item.precio_unitario|formato_moneda }}</td>
+                        <td>${{ item.subtotal|formato_moneda }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="confirmacion-tabla__total">
+                        <td colspan="3"><strong>Total pagado</strong></td>
+                        <td><strong>${{ pedido.total|formato_moneda }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="confirmacion__acciones">
+                <a href="{% url 'catalogo' %}" class="btn btn--primary">Seguir comprando</a>
+                <a href="{% url 'home' %}" class="btn btn--outline">Ir al inicio</a>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/pages/confirmacion.js' %}"></script>
+{% endblock %}

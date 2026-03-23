@@ -1,0 +1,54 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <h1 class="auth-card__title">Iniciar sesion</h1>
+        <p class="auth-card__subtitle">Bienvenido de vuelta a FERREMAX</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="auth-card__alert auth-card__alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        {% if next_url %}
+            <p class="auth-card__alert auth-card__alert--success">Inicia sesion para continuar con el producto seleccionado.</p>
+        {% endif %}
+
+        <form class="auth-form" method="post" action="{% url 'login' %}" novalidate>
+            {% csrf_token %}
+            {% if next_url %}
+                <input type="hidden" name="next" value="{{ next_url }}">
+            {% endif %}
+
+            <div class="auth-form__field">
+                <label for="id_email">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <span class="auth-form__error">{{ form.email.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_password">{{ form.password.label }}</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <span class="auth-form__error">{{ form.password.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <button class="auth-form__submit" type="submit">Entrar</button>
+        </form>
+
+        <p class="auth-card__footer">
+            ¿No tienes cuenta? <a href="{% if next_url %}{% url 'registro' %}?next={{ next_url }}{% else %}{% url 'registro' %}{% endif %}">Registrate aqui</a>
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/pages/login.js' %}"></script>
+{% endblock %}

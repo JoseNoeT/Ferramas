@@ -1,0 +1,127 @@
+.producto-section {
+	padding: 2rem 1rem 3rem;
+}
+
+.producto-container {
+	max-width: var(--container-width);
+	margin: 0 auto;
+}
+
+.producto-back {
+	display: inline-block;
+	margin-bottom: 1.5rem;
+	color: var(--color-primary);
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 0.92rem;
+}
+.producto-back:hover { text-decoration: underline; }
+
+.producto-detail {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 2.5rem;
+	align-items: start;
+}
+
+.producto-detail__imagen {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	background: var(--color-light);
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	border: 1px solid #ececec;
+}
+
+.producto-detail__imagen img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.producto-detail__imagen--placeholder {
+	color: #aaa;
+	font-size: 0.9rem;
+}
+
+.producto-detail__info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.8rem;
+}
+
+.producto-detail__categoria {
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--color-primary);
+	font-weight: 700;
+}
+
+.producto-detail__nombre {
+	margin: 0;
+	font-size: 1.9rem;
+	color: var(--color-dark);
+	line-height: 1.2;
+}
+
+.producto-detail__descripcion {
+	margin: 0;
+	color: #555;
+	line-height: 1.6;
+}
+
+.producto-detail__precio {
+	margin: 0;
+	font-size: 2rem;
+	font-weight: 800;
+	color: var(--color-primary);
+}
+
+.producto-detail__stock {
+	margin: 0;
+	font-size: 0.92rem;
+	color: #555;
+}
+
+.producto-detail__stock--agotado {
+	color: var(--color-accent);
+	font-weight: 600;
+}
+
+.producto-form {
+	display: flex;
+	gap: 1rem;
+	align-items: flex-end;
+	margin-top: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.producto-form__cantidad {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+}
+
+.producto-form__cantidad label {
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+.producto-form__cantidad input {
+	width: 80px;
+	padding: 0.55rem 0.7rem;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	font-size: 1rem;
+	text-align: center;
+}
+
+@media (max-width: 760px) {
+	.producto-detail {
+		grid-template-columns: 1fr;
+	}
+}

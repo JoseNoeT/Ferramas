@@ -1,0 +1,69 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="dashboard-admin">
+    <header class="dashboard-admin__header">
+        <div>
+            <h1>Gestion de Categorias</h1>
+            <p>Administra categorias existentes y crea nuevas para el catalogo.</p>
+        </div>
+        <a class="btn btn--secondary" href="{% url 'admin_productos_dashboard' %}">Volver a productos</a>
+    </header>
+
+    {% if messages %}
+    <ul class="dashboard-admin__messages">
+        {% for message in messages %}
+        <li class="dashboard-admin__message dashboard-admin__message--{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form method="post" class="dashboard-admin__form" novalidate>
+        {% csrf_token %}
+        <h2>Nueva categoria</h2>
+        {% for field in form %}
+        <div class="dashboard-admin__field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}
+            <p class="dashboard-admin__error">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <div class="dashboard-admin__form-actions">
+            <button type="submit" class="btn btn--primary">Agregar categoria</button>
+        </div>
+    </form>
+
+    <div class="dashboard-admin__table-wrap" style="margin-top: 1rem;">
+        <table class="dashboard-admin__table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Slug</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for categoria in categorias %}
+                <tr>
+                    <td>{{ categoria.nombre }}</td>
+                    <td>{{ categoria.slug }}</td>
+                    <td>
+                        {% if categoria.activa %}
+                        <span class="badge badge--activo">Activa</span>
+                        {% else %}
+                        <span class="badge badge--inactivo">Inactiva</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="dashboard-admin__empty">No hay categorias registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

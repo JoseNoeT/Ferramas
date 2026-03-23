@@ -1,0 +1,73 @@
+{% extends "base/base.html" %}
+{% load ecommerce_tags static %}
+
+{% block content %}
+<section class="carrito-section">
+    <div class="carrito-container">
+
+        <h1 class="carrito__title">Mi Carrito</h1>
+
+        {% if messages %}
+        <div class="carrito-messages">
+            {% for message in messages %}
+            <p class="alert alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if items %}
+        <div class="carrito-layout">
+
+            <div class="carrito-items">
+                {% for item in items %}
+                <article class="carrito-item">
+                    <div class="carrito-item__info">
+                        <h2 class="carrito-item__nombre">{{ item.producto.nombre }}</h2>
+                        <p class="carrito-item__precio">Precio unitario: ${{ item.producto.precio|formato_moneda }}</p>
+                        <p class="carrito-item__subtotal">Subtotal: ${{ item.subtotal|formato_moneda }}</p>
+                    </div>
+
+                    <form class="carrito-item__update" method="post" action="{% url 'actualizar_item_carrito' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" value="{{ item.pk }}">
+                        <input type="number" name="cantidad" value="{{ item.cantidad }}"
+                               min="1" max="{{ item.producto.stock }}">
+                        <button type="submit" class="btn btn--outline btn--sm">Actualizar</button>
+                    </form>
+
+                    <form class="carrito-item__delete" method="post" action="{% url 'eliminar_item_carrito' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" value="{{ item.pk }}">
+                        <button type="submit" class="btn btn--danger btn--sm">Eliminar</button>
+                    </form>
+                </article>
+                {% endfor %}
+            </div>
+
+            <aside class="carrito-resumen">
+                <h2 class="carrito-resumen__title">Resumen</h2>
+                <div class="carrito-resumen__line">
+                    <span>Subtotal</span><strong>${{ subtotal|formato_moneda }}</strong>
+                </div>
+                <div class="carrito-resumen__line carrito-resumen__line--total">
+                    <span>Total</span><strong>${{ total|formato_moneda }}</strong>
+                </div>
+                <a href="{% url 'checkout' %}" class="btn btn--primary btn--full">Ir al checkout &rarr;</a>
+                <a href="{% url 'catalogo' %}" class="btn btn--link">Seguir comprando</a>
+            </aside>
+
+        </div>
+        {% else %}
+        <div class="carrito-empty">
+            <p>Tu carrito esta vacio.</p>
+            <a href="{% url 'catalogo' %}" class="btn btn--primary">Ver catalogo</a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/pages/carrito.js' %}"></script>
+{% endblock %}

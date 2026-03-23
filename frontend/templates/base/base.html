@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	{% include "base/head.html" %}
+</head>
+<body>
+	{% include "base/navbar.html" %}
+
+	<main id="main-content">
+		{% block content %}
+		<!-- Page content -->
+		{% endblock %}
+	</main>
+
+	{% include "base/footer.html" %}
+	{% include "base/scripts.html" %}
+</body>
+</html>

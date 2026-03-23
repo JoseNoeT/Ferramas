@@ -1,0 +1,61 @@
+{% extends "base/base.html" %}
+{% load ecommerce_tags static %}
+
+{% block content %}
+<section class="producto-section">
+    <div class="producto-container">
+
+        <a href="{% url 'catalogo' %}" class="producto-back">&#8592; Volver al catalogo</a>
+
+        <div class="producto-detail">
+
+            <div class="producto-detail__imagen">
+                {% if producto.imagen %}
+                <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}">
+                {% else %}
+                <div class="producto-detail__imagen--placeholder">Sin imagen</div>
+                {% endif %}
+            </div>
+
+            <div class="producto-detail__info">
+                {% if producto.categoria %}
+                <span class="producto-detail__categoria">{{ producto.categoria.nombre }}</span>
+                {% endif %}
+
+                <h1 class="producto-detail__nombre">{{ producto.nombre }}</h1>
+                <p class="producto-detail__descripcion">{{ producto.descripcion }}</p>
+                <p class="producto-detail__precio">${{ producto.precio|formato_moneda }}</p>
+
+                <p class="producto-detail__stock{% if producto.stock == 0 %} producto-detail__stock--agotado{% endif %}">
+                    {% if producto.stock > 0 %}Stock disponible: {{ producto.stock }}{% else %}Producto agotado{% endif %}
+                </p>
+
+                {% if messages %}
+                {% for message in messages %}
+                <p class="alert alert--{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+                {% endif %}
+
+                {% if producto.stock > 0 %}
+                <form class="producto-form" method="post" action="{% url 'agregar_al_carrito' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="producto_id" value="{{ producto.pk }}">
+                    <input type="hidden" name="next" value="carrito">
+                    <div class="producto-form__cantidad">
+                        <label for="cantidad">Cantidad:</label>
+                        <input type="number" id="cantidad" name="cantidad"
+                               value="1" min="1" max="{{ producto.stock }}">
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--lg">Agregar al carrito</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/pages/producto.js' %}"></script>
+{% endblock %}

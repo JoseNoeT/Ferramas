@@ -1,0 +1,71 @@
+{% extends "base/base.html" %}
+{% load ecommerce_tags %}
+
+{% block content %}
+<section class="admin-productos dashboard-admin">
+    <header class="dashboard-admin__header">
+        <div>
+            <h1>Dashboard de Productos</h1>
+            <p>Gestiona el catalogo interno de FERREMAS.</p>
+        </div>
+        <a class="btn btn--primary" href="{% url 'admin_producto_crear' %}">Crear producto</a>
+    </header>
+
+    {% if messages %}
+    <ul class="dashboard-admin__messages">
+        {% for message in messages %}
+        <li class="dashboard-admin__message dashboard-admin__message--{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="dashboard-admin__table-wrap">
+        <table class="dashboard-admin__table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoria</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.categoria.nombre }}</td>
+                    <td>${{ producto.precio|formato_moneda }}</td>
+                    <td>{{ producto.stock }}</td>
+                    <td>
+                        {% if producto.activo %}
+                        <span class="badge badge--activo">Activo</span>
+                        {% else %}
+                        <span class="badge badge--inactivo">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td class="dashboard-admin__actions">
+                        <a class="btn btn--secondary" href="{% url 'admin_producto_editar' producto.pk %}">Editar</a>
+                        <form method="post" action="{% url 'admin_producto_estado' producto.pk %}">
+                            {% csrf_token %}
+                            {% if producto.activo %}
+                            <input type="hidden" name="activo" value="0">
+                            <button type="submit" class="btn btn--danger">Desactivar</button>
+                            {% else %}
+                            <input type="hidden" name="activo" value="1">
+                            <button type="submit" class="btn btn--success">Activar</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="dashboard-admin__empty">No hay productos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

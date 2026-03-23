@@ -1,0 +1,52 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="admin-producto-form dashboard-admin">
+    <header class="dashboard-admin__header">
+        <div>
+            <h1>{{ titulo }}</h1>
+            <p>Completa los datos del producto para mantener el catalogo actualizado.</p>
+        </div>
+        <div class="dashboard-admin__form-actions">
+            <a class="btn btn--secondary" href="{% url 'admin_categorias_dashboard' %}">Gestionar categorias</a>
+            <a class="btn btn--secondary" href="{% url 'admin_productos_dashboard' %}">Volver al listado</a>
+        </div>
+    </header>
+
+    {% if messages %}
+    <ul class="dashboard-admin__messages">
+        {% for message in messages %}
+        <li class="dashboard-admin__message dashboard-admin__message--{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form method="post" class="dashboard-admin__form" novalidate>
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="dashboard-admin__field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <p class="dashboard-admin__error">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+            <p class="dashboard-admin__error">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <div class="dashboard-admin__form-actions">
+            <button type="submit" class="btn btn--primary">Guardar</button>
+            <a class="btn btn--secondary" href="{% url 'admin_productos_dashboard' %}">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

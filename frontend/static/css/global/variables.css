@@ -1,0 +1,9 @@
+:root {
+	--color-primary: #F57C00;
+	--color-dark: #333333;
+	--color-accent: #C10000;
+	--color-light: #F5F5F5;
+
+	--font-base: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+	--container-width: 1200px;
+}

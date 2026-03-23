@@ -1,0 +1,38 @@
+<header class="site-header">
+	<nav class="navbar" aria-label="Navegacion principal">
+		<a class="navbar__brand" href="/">FERREMAX</a>
+
+		<ul class="navbar__links">
+			{% if user.is_authenticated and user.rol == 'vendedor' %}
+				<li><a href="{% url 'vendedor_dashboard' %}">Dashboard Vendedor</a></li>
+			{% elif user.is_authenticated and user.rol == 'bodeguero' %}
+				<li><a href="{% url 'bodeguero_dashboard' %}">Dashboard Bodeguero</a></li>
+			{% elif user.is_authenticated and user.rol == 'contador' %}
+				<li><a href="{% url 'contador_dashboard' %}">Dashboard Contador</a></li>
+			{% elif user.is_authenticated and user.rol == 'admin' %}
+				<li><a href="{% url 'admin_dashboard' %}">Dashboard Admin</a></li>
+				<li><a href="{% url 'admin_productos_dashboard' %}">Productos</a></li>
+				<li><a href="{% url 'admin_categorias_dashboard' %}">Categorias</a></li>
+				<li><a href="{% url 'admin_usuarios_dashboard' %}">Usuarios</a></li>
+			{% else %}
+				<li><a href="/">Inicio</a></li>
+				<li><a href="{% url 'catalogo' %}">Catalogo</a></li>
+				<li><a href="#promociones">Ofertas</a></li>
+				<li><a href="#contacto">Contacto</a></li>
+			{% endif %}
+		</ul>
+
+		<div class="navbar__actions">
+			{% if user.is_authenticated %}
+				<span class="navbar__user">{{ user.email }}</span>
+				<a class="navbar__logout" href="{% url 'logout' %}">Cerrar sesion</a>
+			{% else %}
+				<a class="navbar__login" href="{% url 'login' %}">Iniciar sesion</a>
+			{% endif %}
+			{% if not user.is_authenticated or user.rol == 'cliente' %}
+				<a class="navbar__cart" href="{% url 'carrito' %}" aria-label="Abrir carrito">Carrito ({{ carrito_items_total }})</a>
+			{% endif %}
+		</div>
+	</nav>
+</header>
+

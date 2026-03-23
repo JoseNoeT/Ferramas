@@ -1,0 +1,128 @@
+.carrito-section {
+	padding: 2rem 1rem 3rem;
+}
+
+.carrito-container {
+	max-width: var(--container-width);
+	margin: 0 auto;
+}
+
+.carrito__title {
+	margin: 0 0 1.5rem 0;
+	font-size: 2rem;
+	color: var(--color-dark);
+}
+
+.carrito-messages { margin-bottom: 1rem; }
+
+.carrito-layout {
+	display: grid;
+	grid-template-columns: 1fr 300px;
+	gap: 2rem;
+	align-items: start;
+}
+
+.carrito-items {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.carrito-item {
+	background: #ffffff;
+	border: 1px solid #ececec;
+	border-radius: 12px;
+	padding: 1rem 1.2rem;
+	display: grid;
+	grid-template-columns: 1fr auto auto;
+	gap: 1rem;
+	align-items: center;
+}
+
+.carrito-item__info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+}
+
+.carrito-item__nombre {
+	margin: 0;
+	font-size: 1.05rem;
+	color: var(--color-dark);
+}
+
+.carrito-item__precio {
+	margin: 0;
+	font-size: 0.88rem;
+	color: #666;
+}
+
+.carrito-item__subtotal {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--color-primary);
+}
+
+.carrito-item__update,
+.carrito-item__delete {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.carrito-item__update input[type="number"] {
+	width: 65px;
+	padding: 0.35rem 0.5rem;
+	border: 1px solid #d1d5db;
+	border-radius: 7px;
+	font-size: 0.93rem;
+	text-align: center;
+}
+
+/* Resumen lateral */
+.carrito-resumen {
+	background: #ffffff;
+	border: 1px solid #ececec;
+	border-radius: 14px;
+	padding: 1.4rem;
+	position: sticky;
+	top: 80px;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.carrito-resumen__title {
+	margin: 0 0 0.5rem 0;
+	font-size: 1.2rem;
+}
+
+.carrito-resumen__line {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.97rem;
+	color: #444;
+}
+
+.carrito-resumen__line--total {
+	padding-top: 0.75rem;
+	border-top: 1px solid #ececec;
+	font-size: 1.05rem;
+	color: var(--color-dark);
+}
+
+.carrito-empty {
+	text-align: center;
+	padding: 4rem 1rem;
+	color: #666;
+}
+
+@media (max-width: 800px) {
+	.carrito-layout {
+		grid-template-columns: 1fr;
+	}
+	.carrito-item {
+		grid-template-columns: 1fr;
+	}
+}

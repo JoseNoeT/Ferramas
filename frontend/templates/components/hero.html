@@ -1,0 +1,27 @@
+{% load static %}
+<section class="hero" aria-labelledby="home-hero-title">
+
+	<!-- Card principal: mensaje de marca + CTA sobre hero.png -->
+	<div class="hero__card hero__card--primary">
+		<img class="hero__card-bg" src="{% static 'img/banners/hero.png' %}" alt="">
+		<div class="hero__card-body">
+			<p class="hero__eyebrow">Ecommerce ferretero</p>
+			<h1 id="home-hero-title">FERREMAX</h1>
+			<p class="hero__subtitle">Todo en herramientas y materiales de construccion</p>
+			<a class="hero__cta" href="#catalogo">Ver catalogo</a>
+		</div>
+	</div>
+
+	<!-- Card promo: imagen de producto + banner de oferta sobre hero1.png -->
+	<div class="hero__card hero__card--secondary">
+		<img class="hero__card-bg" src="{% static 'img/banners/hero1.png' %}" alt="">
+		<div class="hero__card-body">
+			<div class="hero__promo">
+				<p class="hero__promo-label">Oferta de temporada</p>
+				<p class="hero__promo-discount">Hasta 40% dcto.</p>
+				<p class="hero__promo-copy">Equipos y accesorios seleccionados</p>
+			</div>
+		</div>
+	</div>
+
+</section>

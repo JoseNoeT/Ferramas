@@ -1,0 +1,197 @@
+/* ============================================================
+   HERO — Sistema de doble hero card
+   Dos cards hermanas con imagen de fondo, overlay y texto
+   superpuesto. Misma lógica visual, misma altura, coherencia total.
+   ============================================================ */
+
+.hero {
+	display: grid;
+	grid-template-columns: 1.15fr 0.85fr;
+	gap: 1rem;
+	align-items: stretch;
+	padding: 1.25rem 0 0.75rem;
+}
+
+/* ---------------------------------------------------------------
+   Base compartida — ambas cards usan la misma arquitectura
+   --------------------------------------------------------------- */
+
+.hero__card {
+	position: relative;
+	border-radius: 16px;
+	overflow: hidden;
+	min-height: 400px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	box-shadow: 0 12px 32px rgba(51, 51, 51, 0.16);
+}
+
+/* <img> absolutamente posicionada: control total del recorte */
+.hero__card-bg {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center 20%;
+	z-index: 0;
+}
+
+/* Overlay base (rellenado por cada variante) */
+.hero__card::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+}
+
+/* ---------------------------------------------------------------
+   Variante primaria (izquierda): marca principal + CTA
+   Overlay oscuro ascendente + acento naranja FERREMAS en esquina
+   --------------------------------------------------------------- */
+
+.hero__card--primary::before {
+	background:
+		linear-gradient(to top,
+			rgba(18, 10, 2, 0.90) 0%,
+			rgba(18, 10, 2, 0.55) 42%,
+			rgba(18, 10, 2, 0.10) 100%),
+		radial-gradient(ellipse at 78% 8%, rgba(245, 124, 0, 0.36), transparent 52%);
+}
+
+/* ---------------------------------------------------------------
+   Variante secundaria (derecha): producto + promo
+   Overlay oscuro ascendente + acento rojo en esquina
+   --------------------------------------------------------------- */
+
+.hero__card--secondary::before {
+	background:
+		linear-gradient(to top,
+			rgba(18, 6, 6, 0.88) 0%,
+			rgba(18, 6, 6, 0.46) 48%,
+			rgba(18, 6, 6, 0.06) 100%),
+		radial-gradient(ellipse at 22% 8%, rgba(193, 0, 0, 0.30), transparent 52%);
+}
+
+/* ---------------------------------------------------------------
+   Cuerpo de texto — encima de la imagen y el overlay
+   --------------------------------------------------------------- */
+
+.hero__card-body {
+	position: relative;
+	z-index: 2;
+	padding: 2rem;
+}
+
+/* ---------------------------------------------------------------
+   Tipografía del hero primario
+   --------------------------------------------------------------- */
+
+.hero__eyebrow {
+	margin: 0 0 0.55rem;
+	color: var(--color-primary);
+	font-size: 0.8rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+}
+
+.hero__card h1 {
+	margin: 0 0 0.7rem;
+	font-size: clamp(2rem, 4.5vw, 3rem);
+	line-height: 1.05;
+	color: #ffffff;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.hero__subtitle {
+	margin: 0 0 1.6rem;
+	max-width: 30ch;
+	font-size: 1.05rem;
+	line-height: 1.55;
+	color: rgba(255, 255, 255, 0.82);
+}
+
+.hero__cta {
+	display: inline-block;
+	padding: 0.8rem 1.6rem;
+	border-radius: 9px;
+	background: var(--color-primary);
+	color: #ffffff;
+	font-weight: 700;
+	font-size: 1rem;
+	text-decoration: none;
+	transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	box-shadow: 0 4px 16px rgba(245, 124, 0, 0.42);
+}
+
+.hero__cta:hover {
+	background: #da6f00;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 22px rgba(245, 124, 0, 0.55);
+}
+
+/* ---------------------------------------------------------------
+   Banner promo — interior del hero secundario
+   --------------------------------------------------------------- */
+
+.hero__promo {
+	background: linear-gradient(120deg, var(--color-primary), var(--color-accent));
+	border-radius: 12px;
+	padding: 1.1rem 1.25rem;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.hero__promo-label {
+	margin: 0 0 0.35rem;
+	font-size: 0.78rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: rgba(255, 255, 255, 0.84);
+}
+
+.hero__promo-discount {
+	margin: 0 0 0.2rem;
+	font-size: 1.65rem;
+	font-weight: 800;
+	color: #ffffff;
+	line-height: 1.1;
+}
+
+.hero__promo-copy {
+	margin: 0;
+	font-size: 0.92rem;
+	color: rgba(255, 255, 255, 0.90);
+	line-height: 1.45;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+	.hero {
+		grid-template-columns: 1fr;
+	}
+
+	.hero__card {
+		min-height: 320px;
+	}
+}
+
+@media (max-width: 480px) {
+	.hero__card {
+		min-height: 260px;
+	}
+
+	.hero__card-body {
+		padding: 1.5rem;
+	}
+
+	.hero__subtitle {
+		font-size: 0.96rem;
+	}
+}

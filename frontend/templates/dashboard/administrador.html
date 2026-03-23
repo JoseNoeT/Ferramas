@@ -1,0 +1,260 @@
+{% extends "base/base.html" %}
+{% load ecommerce_tags %}
+
+{% block content %}
+<section class="dashboard-admin">
+    <header class="dashboard-admin__hero">
+        <div class="dashboard-admin__hero-content">
+            <span class="dashboard-admin__badge">Centro de control FERREMAS</span>
+            <h1>Dashboard Administrativo</h1>
+            <p>
+                Visualiza el estado operativo del negocio, detecta alertas y gestiona rápidamente
+                catálogo, categorías y usuarios internos desde un solo panel.
+            </p>
+        </div>
+    </header>
+
+    <section class="dashboard-admin__stats">
+        <article class="dashboard-card dashboard-card--highlight">
+            <div class="dashboard-card__label">Ventas totales</div>
+            <div class="dashboard-card__value">${{ total_ventas|formato_moneda }}</div>
+            <div class="dashboard-card__meta">
+                {% if pedidos_disponibles %}
+                Total acumulado de pedidos registrados.
+                {% else %}
+                Métrica no disponible por configuración actual de pedidos.
+                {% endif %}
+            </div>
+        </article>
+
+        <article class="dashboard-card">
+            <div class="dashboard-card__label">Pedidos hoy</div>
+            <div class="dashboard-card__value">{{ pedidos_hoy }}</div>
+            <div class="dashboard-card__meta">Pedidos creados durante la jornada actual.</div>
+        </article>
+
+        <article class="dashboard-card">
+            <div class="dashboard-card__label">Pedidos pendientes</div>
+            <div class="dashboard-card__value">{{ pedidos_pendientes }}</div>
+            <div class="dashboard-card__meta">Generados, aprobados o en preparación.</div>
+        </article>
+
+        <article class="dashboard-card">
+            <div class="dashboard-card__label">Productos activos</div>
+            <div class="dashboard-card__value">{{ productos_activos }}</div>
+            <div class="dashboard-card__meta">Disponibles actualmente en catálogo.</div>
+        </article>
+
+        <article class="dashboard-card dashboard-card--warning">
+            <div class="dashboard-card__label">Stock bajo</div>
+            <div class="dashboard-card__value">{{ productos_stock_bajo }}</div>
+            <div class="dashboard-card__meta">Bajo el umbral de {{ stock_bajo_limite }} unidades.</div>
+        </article>
+
+        <article class="dashboard-card dashboard-card--danger-soft">
+            <div class="dashboard-card__label">Sin stock</div>
+            <div class="dashboard-card__value">{{ productos_sin_stock }}</div>
+            <div class="dashboard-card__meta">Productos agotados que requieren reposición.</div>
+        </article>
+
+        <article class="dashboard-card">
+            <div class="dashboard-card__label">Usuarios</div>
+            <div class="dashboard-card__value">{{ total_usuarios }}</div>
+            <div class="dashboard-card__meta">Clientes e internos registrados en la plataforma.</div>
+        </article>
+
+        <article class="dashboard-card">
+            <div class="dashboard-card__label">Categorías</div>
+            <div class="dashboard-card__value">{{ total_categorias }}</div>
+            <div class="dashboard-card__meta">Estructura activa del catálogo FERREMAS.</div>
+        </article>
+    </section>
+
+    <section class="dashboard-admin__insights">
+        <div class="dashboard-panel">
+            <div class="dashboard-panel__header">
+                <h2>Indicadores operativos</h2>
+                <p>Lectura rápida del estado del negocio y su operación interna.</p>
+            </div>
+            <div class="dashboard-admin__indicator-grid">
+                {% for indicador in indicadores_operativos %}
+                <article class="dashboard-meter">
+                    <div class="dashboard-meter__top">
+                        <h3>{{ indicador.titulo }}</h3>
+                        <strong>{{ indicador.valor }}</strong>
+                    </div>
+                    <div class="dashboard-meter__bar">
+                        <span style="width: {{ indicador.porcentaje }}%;"></span>
+                    </div>
+                    <p>{{ indicador.detalle }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-panel dashboard-panel--compact">
+            <div class="dashboard-panel__header">
+                <h2>Resumen ejecutivo</h2>
+                <p>Indicadores transversales para toma de decisión rápida.</p>
+            </div>
+            <div class="dashboard-admin__mini-stats">
+                <article class="dashboard-summary-card">
+                    <strong>${{ promedio_venta|formato_moneda }}</strong>
+                    <span>ticket promedio</span>
+                </article>
+                <article class="dashboard-summary-card">
+                    <strong>{{ total_usuarios_internos }}</strong>
+                    <span>usuarios internos</span>
+                </article>
+                <article class="dashboard-summary-card">
+                    <strong>{{ productos_sin_stock|add:productos_stock_bajo }}</strong>
+                    <span>alertas de inventario</span>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-admin__content">
+        <div class="dashboard-admin__main">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel__header">
+                    <h2>Gestión principal</h2>
+                    <p>Accede a los módulos clave del panel administrativo.</p>
+                </div>
+
+                <div class="dashboard-admin__modules">
+                    {% for modulo in modulos_admin %}
+                    <article class="dashboard-module-card">
+                        <div class="dashboard-module-card__top">
+                            <span class="dashboard-admin__badge dashboard-admin__badge--soft">{{ modulo.titulo }}</span>
+                            <strong>{{ modulo.cantidad }}</strong>
+                        </div>
+                        <h3>{{ modulo.titulo }}</h3>
+                        <p>{{ modulo.descripcion }}</p>
+                        <div class="dashboard-module-card__meta">{{ modulo.meta }}</div>
+                        <a class="btn btn--primary" href="{% url modulo.url %}">Abrir módulo</a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="dashboard-panel">
+                <div class="dashboard-panel__header">
+                    <h2>Resumen por rol</h2>
+                    <p>Distribución actual de usuarios del sistema.</p>
+                </div>
+
+                <div class="dashboard-admin__role-grid">
+                    <article class="dashboard-summary-card">
+                        <strong>{{ usuarios_por_rol.admins }}</strong>
+                        <span>Administradores</span>
+                    </article>
+                    <article class="dashboard-summary-card">
+                        <strong>{{ usuarios_por_rol.vendedores }}</strong>
+                        <span>Vendedores</span>
+                    </article>
+                    <article class="dashboard-summary-card">
+                        <strong>{{ usuarios_por_rol.bodegueros }}</strong>
+                        <span>Bodegueros</span>
+                    </article>
+                    <article class="dashboard-summary-card">
+                        <strong>{{ usuarios_por_rol.contadores }}</strong>
+                        <span>Contadores</span>
+                    </article>
+                    <article class="dashboard-summary-card">
+                        <strong>{{ usuarios_por_rol.clientes }}</strong>
+                        <span>Clientes</span>
+                    </article>
+                </div>
+            </div>
+        </div>
+
+        <aside class="dashboard-admin__sidebar">
+            <div class="dashboard-panel">
+                <div class="dashboard-panel__header">
+                    <h2>Resumen del sistema</h2>
+                </div>
+                <ul class="dashboard-summary">
+                    <li>
+                        <strong>{{ total_productos }}</strong>
+                        <span>productos registrados en total</span>
+                    </li>
+                    <li>
+                        <strong>{{ productos_inactivos }}</strong>
+                        <span>productos inactivos o fuera de catálogo</span>
+                    </li>
+                    <li>
+                        <strong>{{ total_pedidos }}</strong>
+                        <span>pedidos acumulados en el sistema</span>
+                    </li>
+                    <li>
+                        <strong>{{ pedidos_pendientes }}</strong>
+                        <span>pedidos con seguimiento pendiente</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="dashboard-panel dashboard-panel--alert">
+                <div class="dashboard-panel__header">
+                    <h2>Alertas</h2>
+                </div>
+                <div class="dashboard-panel__list">
+                    {% for alerta in alertas %}
+                    <article class="dashboard-panel__item dashboard-panel__item--{{ alerta.tipo }}">
+                        <h3>{{ alerta.titulo }}</h3>
+                        <p>{{ alerta.detalle }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="dashboard-panel">
+                <div class="dashboard-panel__header">
+                    <h2>Categorías destacadas</h2>
+                    <p>Las categorías con más productos cargados.</p>
+                </div>
+                <div class="dashboard-panel__list">
+                    {% for categoria in categorias_destacadas %}
+                    <article class="dashboard-panel__item">
+                        <div class="dashboard-panel__item-row">
+                            <strong>{{ categoria.nombre }}</strong>
+                            <span class="badge badge--neutral">{{ categoria.total_productos }} productos</span>
+                        </div>
+                    </article>
+                    {% empty %}
+                    <p class="dashboard-admin__empty">No hay categorías registradas todavía.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="dashboard-panel">
+                <div class="dashboard-panel__header">
+                    <h2>Productos recientes</h2>
+                    <p>Últimos productos agregados al catálogo.</p>
+                </div>
+                <div class="dashboard-panel__list">
+                    {% for producto in productos_recientes %}
+                    <article class="dashboard-panel__item">
+                        <div class="dashboard-panel__item-row">
+                            <strong>{{ producto.nombre }}</strong>
+                            {% if producto.activo %}
+                            <span class="badge badge--activo">Activo</span>
+                            {% else %}
+                            <span class="badge badge--inactivo">Inactivo</span>
+                            {% endif %}
+                        </div>
+                        <p>
+                            {{ producto.categoria.nombre|default:"Sin categoria" }} ·
+                            ${{ producto.precio|formato_moneda }} ·
+                            Stock: {{ producto.stock }}
+                        </p>
+                    </article>
+                    {% empty %}
+                    <p class="dashboard-admin__empty">Todavía no hay productos recientes para mostrar.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+    </section>
+</section>
+{% endblock %}
