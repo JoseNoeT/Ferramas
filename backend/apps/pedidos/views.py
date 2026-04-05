@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 
+from apps.catalogo.models import Producto
 from apps.pedidos import services as pedidos_services
 from apps.pedidos.models import Pedido
 from apps.usuarios.models import Usuario
@@ -97,13 +98,29 @@ def pedido_confirmacion_view(request, pk):
 
 @_requiere_rol(Usuario.Rol.VENDEDOR, Usuario.Rol.ADMIN)
 def vendedor_dashboard_view(request):
-    pedidos = (
+    pedidos_pendientes = (
         Pedido.objects
         .select_related("usuario")
         .filter(estado=Pedido.Estado.GENERADO)
         .order_by("-creado_en")
     )
-    return render(request, "dashboard/vendedor.html", {"pedidos": pedidos})
+    pedidos_aprobados = (
+        Pedido.objects
+        .select_related("usuario")
+        .filter(estado=Pedido.Estado.APROBADO)
+        .order_by("-creado_en")
+    )
+    productos_bodega = (
+        Producto.objects
+        .select_related("categoria")
+        .filter(activo=True, stock__gt=0)
+        .order_by("nombre")
+    )
+    return render(request, "dashboard/vendedor.html", {
+        "pedidos": pedidos_pendientes,
+        "pedidos_aprobados": pedidos_aprobados,
+        "productos_bodega": productos_bodega,
+    })
 
 
 @_requiere_rol(Usuario.Rol.VENDEDOR, Usuario.Rol.ADMIN)
@@ -127,6 +144,20 @@ def rechazar_pedido_view(request, pk):
     try:
         pedidos_services.rechazar_pedido(pedido)
         messages.warning(request, f"Pedido #{pedido.pk} rechazado.")
+    except ValueError as exc:
+        messages.error(request, str(exc))
+    return redirect("vendedor_dashboard")
+
+
+@_requiere_rol(Usuario.Rol.VENDEDOR, Usuario.Rol.ADMIN)
+def enviar_a_bodega_view(request, pk):
+    """Envía un pedido aprobado a bodega (pasa a en_preparacion)."""
+    if request.method != "POST":
+        return redirect("vendedor_dashboard")
+    pedido = get_object_or_404(Pedido, pk=pk)
+    try:
+        pedidos_services.poner_en_preparacion(pedido)
+        messages.success(request, f"Pedido #{pedido.pk} enviado a bodega para preparación.")
     except ValueError as exc:
         messages.error(request, str(exc))
     return redirect("vendedor_dashboard")

@@ -1,193 +1,748 @@
-/* ═══════════════════════════════════════════════════════
-   Dashboard compartido (vendedor + bodeguero)
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   Dashboard Vendedor — FERREMAX
+   14 Leyes UX/UI aplicadas:
+   ───────────────────────────────────────────────────────
+   1  Jakob        → Consistencia visual con dashboard admin (mismos radios, sombras, variables)
+   2  Fitts        → Botones grandes (min 44px touch), CTAs prominentes, áreas clicables amplias
+   3  Hick         → Solo 3 tabs claros, acciones mínimas por fila, sin sobrecarga de opciones
+   4  Miller       → Información agrupada en 3 chunks (tabs) con ≤7 columnas por tabla
+   5  Postel       → Input de búsqueda flexible, acepta cualquier texto sin restricción
+   6  Von Restorff → Stock crítico y contadores pendientes resaltados con color distinto
+   7  Zeigarnik    → Badge counter en tabs muestra tareas incompletas/pendientes
+   8  Proximidad   → Espaciado coherente, elementos relacionados agrupados
+   9  Similitud    → Estilo visual uniforme para panels, badges y botones
+   10 Prägnanz     → Jerarquía visual limpia, máxima simplicidad
+   11 Región Común → Paneles con borde y fondo agrupan contenido relacionado
+   12 Parkinson    → Indicadores de urgencia visual en items pendientes
+   13 Tesler       → Un botón = una acción, confirmación en destructivos
+   14 Doherty      → Transiciones ≤300ms, feedback visual instantáneo
+   ═══════════════════════════════════════════════════════════ */
 
-.dashboard {
-    max-width: 1100px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
+/* ─ Layout general ──────────────────────────────── */
+/* [8-Proximidad] Márgenes y padding consistentes */
+
+.dashboard-vendedor {
+	max-width: 1280px;
+	margin: 2.5rem auto;
+	padding: 0 1.25rem 2rem;
 }
 
-.dashboard__header {
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid var(--color-primary, #e63900);
-    padding-bottom: 0.75rem;
+/* ─ Hero ────────────────────────────────────────── */
+/* [1-Jakob] Mismo estilo hero que admin dashboard
+   [10-Prägnanz] Información clara y directa */
+
+.dv-hero {
+	position: relative;
+	overflow: hidden;
+	background: linear-gradient(135deg, var(--color-dark) 0%, #444444 48%, var(--color-primary) 100%);
+	border-radius: 24px;
+	padding: 2rem;
+	color: #ffffff;
+	box-shadow: 0 18px 45px rgba(51, 51, 51, 0.18);
+	margin-bottom: 1.75rem;
 }
 
-.dashboard__title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--color-text, #1a1a1a);
-    margin: 0;
+.dv-hero::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 28%),
+		radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.12), transparent 24%);
+	pointer-events: none;
 }
 
-.dashboard__subtitle {
-    color: var(--color-text-muted, #666);
-    margin: 0.25rem 0 0;
-    font-size: 0.95rem;
+.dv-hero__content {
+	position: relative;
+	z-index: 1;
+	max-width: 720px;
 }
 
-/* ─ Mensajes ────────────────────────────────────── */
-
-.dashboard__messages {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+.dv-hero__badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.4rem 0.85rem;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.14);
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	backdrop-filter: blur(6px);
+	margin-bottom: 0.85rem;
 }
 
-.dashboard__message {
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
+.dv-hero__content h1 {
+	margin: 0;
+	font-size: clamp(1.8rem, 4vw, 2.6rem);
+	line-height: 1.1;
+	font-weight: 800;
 }
 
-.dashboard__message--success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+.dv-hero__content p {
+	margin: 0.9rem 0 0;
+	font-size: 1rem;
+	line-height: 1.65;
+	color: rgba(255, 255, 255, 0.92);
+	max-width: 600px;
 }
 
-.dashboard__message--error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+/* ─ Resumen rápido (cards KPI) ──────────────────── */
+/* [7-Zeigarnik] Muestra tareas pendientes de forma prominente
+   [6-Von Restorff] Card de urgencia destaca visualmente
+   [4-Miller] Solo 3 métricas, fácil de retener */
+
+.dv-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 1rem;
+	margin-bottom: 1.75rem;
 }
 
-.dashboard__message--warning {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
+.dv-stat-card {
+	background: #ffffff;
+	border: 1px solid #e9edf5;
+	border-radius: 20px;
+	padding: 1.2rem 1.15rem;
+	box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+	transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.dv-stat-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 16px 38px rgba(51, 51, 51, 0.1);
+	border-color: rgba(245, 124, 0, 0.2);
+}
+
+/* [6-Von Restorff] Card de urgencia tiene fondo diferente */
+.dv-stat-card--urgente {
+	background: linear-gradient(135deg, #fff8e8 0%, #fff0db 100%);
+	border-color: rgba(245, 124, 0, 0.2);
+}
+
+.dv-stat-card--alerta {
+	background: linear-gradient(135deg, #fff2f2 0%, #ffe7e7 100%);
+	border-color: rgba(193, 0, 0, 0.18);
+}
+
+.dv-stat-card__label {
+	font-size: 0.86rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	color: #667085;
+	margin: 0 0 0.45rem;
+}
+
+.dv-stat-card__value {
+	font-size: 2rem;
+	font-weight: 800;
+	line-height: 1.1;
+	margin: 0 0 0.35rem;
+	color: #101828;
+}
+
+.dv-stat-card__meta {
+	font-size: 0.9rem;
+	line-height: 1.45;
+	color: #667085;
+	margin: 0;
+}
+
+/* ─ Tabs de navegación ──────────────────────────── */
+/* [3-Hick] Solo 3 opciones claras
+   [7-Zeigarnik] Contadores muestran pendientes
+   [2-Fitts] Área clicable amplia (min 44px alto)
+   [14-Doherty] Transición instantánea 200ms */
+
+.dv-tabs {
+	display: flex;
+	gap: 0;
+	margin-bottom: 1.5rem;
+	border-bottom: 2px solid #e9edf5;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.dv-tabs__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.85rem 1.35rem;
+	min-height: 48px;               /* [2-Fitts] target mínimo 48px */
+	background: none;
+	border: none;
+	border-bottom: 3px solid transparent;
+	font-size: 0.9rem;
+	font-weight: 700;
+	color: #667085;
+	cursor: pointer;
+	transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+	white-space: nowrap;
+	margin-bottom: -2px;
+	position: relative;
+}
+
+.dv-tabs__btn:hover {
+	color: var(--color-primary);
+	background: rgba(245, 124, 0, 0.04);
+}
+
+.dv-tabs__btn--active {
+	color: var(--color-primary);
+	border-bottom-color: var(--color-primary);
+	background: rgba(245, 124, 0, 0.06);
+}
+
+.dv-tabs__btn svg {
+	flex-shrink: 0;
+	opacity: 0.65;
+}
+
+.dv-tabs__btn--active svg {
+	opacity: 1;
+}
+
+/* [7-Zeigarnik] Contadores muestran trabajo pendiente */
+.dv-tabs__count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 24px;
+	height: 24px;
+	padding: 0 7px;
+	background: #e9edf5;
+	color: #495057;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 800;
+	transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dv-tabs__btn--active .dv-tabs__count {
+	background: linear-gradient(135deg, var(--color-primary) 0%, #da6f00 100%);
+	color: #ffffff;
+	box-shadow: 0 4px 12px rgba(245, 124, 0, 0.3);
+}
+
+/* [12-Parkinson] Urgencia visual cuando hay pendientes > 0 */
+.dv-tabs__count--urgente {
+	background: linear-gradient(135deg, var(--color-accent) 0%, #8f0000 100%);
+	color: #ffffff;
+	animation: dvPulse 2s ease-in-out infinite;
+}
+
+@keyframes dvPulse {
+	0%, 100% { box-shadow: 0 0 0 0 rgba(193, 0, 0, 0.3); }
+	50%      { box-shadow: 0 0 0 6px rgba(193, 0, 0, 0); }
+}
+
+/* ─ Paneles de contenido ────────────────────────── */
+/* [11-Región Común] Cada panel está contenido con borde y fondo
+   [14-Doherty] Animación suave 250ms */
+
+.dv-panel {
+	display: none;
+}
+
+.dv-panel--active {
+	display: block;
+	animation: dvFadeIn 0.25s ease;
+}
+
+@keyframes dvFadeIn {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+.dv-panel__header {
+	margin-bottom: 1.25rem;
+}
+
+.dv-panel__header h2 {
+	margin: 0 0 0.3rem;
+	font-size: 1.2rem;
+	font-weight: 800;
+	color: #111827;
+}
+
+.dv-panel__header p {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.55;
+	color: #667085;
+}
+
+/* ─ Buscador de productos ───────────────────────── */
+/* [5-Postel] Acepta cualquier texto, filtra en tiempo real
+   [14-Doherty] Feedback instantáneo mientras se escribe
+   [2-Fitts] Input grande, fácil de alcanzar */
+
+.dv-search {
+	margin-bottom: 1.25rem;
+	position: relative;
+}
+
+.dv-search__icon {
+	position: absolute;
+	left: 0.85rem;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #98a2b3;
+	pointer-events: none;
+}
+
+.dv-search__input {
+	width: 100%;
+	max-width: 480px;
+	padding: 0.78rem 0.9rem 0.78rem 2.6rem;
+	border: 1px solid #d7deea;
+	border-radius: 14px;
+	font: inherit;
+	font-size: 0.9rem;
+	background: #ffffff;
+	color: #111827;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.dv-search__input::placeholder {
+	color: #98a2b3;
+}
+
+.dv-search__input:focus {
+	outline: none;
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 4px rgba(245, 124, 0, 0.14);
+	background: #fcfdff;
+}
+
+/* contador de resultados visible tras filtrar */
+.dv-search__results {
+	margin-top: 0.5rem;
+	font-size: 0.82rem;
+	color: #667085;
+	font-weight: 600;
+	min-height: 1.2em;
 }
 
 /* ─ Tabla ──────────────────────────────────────── */
+/* [1-Jakob] Misma estructura de tabla que admin dashboard
+   [9-Similitud] Mismo estilo visual en todas las tablas
+   [11-Región Común] Wrapper con borde agrupa datos */
 
-.dashboard__table-wrapper {
-    overflow-x: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.dv-table-wrap {
+	overflow: auto;
+	border: 1px solid #e6ebf2;
+	border-radius: 20px;
+	background: #ffffff;
+	box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
 }
 
-.dashboard__table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    font-size: 0.9rem;
+.dv-table {
+	width: 100%;
+	border-collapse: collapse;
+	min-width: 680px;
 }
 
-.dashboard__table thead {
-    background: var(--color-primary, #e63900);
-    color: #fff;
+.dv-table thead th {
+	background: #fff8e8;
+	color: var(--color-dark);
+	font-size: 0.84rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	font-weight: 800;
 }
 
-.dashboard__table th {
-    padding: 0.85rem 1rem;
-    text-align: left;
-    font-weight: 600;
-    white-space: nowrap;
+.dv-table th,
+.dv-table td {
+	padding: 0.95rem 1rem;
+	border-bottom: 1px solid #eef2f7;
+	text-align: left;
+	vertical-align: middle;
 }
 
-.dashboard__table td {
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: middle;
-    color: var(--color-text, #1a1a1a);
+/* [14-Doherty] Hover instantáneo */
+.dv-table tbody tr {
+	transition: background-color 0.15s ease;
 }
 
-.dashboard__table tbody tr:last-child td {
-    border-bottom: none;
+.dv-table tbody tr:hover {
+	background: #fffaf3;
 }
 
-.dashboard__table tbody tr:hover {
-    background: #fafafa;
+.dv-table tbody tr:last-child td {
+	border-bottom: none;
 }
 
-/* ─ Bádges de estado ────────────────────────────── */
+/* ─ Fila con urgencia ───────────────────────────── */
+/* [12-Parkinson] Filas con indicador de urgencia */
+
+.dv-table tbody tr.dv-row--critico {
+	background: #fff2f2;
+}
+
+.dv-table tbody tr.dv-row--critico:hover {
+	background: #ffe8e8;
+}
+
+/* ─ Producto nombre + thumb en tabla ────────────── */
+/* [10-Prägnanz] Imagen + nombre facilitan escaneo */
+
+.dv-producto-nombre {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+}
+
+.dv-producto-thumb {
+	width: 40px;
+	height: 40px;
+	object-fit: cover;
+	border-radius: 10px;
+	border: 1px solid #e9edf5;
+	flex-shrink: 0;
+}
+
+/* ─ Badges de estado ────────────────────────────── */
+/* [9-Similitud] Todos los badges comparten forma/peso
+   [6-Von Restorff] Colores distintos para cada estado */
 
 .badge {
-    display: inline-block;
-    padding: 0.25em 0.65em;
-    border-radius: 12px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 800;
+	padding: 0.34rem 0.72rem;
+	letter-spacing: 0.02em;
+	border: 1px solid transparent;
+	white-space: nowrap;
+	text-transform: uppercase;
 }
 
-.badge--borrador     { background: #e9ecef; color: #495057; }
-.badge--generado     { background: #cce5ff; color: #004085; }
-.badge--aprobado     { background: #d4edda; color: #155724; }
-.badge--rechazado    { background: #f8d7da; color: #721c24; }
-.badge--en_preparacion { background: #fff3cd; color: #856404; }
-.badge--listo        { background: #d1ecf1; color: #0c5460; }
-.badge--entregado    { background: #e2e3e5; color: #383d41; }
+.badge--borrador       { background: #f2f2f2; color: var(--color-dark); border-color: #e3e3e3; }
+.badge--generado       { background: #fff8e8; color: var(--color-primary); border-color: rgba(245, 124, 0, 0.2); }
+.badge--aprobado       { background: #ecfdf5; color: #065f46; border-color: rgba(6, 95, 70, 0.2); }
+.badge--rechazado      { background: #fff2f2; color: var(--color-accent); border-color: rgba(193, 0, 0, 0.2); }
+.badge--en_preparacion { background: #fff8e8; color: #b08000; border-color: rgba(176, 128, 0, 0.2); }
+.badge--listo          { background: #f0f9ff; color: #0c5460; border-color: rgba(12, 84, 96, 0.2); }
+.badge--entregado      { background: #f2f2f2; color: #383d41; border-color: #e3e3e3; }
+
+/* Badges de stock */
+.badge--stock-ok       { background: #ecfdf5; color: #065f46; border-color: rgba(6, 95, 70, 0.2); }
+.badge--stock-bajo     { background: #fff8e8; color: var(--color-primary); border-color: rgba(245, 124, 0, 0.2); }
+.badge--stock-critico  { background: #fff2f2; color: var(--color-accent); border-color: rgba(193, 0, 0, 0.2); }
+
+/* ─ Tags de tipo entrega ────────────────────────── */
+/* [6-Von Restorff] Despacho y retiro visualmente diferenciados */
+
+.dv-entrega {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.3rem 0.7rem;
+	border-radius: 999px;
+	font-size: 0.78rem;
+	font-weight: 700;
+	border: 1px solid transparent;
+}
+
+.dv-entrega--despacho {
+	background: #fff8e8;
+	color: var(--color-primary);
+	border-color: rgba(245, 124, 0, 0.18);
+}
+
+.dv-entrega--retiro {
+	background: #f2f2f2;
+	color: var(--color-dark);
+	border-color: #e3e3e3;
+}
 
 /* ─ Columna de acciones ───────────────────────────── */
+/* [2-Fitts] Botones suficientemente grandes
+   [13-Tesler] Una acción = un botón, sin complejidad extra */
 
-.dashboard__actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    align-items: center;
+.dv-actions {
+	display: flex;
+	gap: 0.55rem;
+	flex-wrap: wrap;
+	align-items: center;
 }
 
-.dashboard__actions form {
-    margin: 0;
+.dv-actions form {
+	margin: 0;
 }
 
 /* ─ Botones ─────────────────────────────────────── */
+/* [2-Fitts] Mínimo 44px de altura para touch targets
+   [14-Doherty] Hover/active instantáneos (<200ms)
+   [1-Jakob] Estilo consistente con admin dashboard */
 
 .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.4rem 1rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: opacity 0.15s, transform 0.1s;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem;
+	text-decoration: none;
+	border: none;
+	border-radius: 12px;
+	padding: 0.65rem 1.1rem;
+	min-height: 44px;                /* [2-Fitts] touch target mínimo */
+	font-weight: 800;
+	font-size: 0.88rem;
+	line-height: 1;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
-.btn:hover   { opacity: 0.88; transform: translateY(-1px); }
-.btn:active  { transform: translateY(0); }
+.btn:hover {
+	transform: translateY(-2px);
+}
 
-.btn--sm     { padding: 0.3rem 0.75rem; font-size: 0.8rem; }
+.btn:active {
+	transform: translateY(0);
+}
 
-.btn--primary { background: var(--color-primary, #e63900); color: #fff; }
-.btn--success { background: #28a745; color: #fff; }
-.btn--danger  { background: #dc3545; color: #fff; }
-.btn--warning { background: #ffc107; color: #212529; }
+.btn--sm {
+	padding: 0.5rem 0.85rem;
+	min-height: 40px;
+	font-size: 0.83rem;
+	border-radius: 10px;
+}
+
+.btn--primary {
+	background: linear-gradient(135deg, var(--color-primary) 0%, #da6f00 100%);
+	color: #ffffff;
+	box-shadow: 0 8px 20px rgba(245, 124, 0, 0.22);
+}
+
+.btn--primary:hover {
+	box-shadow: 0 12px 28px rgba(245, 124, 0, 0.32);
+}
+
+.btn--success {
+	background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+	color: #ffffff;
+	box-shadow: 0 8px 20px rgba(21, 128, 61, 0.18);
+}
+
+.btn--success:hover {
+	box-shadow: 0 12px 28px rgba(21, 128, 61, 0.28);
+}
+
+.btn--danger {
+	background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+	color: #ffffff;
+	box-shadow: 0 8px 20px rgba(185, 28, 28, 0.18);
+}
+
+.btn--danger:hover {
+	box-shadow: 0 12px 28px rgba(185, 28, 28, 0.28);
+}
+
+/* [13-Tesler] Estado disabled evita doble clic accidental */
+.btn:disabled,
+.btn.btn--loading {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none !important;
+}
+
+/* ─ Mensajes ──────────────────────────────────────── */
+/* [1-Jakob] Misma estructura que admin dashboard
+   [14-Doherty] Aparecen inmediatamente sin retardo */
+
+.dv-messages {
+	list-style: none;
+	margin: 0 0 1.2rem;
+	padding: 0;
+	display: grid;
+	gap: 0.65rem;
+}
+
+.dv-message {
+	border-radius: 14px;
+	padding: 0.85rem 1rem;
+	font-weight: 700;
+	font-size: 0.9rem;
+	border: 1px solid transparent;
+	box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.dv-message--success {
+	background: #fff8e8;
+	color: var(--color-dark);
+	border-color: rgba(245, 124, 0, 0.22);
+}
+
+.dv-message--warning {
+	background: #fff8e8;
+	color: var(--color-primary);
+	border-color: rgba(245, 124, 0, 0.25);
+}
+
+.dv-message--error {
+	background: #fff2f2;
+	color: var(--color-accent);
+	border-color: rgba(193, 0, 0, 0.22);
+}
 
 /* ─ Estado vacío ────────────────────────────────────── */
+/* [10-Prägnanz] Mensaje simple y claro */
 
-.dashboard__empty {
-    padding: 3rem 1rem;
-    text-align: center;
-    background: #fff;
-    border-radius: 8px;
-    border: 1px dashed #dee2e6;
-    color: var(--color-text-muted, #666);
-    font-size: 0.95rem;
+.dv-empty {
+	text-align: center;
+	color: #667085;
+	padding: 3rem 1rem;
+	font-size: 0.98rem;
+	background: var(--color-light);
+	border-radius: 20px;
+	border: 1px dashed rgba(245, 124, 0, 0.2);
+}
+
+.dv-empty__icon {
+	display: block;
+	margin: 0 auto 0.75rem;
+	opacity: 0.4;
+}
+
+/* ─ Confirmación modal ──────────────────────────── */
+/* [3-Hick] Confirmación clara antes de acción destructiva
+   [13-Tesler] Complejidad mínima: sí/no */
+
+.dv-confirm-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.5);
+	backdrop-filter: blur(4px);
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	animation: dvModalIn 0.2s ease;
+}
+
+@keyframes dvModalIn {
+	from { opacity: 0; }
+	to   { opacity: 1; }
+}
+
+.dv-confirm-dialog {
+	background: #ffffff;
+	border-radius: 22px;
+	padding: 1.75rem;
+	max-width: 400px;
+	width: 90%;
+	box-shadow: 0 25px 60px rgba(15, 23, 42, 0.2);
+	animation: dvDialogIn 0.25s ease;
+}
+
+@keyframes dvDialogIn {
+	from { opacity: 0; transform: scale(0.95) translateY(10px); }
+	to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dv-confirm-dialog h3 {
+	margin: 0 0 0.5rem;
+	font-size: 1.1rem;
+	font-weight: 800;
+	color: #111827;
+}
+
+.dv-confirm-dialog p {
+	margin: 0 0 1.5rem;
+	color: #667085;
+	line-height: 1.55;
+	font-size: 0.92rem;
+}
+
+.dv-confirm-dialog__actions {
+	display: flex;
+	gap: 0.75rem;
+	justify-content: flex-end;
+}
+
+.btn--ghost {
+	background: #eef2f7;
+	color: #1f2937;
+	box-shadow: none;
+}
+
+.btn--ghost:hover {
+	background: #e5e9f0;
 }
 
 /* ─ Responsive ───────────────────────────────────── */
+/* [2-Fitts] En mobile, botones aún más grandes */
+
+@media (max-width: 1024px) {
+	.dashboard-vendedor {
+		margin-top: 1.5rem;
+	}
+
+	.dv-stats {
+		grid-template-columns: 1fr;
+	}
+}
 
 @media (max-width: 768px) {
-    .dashboard__table th,
-    .dashboard__table td {
-        padding: 0.6rem 0.75rem;
-        font-size: 0.82rem;
-    }
+	.dashboard-vendedor {
+		margin: 1.4rem auto;
+		padding: 0 1rem 1.5rem;
+	}
 
-    .dashboard__actions {
-        flex-direction: column;
-        gap: 0.35rem;
+	.dv-hero {
+		padding: 1.4rem;
+		border-radius: 20px;
+	}
+
+	.dv-hero__content h1 {
+		font-size: 1.6rem;
+	}
+
+	.dv-tabs__btn {
+		padding: 0.7rem 0.85rem;
+		font-size: 0.82rem;
+		min-height: 48px;
+	}
+
+	.dv-table th,
+	.dv-table td {
+		padding: 0.7rem 0.8rem;
+		font-size: 0.82rem;
+	}
+
+	.dv-actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.btn--sm {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.dv-search__input {
+		max-width: 100%;
+	}
+
+	.dv-confirm-dialog {
+		padding: 1.25rem;
+	}
+}
+
+@media (max-width: 520px) {
+	.dv-tabs__btn span:not(.dv-tabs__count) {
+		font-size: 0.78rem;
+	}
+
+	.dv-stats {
+		grid-template-columns: 1fr;
     }
 }

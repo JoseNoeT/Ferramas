@@ -15,6 +15,7 @@ urlpatterns = [
     path("dashboard/vendedor/", views.vendedor_dashboard_view, name="vendedor_dashboard"),
     path("pedido/<int:pk>/aprobar/", views.aprobar_pedido_view, name="aprobar_pedido"),
     path("pedido/<int:pk>/rechazar/", views.rechazar_pedido_view, name="rechazar_pedido"),
+    path("pedido/<int:pk>/enviar-bodega/", views.enviar_a_bodega_view, name="enviar_a_bodega"),
 
     # ── Dashboard Bodeguero ────────────────────────────────────────────────────
     path("dashboard/bodeguero/", views.bodeguero_dashboard_view, name="bodeguero_dashboard"),
