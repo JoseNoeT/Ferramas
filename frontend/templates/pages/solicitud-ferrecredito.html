@@ -1,0 +1,90 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container" style="max-width: 860px; margin: 2rem auto;">
+        <header style="margin-bottom: 1.5rem;">
+            <h1>Solicitud FerreCrédito</h1>
+            <p>
+                FerreCrédito es una cuenta corriente interna de FERREMAS disponible para
+                Maestros/PYMES aprobados.
+            </p>
+        </header>
+
+        {% if messages %}
+        <div style="margin-bottom: 1rem;">
+            {% for message in messages %}
+            <p class="alert alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <section style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+            <h2 style="margin-top: 0;">Condiciones informativas</h2>
+            <ul style="margin-bottom: 0;">
+                <li>Uso exclusivo para Maestro/PYME.</li>
+                <li>Compra a crédito en cuotas mensuales.</li>
+                <li>Requiere estar al día para una segunda compra.</li>
+                <li>Sujeto a cupo aprobado por administrador.</li>
+            </ul>
+        </section>
+
+        <form method="post" action="{% url 'solicitud_ferrecredito' %}" style="display: grid; gap: 1rem;">
+            {% csrf_token %}
+
+            <label>
+                Nombre o razón social
+                <input type="text" name="nombre_razon_social" required>
+            </label>
+
+            <label>
+                RUT
+                <input type="text" name="rut" required>
+            </label>
+
+            <label>
+                Tipo
+                <select name="tipo" required>
+                    <option value="">Seleccione una opción</option>
+                    <option value="maestro">Maestro</option>
+                    <option value="pyme">PYME</option>
+                </select>
+            </label>
+
+            <label>
+                Rubro u oficio
+                <input type="text" name="rubro_oficio" required>
+            </label>
+
+            <label>
+                Monto de crédito solicitado
+                <input type="number" name="monto_solicitado" min="0" step="1" required>
+            </label>
+
+            <label>
+                Número de cuotas estimadas
+                <input type="number" name="cuotas_estimadas" min="1" step="1" required>
+            </label>
+
+            <label>
+                Teléfono
+                <input type="tel" name="telefono" required>
+            </label>
+
+            <label>
+                Email
+                <input type="email" name="email" required>
+            </label>
+
+            <label>
+                Observación
+                <textarea name="observacion" rows="4" placeholder="Detalle adicional de la solicitud"></textarea>
+            </label>
+
+            <div>
+                <button type="submit">Enviar solicitud</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -40,8 +40,38 @@
                 </tfoot>
             </table>
 
+            <section class="confirmacion__detalle-extra" aria-label="Datos de contacto Maestro PYME">
+                <h2>Datos de contacto Maestro/PYME</h2>
+                <ul>
+                    <li><strong>Nombre maestro/pyme:</strong> Maestro Instalador Demo</li>
+                    <li><strong>Rubro:</strong> Instalacion y reparacion</li>
+                    <li><strong>Telefono:</strong> +56 9 1234 5678</li>
+                    <li><strong>Email:</strong> maestro.demo@ferremax.cl</li>
+                    <li><strong>Zona de atencion:</strong> Region Metropolitana</li>
+                </ul>
+                <p>
+                    Estos datos se incluiran en el voucher cuando el cliente contrate una asesoria
+                    de Maestro/PYME.
+                </p>
+            </section>
+
+            <section class="confirmacion__detalle-extra" aria-label="Asesoria Maestro PYME">
+                <h2>Asesoria Maestro/PYME</h2>
+                <p><strong>Cargo de confirmacion: $5.000</strong></p>
+                <p>
+                    El pago final del servicio profesional se realiza directamente entre cliente y
+                    Maestro/PYME, fuera de los sistemas de FERREMAS.
+                </p>
+            </section>
+
+            <p class="confirmacion__nota-extra">
+                El correo mixto cliente-maestro sera implementado posteriormente desde el modulo
+                de notificaciones.
+            </p>
+
             <div class="confirmacion__acciones">
                 <a href="{% url 'catalogo' %}" class="btn btn--primary">Seguir comprando</a>
+                <a href="{% url 'encuesta_satisfaccion' %}" class="btn btn--outline">Responder encuesta de satisfaccion</a>
                 <a href="{% url 'home' %}" class="btn btn--outline">Ir al inicio</a>
             </div>
 

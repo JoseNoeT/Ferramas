@@ -1,0 +1,98 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container" style="max-width: 920px; margin: 2rem auto;">
+        <header style="margin-bottom: 1rem;">
+            <h1>Solicitud de asesoría Maestro/PYME</h1>
+            <p>
+                FERREMAS permite conectar clientes con maestros y PYMES para servicios
+                asociados a la compra de materiales.
+            </p>
+        </header>
+
+        {% if messages %}
+        <div style="margin-bottom: 1rem;">
+            {% for message in messages %}
+            <p class="alert alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <section style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <h2 style="margin-top: 0;">Servicio de referencia</h2>
+            <ul style="margin-bottom: 0;">
+                <li><strong>Servicio:</strong> Instalación y reparación general</li>
+                <li><strong>Maestro/PYME:</strong> Maestro Instalador Demo</li>
+                <li><strong>Rubro:</strong> Construcción y terminaciones</li>
+                <li><strong>Zona de atención:</strong> Región Metropolitana</li>
+                <li><strong>Teléfono referencial:</strong> +56 9 1234 5678</li>
+                <li><strong>Email referencial:</strong> maestro.demo@ferremax.cl</li>
+            </ul>
+        </section>
+
+        <section style="background: #fff7ed; border: 1px solid #fdba74; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <h2 style="margin-top: 0;">Cobro de confirmación</h2>
+            <p><strong>Cargo de confirmación: $5.000</strong></p>
+            <p>Este monto corresponde solo a la confirmación de contacto inicial.</p>
+            <p style="margin-bottom: 0;">
+                <strong>
+                    El pago final del servicio profesional se realiza directamente entre el
+                    cliente y el Maestro/PYME, fuera de los sistemas de FERREMAS.
+                </strong>
+            </p>
+        </section>
+
+        <form method="post" action="{% url 'solicitud_asesoria_maestro' %}" style="display: grid; gap: 0.9rem; margin-bottom: 1rem;">
+            {% csrf_token %}
+
+            <label>
+                Nombre cliente
+                <input type="text" name="nombre_cliente" required>
+            </label>
+
+            <label>
+                Email
+                <input type="email" name="email" required>
+            </label>
+
+            <label>
+                Teléfono
+                <input type="tel" name="telefono" required>
+            </label>
+
+            <label>
+                Dirección o comuna
+                <input type="text" name="direccion_comuna" required>
+            </label>
+
+            <label>
+                Servicio requerido
+                <input type="text" name="servicio_requerido" required>
+            </label>
+
+            <label>
+                Comentario
+                <textarea name="comentario" rows="4" placeholder="Agrega detalles de tu necesidad"></textarea>
+            </label>
+
+            <div>
+                <button type="submit">Confirmar solicitud de asesoría</button>
+            </div>
+        </form>
+
+        <section style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <h2 style="margin-top: 0;">Información adicional</h2>
+            <ul style="margin-bottom: 0;">
+                <li>El detalle del maestro será incorporado en el voucher.</li>
+                <li>El correo mixto cliente-maestro será implementado posteriormente desde el módulo de notificaciones.</li>
+            </ul>
+        </section>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="{% url 'servicios_maestros' %}" style="display: inline-block; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.65rem 0.9rem; text-decoration: none;">Volver a servicios maestros</a>
+            <a href="{% url 'home' %}" style="display: inline-block; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.65rem 0.9rem; text-decoration: none;">Volver al inicio</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="dashboard-admin">
+    <div class="dashboard-panel">
+        <div class="dashboard-panel__header">
+            <h1>Gestion de puntos</h1>
+            <p>Control visual de acumulacion y uso de puntos por cliente.</p>
+        </div>
+
+        <table class="checkout-tabla">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Puntos acumulados</th>
+                    <th>Puntos usados</th>
+                    <th>Saldo disponible</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cliente Demo 1</td>
+                    <td>2.100</td>
+                    <td>600</td>
+                    <td>1.500</td>
+                </tr>
+                <tr>
+                    <td>Cliente Demo 2</td>
+                    <td>1.750</td>
+                    <td>250</td>
+                    <td>1.500</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="dashboard-panel dashboard-panel--compact">
+            <div class="dashboard-panel__header">
+                <h2>Informacion</h2>
+            </div>
+            <p>Los puntos seran acumulados por compras y podran descontarse en checkout.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

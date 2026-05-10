@@ -1,0 +1,66 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <h1 class="auth-card__title">Mis puntos FERREMAS</h1>
+        <p class="auth-card__subtitle">Resumen visual de puntos acumulados y uso en compras.</p>
+
+        <section class="auth-card__benefits" aria-label="Resumen de puntos">
+            <h2>Resumen</h2>
+            <ul>
+                <li><strong>Saldo disponible:</strong> 1.250 puntos</li>
+                <li><strong>Puntos ganados:</strong> 2.000</li>
+                <li><strong>Puntos usados:</strong> 750</li>
+            </ul>
+        </section>
+
+        <section class="auth-card__benefits" aria-label="Historial de movimientos de puntos">
+            <h2>Historial demo</h2>
+            <table class="checkout-tabla">
+                <thead>
+                    <tr>
+                        <th>Compra</th>
+                        <th>Puntos ganados</th>
+                        <th>Puntos usados</th>
+                        <th>Saldo resultante</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pedido #120</td>
+                        <td>+500</td>
+                        <td>0</td>
+                        <td>500</td>
+                        <td>2026-05-02</td>
+                    </tr>
+                    <tr>
+                        <td>Pedido #124</td>
+                        <td>+700</td>
+                        <td>-250</td>
+                        <td>950</td>
+                        <td>2026-05-05</td>
+                    </tr>
+                    <tr>
+                        <td>Pedido #130</td>
+                        <td>+800</td>
+                        <td>-500</td>
+                        <td>1.250</td>
+                        <td>2026-05-09</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <p>
+            Los puntos se acumulan por cada compra y pueden aplicarse en checkout para reducir el total.
+        </p>
+
+        <div class="auth-form" aria-label="Acciones de puntos">
+            <a class="auth-form__submit" href="{% url 'checkout' %}">Ir al checkout</a>
+            <a class="auth-form__submit" href="{% url 'home' %}">Volver al inicio</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

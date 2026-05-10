@@ -17,7 +17,16 @@
 			{% else %}
 				<li><a href="/">Inicio</a></li>
 				<li><a href="{% url 'catalogo' %}">Catalogo</a></li>
-				<li><a href="{% url 'registro_maestro_pyme' %}">Maestro/PYME</a></li>
+				<li class="navbar__dropdown">
+					<a href="#" class="navbar__dropdown-toggle">Beneficios</a>
+					<div class="navbar__dropdown-menu">
+						<a href="{% url 'mis_puntos' %}">Mis puntos</a>
+						<a href="{% url 'servicios_maestros' %}">Servicios Maestros</a>
+						<a href="{% url 'registro_maestro_pyme' %}">Maestro/PYME</a>
+						<a href="{% url 'panel_maestro_pyme' %}">Panel Maestro/PYME</a>
+						<a href="{% url 'solicitud_ferrecredito' %}">FerreCrédito</a>
+					</div>
+				</li>
 				<li><a href="#promociones">Ofertas</a></li>
 				<li><a href="#contacto">Contacto</a></li>
 			{% endif %}
@@ -35,5 +44,60 @@
 			{% endif %}
 		</div>
 	</nav>
+
+	<style>
+		/* Dropdown styles para menú Beneficios */
+		.navbar__dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.navbar__dropdown-toggle {
+			text-decoration: none;
+			cursor: pointer;
+			display: inline-block;
+		}
+
+		.navbar__dropdown-toggle::after {
+			content: " ▼";
+			font-size: 0.75em;
+			margin-left: 4px;
+		}
+
+		.navbar__dropdown-menu {
+			display: none;
+			position: absolute;
+			top: 100%;
+			left: 0;
+			background-color: #ffffff;
+			min-width: 200px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+			border-radius: 4px;
+			z-index: 1000;
+			margin-top: 8px;
+		}
+
+		.navbar__dropdown:hover .navbar__dropdown-menu {
+			display: block;
+		}
+
+		.navbar__dropdown-menu a {
+			color: #333;
+			padding: 12px 16px;
+			text-decoration: none;
+			display: block;
+			border-bottom: 1px solid #f0f0f0;
+			transition: background-color 0.2s ease;
+		}
+
+		.navbar__dropdown-menu a:last-child {
+			border-bottom: none;
+		}
+
+		.navbar__dropdown-menu a:hover {
+			background-color: #f5f5f5;
+			color: #0066cc;
+		}
+	</style>
 </header>
 

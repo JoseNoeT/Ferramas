@@ -72,6 +72,45 @@
                         </label>
                     </fieldset>
 
+                    <fieldset class="checkout-entrega">
+                        <legend class="checkout-entrega__legend">Beneficios disponibles</legend>
+                        <p><strong>Puntos disponibles:</strong> 1.250 puntos</p>
+                        <label class="checkout-entrega__opcion">
+                            <input type="checkbox" name="usar_puntos" value="1">
+                            <span>
+                                <strong>Usar puntos en esta compra</strong>
+                                <small>Los puntos se descontaran del total cuando la logica backend sea implementada.</small>
+                            </span>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="checkout-entrega">
+                        <legend class="checkout-entrega__legend">Medios de pago</legend>
+
+                        <label class="checkout-entrega__opcion">
+                            <input type="radio" name="medio_pago" value="tienda" checked>
+                            <span>
+                                <strong>Pago en tienda</strong>
+                                <small>Medio actual disponible en el flujo web.</small>
+                            </span>
+                        </label>
+
+                        <label class="checkout-entrega__opcion">
+                            <input type="radio" name="medio_pago" value="ferrecredito">
+                            <span>
+                                <strong>FerreCredito</strong>
+                                <small>Disponible solo para clientes Maestro/PYME aprobados.</small>
+                                <small>Sujeto a cupo disponible y deuda al dia.</small>
+                            </span>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="checkout-entrega">
+                        <legend class="checkout-entrega__legend">Beneficio Maestro/PYME</legend>
+                        <p><strong>30% descuento en primera compra Maestro/PYME</strong></p>
+                        <p>Este beneficio sera validado por backend posteriormente.</p>
+                    </fieldset>
+
                     <button type="submit" class="btn btn--primary btn--lg btn--full">Generar pedido</button>
                 </form>
                 <a href="{% url 'carrito' %}" class="btn btn--link">&#8592; Volver al carrito</a>

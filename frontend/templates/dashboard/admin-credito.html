@@ -1,0 +1,51 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="dashboard-admin">
+    <div class="dashboard-panel">
+        <div class="dashboard-panel__header">
+            <h1>Gestion FerreCredito</h1>
+            <p>Vista administrativa demo para control de lineas de credito.</p>
+        </div>
+
+        <table class="checkout-tabla">
+            <thead>
+                <tr>
+                    <th>Maestro/PYME</th>
+                    <th>Cupo aprobado</th>
+                    <th>Saldo usado</th>
+                    <th>Estado deuda</th>
+                    <th>Estado credito</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Juan Perez</td>
+                    <td>$1.200.000</td>
+                    <td>$350.000</td>
+                    <td>Al dia</td>
+                    <td>Activo</td>
+                    <td>
+                        <a class="btn btn--primary" href="#">Ajustar cupo</a>
+                        <a class="btn btn--outline" href="#">Bloquear credito</a>
+                        <a class="btn btn--link" href="#">Ver cuotas</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Constructora Demo SpA</td>
+                    <td>$2.500.000</td>
+                    <td>$2.000.000</td>
+                    <td>En mora</td>
+                    <td>Restringido</td>
+                    <td>
+                        <a class="btn btn--primary" href="#">Ajustar cupo</a>
+                        <a class="btn btn--outline" href="#">Bloquear credito</a>
+                        <a class="btn btn--link" href="#">Ver cuotas</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

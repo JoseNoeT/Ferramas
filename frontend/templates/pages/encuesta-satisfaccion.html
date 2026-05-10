@@ -1,0 +1,82 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <h1 class="auth-card__title">Encuesta de satisfaccion</h1>
+        <p class="auth-card__subtitle">
+            FERREMAS desea conocer la experiencia del cliente despues de la compra.
+        </p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="auth-card__alert auth-card__alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form class="auth-form" method="post" action="{% url 'encuesta_satisfaccion' %}" novalidate>
+            {% csrf_token %}
+
+            <div class="auth-form__field">
+                <label for="id_pedido">Numero de pedido (opcional)</label>
+                <input id="id_pedido" name="numero_pedido" type="text">
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_satisfaccion">Nivel de satisfaccion general (1 a 5)</label>
+                <select id="id_satisfaccion" name="satisfaccion_general" required>
+                    <option value="">Selecciona un nivel</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_calidad">Calidad de productos (1 a 5)</label>
+                <select id="id_calidad" name="calidad_productos" required>
+                    <option value="">Selecciona un nivel</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_tiempo">Tiempo de entrega/retiro (1 a 5)</label>
+                <select id="id_tiempo" name="tiempo_entrega" required>
+                    <option value="">Selecciona un nivel</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_atencion">Atencion recibida (1 a 5)</label>
+                <select id="id_atencion" name="atencion_recibida" required>
+                    <option value="">Selecciona un nivel</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_comentario">Comentario</label>
+                <textarea id="id_comentario" name="comentario" rows="4"></textarea>
+            </div>
+
+            <button class="auth-form__submit" type="submit">Enviar encuesta</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <h1 class="auth-card__title">Servicios de Maestros y PYMES</h1>
+        <p class="auth-card__subtitle">
+            Solicita una asesoria inicial para conectar con maestros y pymes de confianza en FERREMAX.
+        </p>
+
+        <section class="auth-card__benefits" aria-label="Costo de confirmacion de asesoria">
+            <h2>Confirmacion de asesoria</h2>
+            <p>Costo de confirmacion: <strong>$5.000</strong> (flujo de pago aun no implementado).</p>
+        </section>
+
+        <section class="auth-card__benefits" aria-label="Servicios disponibles de ejemplo">
+            <h2>Servicios destacados</h2>
+            <ul>
+                <li><strong>Maestro gasfiteria urgente</strong> - Cobertura: RM - Tiempo estimado: 24 horas</li>
+                <li><strong>Instalacion de ceramicas</strong> - Cobertura: Quinta Region - Tiempo estimado: 48 horas</li>
+                <li><strong>Asesoria para remodelacion PYME</strong> - Cobertura: Nacional remoto/presencial</li>
+            </ul>
+        </section>
+
+        <div class="auth-form" aria-label="Acciones para solicitar asesoria">
+            <a class="auth-form__submit" href="{% url 'solicitud_asesoria_maestro' %}">Solicitar asesoria</a>
+            <a class="auth-form__submit" href="{% url 'home' %}">Volver al inicio</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

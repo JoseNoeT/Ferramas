@@ -1,0 +1,31 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <h1 class="auth-card__title">Panel Maestro/PYME</h1>
+        <p class="auth-card__subtitle">
+            Bienvenido al panel inicial para maestros y pymes de FERREMAX.
+            Esta vista es demostrativa y la logica funcional sera implementada en etapas posteriores.
+        </p>
+
+        <section class="auth-card__benefits" aria-label="Resumen del panel maestro pyme">
+            <h2>Resumen</h2>
+            <ul>
+                <li><strong>Estado de registro:</strong> En revision inicial</li>
+                <li><strong>Beneficio 30% primera compra:</strong> Disponible al aprobar registro</li>
+                <li><strong>FerreCredito:</strong> Modulo informativo en preparacion</li>
+                <li><strong>Publicacion de servicios:</strong> Pendiente de habilitacion</li>
+                <li><strong>Contactos recibidos:</strong> 0 contactos por ahora</li>
+            </ul>
+        </section>
+
+        <div class="auth-form" aria-label="Acciones panel maestro pyme">
+            <a class="auth-form__submit" href="{% url 'publicar_servicio_maestro' %}">Publicar servicio</a>
+            <a class="auth-form__submit" href="{% url 'mis_servicios_maestro' %}">Ver mis servicios</a>
+            <a class="auth-form__submit" href="{% url 'estado_ferrecredito' %}">Ver estado FerreCredito</a>
+            <a class="auth-form__submit" href="{% url 'home' %}">Volver al inicio</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

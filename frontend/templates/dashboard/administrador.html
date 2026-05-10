@@ -167,6 +167,39 @@
                     </article>
                 </div>
             </div>
+
+            <div class="dashboard-panel">
+                <div class="dashboard-panel__header">
+                    <h2>Nuevos modulos FERREMAS</h2>
+                    <p>Acceso rapido a vistas administrativas en modo demostracion.</p>
+                </div>
+
+                <div class="dashboard-admin__modules">
+                    <article class="dashboard-module-card">
+                        <h3>Gestion Maestro/PYME</h3>
+                        <p>Revision de perfiles, estado y servicios publicados.</p>
+                        <a class="btn btn--primary" href="{% url 'admin_maestros' %}">Ir al modulo</a>
+                    </article>
+
+                    <article class="dashboard-module-card">
+                        <h3>Gestion FerreCredito</h3>
+                        <p>Control visual de cupos, deuda y estado de credito.</p>
+                        <a class="btn btn--primary" href="{% url 'admin_credito' %}">Ir al modulo</a>
+                    </article>
+
+                    <article class="dashboard-module-card">
+                        <h3>Gestion de puntos</h3>
+                        <p>Vista de acumulacion, uso y saldo de puntos de clientes.</p>
+                        <a class="btn btn--primary" href="{% url 'admin_puntos' %}">Ir al modulo</a>
+                    </article>
+
+                    <article class="dashboard-module-card">
+                        <h3>Encuestas de satisfaccion</h3>
+                        <p>Monitoreo visual de feedback postventa y promedio general.</p>
+                        <a class="btn btn--primary" href="{% url 'admin_encuestas' %}">Ir al modulo</a>
+                    </article>
+                </div>
+            </div>
         </div>
 
         <aside class="dashboard-admin__sidebar">

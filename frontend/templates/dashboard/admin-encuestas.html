@@ -1,0 +1,47 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="dashboard-admin">
+    <div class="dashboard-panel">
+        <div class="dashboard-panel__header">
+            <h1>Encuestas de satisfaccion</h1>
+            <p>Seguimiento visual del feedback de clientes postventa.</p>
+        </div>
+
+        <table class="checkout-tabla">
+            <thead>
+                <tr>
+                    <th>Pedido</th>
+                    <th>Cliente</th>
+                    <th>Satisfaccion general</th>
+                    <th>Comentario</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#120</td>
+                    <td>Cliente Demo 1</td>
+                    <td>5/5</td>
+                    <td>Excelente atencion y entrega rapida.</td>
+                    <td>2026-05-08</td>
+                </tr>
+                <tr>
+                    <td>#121</td>
+                    <td>Cliente Demo 2</td>
+                    <td>3/5</td>
+                    <td>Buen producto, mejorar tiempos de retiro.</td>
+                    <td>2026-05-09</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="dashboard-panel dashboard-panel--compact">
+            <div class="dashboard-panel__header">
+                <h2>Promedio de satisfaccion</h2>
+            </div>
+            <p><strong>4.0 / 5.0</strong> en encuestas registradas (datos de demostracion).</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
