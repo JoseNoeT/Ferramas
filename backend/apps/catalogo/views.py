@@ -129,3 +129,6 @@ def admin_categorias_dashboard_view(request):
             "categorias": categorias,
         },
     )
+
+#------------webservices REST.---------------#
+

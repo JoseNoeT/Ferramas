@@ -1,12 +1,31 @@
 """Minimal Django settings scaffold for FERREMAX backend."""
 
+import os
 from pathlib import Path
+
+try:
+	from decouple import config
+except ModuleNotFoundError:
+	def config(key, default=None, cast=str):
+		value = os.getenv(key, default)
+		if cast is bool:
+			if isinstance(value, bool):
+				return value
+			return str(value).lower() in {"1", "true", "yes", "on"}
+		return cast(value) if value is not None else value
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "change-me-in-development"
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
+SECRET_KEY = config("DJANGO_SECRET_KEY", default="change-me-in-development")
+DEBUG = config("DJANGO_DEBUG", default=True, cast=bool)
+ALLOWED_HOSTS = [
+	host.strip()
+	for host in config(
+		"DJANGO_ALLOWED_HOSTS",
+		default="127.0.0.1,localhost,testserver",
+	).split(",")
+	if host.strip()
+]
 
 INSTALLED_APPS = [
 	"django.contrib.admin",
@@ -15,16 +34,26 @@ INSTALLED_APPS = [
 	"django.contrib.sessions",
 	"django.contrib.messages",
 	"django.contrib.staticfiles",
+	"rest_framework",
+	"corsheaders",
 	"apps.usuarios.apps.UsuariosConfig",
 	"apps.catalogo.apps.CatalogoConfig",
-	"apps.inventario",
-	"apps.pagos",
+	"apps.inventario.apps.InventarioConfig",
+	"apps.pagos.apps.PagosConfig",
 	"apps.pedidos.apps.PedidosConfig",
-	"apps.reportes",
+	"apps.reportes.apps.ReportesConfig",
+	"apps.autenticacion.apps.AutenticacionConfig",
+	"apps.credito.apps.CreditoConfig",
+	"apps.puntos.apps.PuntosConfig",
+	"apps.maestros.apps.MaestrosConfig",
+	"apps.encuestas.apps.EncuestasConfig",
+	"apps.notificaciones.apps.NotificacionesConfig",
+	"apps.integraciones.apps.IntegracionesConfig",
 ]
 
 MIDDLEWARE = [
 	"django.middleware.security.SecurityMiddleware",
+	"corsheaders.middleware.CorsMiddleware",
 	"django.contrib.sessions.middleware.SessionMiddleware",
 	"django.middleware.common.CommonMiddleware",
 	"django.middleware.csrf.CsrfViewMiddleware",
@@ -70,6 +99,9 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR.parent / "frontend" / "static"]
 
+# CORS basico para desarrollo local.
+CORS_ALLOW_ALL_ORIGINS = True
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Autenticacion
@@ -77,4 +109,19 @@ AUTH_USER_MODEL = "usuarios.Usuario"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
+
+# API REST base (logica avanzada pendiente por endpoint).
+REST_FRAMEWORK = {
+	"DEFAULT_AUTHENTICATION_CLASSES": (
+		"rest_framework_simplejwt.authentication.JWTAuthentication",
+	),
+	"DEFAULT_PERMISSION_CLASSES": (
+		"rest_framework.permissions.AllowAny",
+	),
+}
+
+# TODO: Ajustar expiraciones y politicas en fase de seguridad.
+SIMPLE_JWT = {
+	"AUTH_HEADER_TYPES": ("Bearer",),
+}
 

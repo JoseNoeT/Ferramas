@@ -1,0 +1,89 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <h1 class="auth-card__title">Registro Maestro/PYME</h1>
+        <p class="auth-card__subtitle">
+            FERREMAX incorpora maestros y pymes para fortalecer su red de servicios y
+            mejorar la experiencia de compra para clientes y empresas.
+        </p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="auth-card__alert auth-card__alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <section class="auth-card__benefits" aria-label="Beneficios del registro">
+            <h2>Beneficios</h2>
+            <ul>
+                <li>30% descuento primera compra</li>
+                <li>Acceso a FerreCredito</li>
+                <li>Publicacion de servicios</li>
+                <li>Posibilidad de recibir contactos de clientes</li>
+            </ul>
+        </section>
+
+        <form class="auth-form" method="post" action="{% url 'registro_maestro_pyme' %}" novalidate>
+            {% csrf_token %}
+
+            <div class="auth-form__field">
+                <label for="id_nombre">Nombre</label>
+                <input id="id_nombre" name="nombre" type="text" required>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_apellido">Apellido</label>
+                <input id="id_apellido" name="apellido" type="text" required>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_email">Email</label>
+                <input id="id_email" name="email" type="email" required>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_telefono">Telefono</label>
+                <input id="id_telefono" name="telefono" type="tel" required>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_tipo">Tipo</label>
+                <select id="id_tipo" name="tipo" required>
+                    <option value="">Selecciona una opcion</option>
+                    <option value="maestro">Maestro</option>
+                    <option value="pyme">PYME</option>
+                </select>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_rubro">Rubro u oficio</label>
+                <input id="id_rubro" name="rubro" type="text" required>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_empresa">Nombre empresa (opcional)</label>
+                <input id="id_empresa" name="empresa" type="text">
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_rut">RUT</label>
+                <input id="id_rut" name="rut" type="text" required>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_direccion">Direccion</label>
+                <input id="id_direccion" name="direccion" type="text" required>
+            </div>
+
+            <div class="auth-form__field">
+                <label for="id_observacion">Observacion</label>
+                <textarea id="id_observacion" name="observacion" rows="4"></textarea>
+            </div>
+
+            <button class="auth-form__submit" type="submit">Enviar solicitud</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

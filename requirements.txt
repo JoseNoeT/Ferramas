@@ -1,2 +1,6 @@
-# Dependencia principal del proyecto FERREMAS
-Django==5.2.4
+# Dependencias base para FERREMAS API (entorno academico)
+django
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+python-decouple
