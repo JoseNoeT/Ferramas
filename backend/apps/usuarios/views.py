@@ -1,3 +1,43 @@
+from apps.maestros.models import PerfilMaestroPyme
+from .forms import PerfilUsuarioForm
+
+# Vista para mostrar y editar el perfil del usuario autenticado
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def perfil_usuario_view(request):
+    user = request.user
+    perfil_maestro_pyme = None
+    es_maestro_pyme = False
+    maestro_aprobado = False
+
+    # Buscar perfil Maestro/PYME asociado si existe
+    try:
+        perfil_maestro_pyme = user.perfil_maestro_pyme
+        es_maestro_pyme = True
+        maestro_aprobado = perfil_maestro_pyme.estado == PerfilMaestroPyme.Estado.APROBADO
+    except PerfilMaestroPyme.DoesNotExist:
+        perfil_maestro_pyme = None
+        es_maestro_pyme = False
+        maestro_aprobado = False
+
+    if request.method == "POST":
+        form = PerfilUsuarioForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Perfil actualizado correctamente.")
+            return redirect("perfil_usuario")
+    else:
+        form = PerfilUsuarioForm(instance=user)
+
+    context = {
+        "form": form,
+        "perfil_maestro_pyme": perfil_maestro_pyme,
+        "es_maestro_pyme": es_maestro_pyme,
+        "maestro_aprobado": maestro_aprobado,
+        "user": user,
+    }
+    return render(request, "pages/perfil.html", context)
 from django.contrib import messages
 from django.db.models import Count, Sum
 from django.contrib.auth import login, logout
@@ -86,6 +126,59 @@ def home_view(request):
         {
             "productos_destacados": productos_destacados,
             "productos_oferta": productos_oferta,
+        },
+    )
+
+
+def contacto_view(request):
+    """Renderiza y procesa un formulario de contacto simple sin persistencia."""
+    tipos_consulta = [
+        ("soporte", "Solicitud de soporte"),
+        ("general", "Consulta general"),
+        ("colaboracion", "Colaboración / Proveedores"),
+    ]
+    data = {
+        "nombre_completo": "",
+        "email": "",
+        "telefono": "",
+        "mensaje": "",
+        "tipo_consulta": "general",
+    }
+
+    if request.method == "POST":
+        data = {
+            "nombre_completo": request.POST.get("nombre_completo", "").strip(),
+            "email": request.POST.get("email", "").strip(),
+            "telefono": request.POST.get("telefono", "").strip(),
+            "mensaje": request.POST.get("mensaje", "").strip(),
+            "tipo_consulta": request.POST.get("tipo_consulta", "general").strip(),
+        }
+
+        errores = []
+        if not data["nombre_completo"]:
+            errores.append("Debes ingresar tu nombre completo.")
+        if not data["email"] or "@" not in data["email"]:
+            errores.append("Debes ingresar un correo electrónico válido.")
+        if not data["mensaje"]:
+            errores.append("Debes ingresar un mensaje.")
+        if data["tipo_consulta"] not in {key for key, _ in tipos_consulta}:
+            errores.append("El tipo de consulta seleccionado no es válido.")
+
+        if errores:
+            messages.error(request, " ".join(errores))
+        else:
+            messages.success(
+                request,
+                "Gracias por tu mensaje. Nos pondremos en contacto contigo.",
+            )
+            return redirect("contacto")
+
+    return render(
+        request,
+        "pages/contacto.html",
+        {
+            "tipos_consulta": tipos_consulta,
+            "form_data": data,
         },
     )
 

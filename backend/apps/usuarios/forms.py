@@ -91,6 +91,29 @@ class UsuarioInternoCreateForm(forms.ModelForm):
         return rol
 
 
+
+
+# Formulario para edición básica del perfil de usuario autenticado
+from django.core.exceptions import ValidationError
+
+class PerfilUsuarioForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ["email"]
+
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip().lower()
+        if not email:
+            raise forms.ValidationError("El email es obligatorio.")
+        queryset = Usuario.objects.filter(email=email)
+        if self.instance and self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise forms.ValidationError("Ya existe un usuario con ese email.")
+        return email
+
+
+# Restaurar UsuarioInternoUpdateForm para no romper imports existentes
 class UsuarioInternoUpdateForm(forms.ModelForm):
     class Meta:
         model = Usuario

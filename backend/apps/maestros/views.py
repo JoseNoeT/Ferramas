@@ -8,7 +8,7 @@ from apps.maestros.forms import (
     ServicioMaestroForm,
     SolicitudAsesoriaForm,
 )
-from apps.maestros.models import PerfilMaestroPyme, ServicioMaestro
+from apps.maestros.models import PerfilMaestroPyme, ServicioMaestro, SolicitudAsesoria
 from apps.maestros.services import (
     crear_servicio_maestro,
     crear_solicitud_asesoria,
@@ -44,8 +44,40 @@ def registro_maestro_pyme_view(request):
     return render(request, "pages/registro-maestro-pyme.html", {"form": form})
 
 
+@login_required
 def panel_maestro_pyme_view(request):
-    return render(request, "pages/panel-maestro-pyme.html")
+    perfil_maestro = PerfilMaestroPyme.objects.filter(usuario=request.user).first()
+
+    if not perfil_maestro:
+        return render(
+            request,
+            "pages/panel-maestro-pyme.html",
+            {
+                "perfil_maestro": None,
+                "maestro_aprobado": False,
+                "total_servicios": 0,
+                "servicios_activos": 0,
+                "total_solicitudes": 0,
+            },
+        )
+
+    servicios = ServicioMaestro.objects.filter(maestro=perfil_maestro)
+    total_servicios = servicios.count()
+    servicios_activos = servicios.filter(activo=True).count()
+    total_solicitudes = SolicitudAsesoria.objects.filter(servicio__maestro=perfil_maestro).count()
+    maestro_aprobado = perfil_maestro.estado == PerfilMaestroPyme.Estado.APROBADO
+
+    return render(
+        request,
+        "pages/panel-maestro-pyme.html",
+        {
+            "perfil_maestro": perfil_maestro,
+            "maestro_aprobado": maestro_aprobado,
+            "total_servicios": total_servicios,
+            "servicios_activos": servicios_activos,
+            "total_solicitudes": total_solicitudes,
+        },
+    )
 
 
 @login_required
@@ -77,8 +109,29 @@ def publicar_servicio_maestro_view(request):
     return render(request, "pages/publicar-servicio-maestro.html", {"form": form})
 
 
+@login_required
 def mis_servicios_maestro_view(request):
-    return render(request, "pages/mis-servicios-maestro.html")
+    perfil_maestro = PerfilMaestroPyme.objects.filter(usuario=request.user).first()
+
+    if not perfil_maestro:
+        return render(
+            request,
+            "pages/mis-servicios-maestro.html",
+            {
+                "perfil_maestro": None,
+                "servicios": [],
+            },
+        )
+
+    servicios = ServicioMaestro.objects.filter(maestro=perfil_maestro).order_by("-creado_en")
+    return render(
+        request,
+        "pages/mis-servicios-maestro.html",
+        {
+            "perfil_maestro": perfil_maestro,
+            "servicios": servicios,
+        },
+    )
 
 
 def servicios_maestros_view(request):

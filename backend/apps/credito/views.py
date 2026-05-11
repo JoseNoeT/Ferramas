@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from apps.usuarios.views import _requiere_admin
 from rest_framework import viewsets
@@ -22,6 +23,7 @@ def solicitud_ferrecredito_view(request):
     return render(request, "pages/solicitud-ferrecredito.html")
 
 
+@login_required
 def estado_ferrecredito_view(request):
     return render(request, "pages/estado-ferrecredito.html")
 

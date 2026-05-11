@@ -3,10 +3,14 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from apps.catalogo import services as catalogo_services
 from apps.catalogo.forms import CategoriaForm, ProductoForm
 from apps.catalogo.models import Producto
+from apps.catalogo.serializers import ProductoSerializers
 from apps.usuarios.models import Usuario
 
 
@@ -47,7 +51,60 @@ def ofertas_view(request):
         .select_related("categoria")
         .order_by("nombre")
     )
-    return render(request, "pages/ofertas.html", {"productos": productos})
+    
+    # Calcular descuentos y preparar datos enriquecidos
+    productos_enriquecidos = []
+    for producto in productos:
+        descuento_porcentaje = 0
+        if producto.precio_oferta and producto.precio:
+            descuento_porcentaje = round(
+                ((producto.precio - producto.precio_oferta) / producto.precio) * 100
+            )
+        productos_enriquecidos.append({
+            "obj": producto,
+            "descuento_porcentaje": descuento_porcentaje,
+        })
+    
+    # Separar productos destacados (top 5 con mayor descuento)
+    productos_destacados = sorted(
+        productos_enriquecidos,
+        key=lambda x: x["descuento_porcentaje"],
+        reverse=True
+    )[:5]
+    
+    # Obtener categorías con ofertas
+    categorias = set(p["obj"].categoria.nombre for p in productos_enriquecidos if p["obj"].categoria)
+    categorias_ordenadas = sorted(list(categorias))
+    
+    # Ordenamiento solicitado (por defecto: mayor descuento)
+    ordenamiento = request.GET.get("ordenar", "descuento")
+    productos_filtrados = productos_enriquecidos
+    
+    if ordenamiento == "precio_menor":
+        productos_filtrados = sorted(productos_filtrados, key=lambda x: x["obj"].precio_oferta or x["obj"].precio)
+    elif ordenamiento == "precio_mayor":
+        productos_filtrados = sorted(productos_filtrados, key=lambda x: x["obj"].precio_oferta or x["obj"].precio, reverse=True)
+    elif ordenamiento == "nombre":
+        productos_filtrados = sorted(productos_filtrados, key=lambda x: x["obj"].nombre)
+    else:  # "descuento" por defecto
+        productos_filtrados = sorted(productos_filtrados, key=lambda x: x["descuento_porcentaje"], reverse=True)
+    
+    # Filtrar por categoría si se selecciona
+    categoria_filtro = request.GET.get("categoria", "")
+    if categoria_filtro and categoria_filtro != "todas":
+        productos_filtrados = [p for p in productos_filtrados if p["obj"].categoria and p["obj"].categoria.nombre == categoria_filtro]
+    
+    return render(
+        request,
+        "pages/ofertas.html",
+        {
+            "productos": productos_filtrados,
+            "productos_destacados": productos_destacados,
+            "categorias": categorias_ordenadas,
+            "ordenamiento_actual": ordenamiento,
+            "categoria_actual": categoria_filtro,
+        }
+    )
 
 
 @_requiere_admin
@@ -148,4 +205,12 @@ def admin_categorias_dashboard_view(request):
     )
 
 #------------webservices REST.---------------#
+
+
+@api_view(["GET"])
+def api_producto_detalle_view(request, pk):
+    """Retorna detalle de un producto activo por id."""
+    producto = get_object_or_404(Producto.objects.select_related("categoria"), pk=pk, activo=True)
+    serializer = ProductoSerializers(producto)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 

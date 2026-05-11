@@ -1,5 +1,8 @@
 from django.urls import path
 
+from apps.pagos import views
+
 urlpatterns = [
-    # TODO: Agregar endpoints REST de la app pagos.
+    path("webpay/iniciar/", views.webpay_iniciar_view, name="api_webpay_iniciar"),
+    path("webpay/retorno/", views.webpay_retorno_view, name="api_webpay_retorno"),
 ]
