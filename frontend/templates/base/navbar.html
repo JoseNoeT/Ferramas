@@ -18,7 +18,7 @@
 				<li><a href="/">Inicio</a></li>
 				<li><a href="{% url 'catalogo' %}">Catalogo</a></li>
 				<li class="navbar__dropdown">
-					<a href="#" class="navbar__dropdown-toggle">Beneficios</a>
+					<button type="button" class="navbar__dropdown-toggle" aria-haspopup="true" aria-expanded="false">Beneficios</button>
 					<div class="navbar__dropdown-menu">
 						<a href="{% url 'mis_puntos' %}">Mis puntos</a>
 						<a href="{% url 'servicios_maestros' %}">Servicios Maestros</a>
@@ -27,7 +27,7 @@
 						<a href="{% url 'solicitud_ferrecredito' %}">FerreCrédito</a>
 					</div>
 				</li>
-				<li><a href="#promociones">Ofertas</a></li>
+				<li><a href="/ofertas/">Ofertas</a></li>
 				<li><a href="#contacto">Contacto</a></li>
 			{% endif %}
 		</ul>
@@ -53,9 +53,15 @@
 		}
 
 		.navbar__dropdown-toggle {
+			background: transparent;
+			border: none;
 			text-decoration: none;
 			cursor: pointer;
 			display: inline-block;
+			font: inherit;
+			font-weight: 600;
+			color: var(--color-dark);
+			padding: 0;
 		}
 
 		.navbar__dropdown-toggle::after {
@@ -67,17 +73,17 @@
 		.navbar__dropdown-menu {
 			display: none;
 			position: absolute;
-			top: 100%;
+			top: calc(100% - 1px);
 			left: 0;
 			background-color: #ffffff;
 			min-width: 200px;
 			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 			border-radius: 4px;
 			z-index: 1000;
-			margin-top: 8px;
 		}
 
-		.navbar__dropdown:hover .navbar__dropdown-menu {
+		.navbar__dropdown:hover .navbar__dropdown-menu,
+		.navbar__dropdown:focus-within .navbar__dropdown-menu {
 			display: block;
 		}
 

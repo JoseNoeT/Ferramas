@@ -5,7 +5,10 @@
 <section class="carrito-section">
     <div class="carrito-container">
 
-        <h1 class="carrito__title">Mi Carrito</h1>
+        <header class="carrito-header">
+            <h1 class="carrito__title">Mi Carrito</h1>
+            <p class="carrito__subtitle">Revisa tus productos y confirma tu compra.</p>
+        </header>
 
         {% if messages %}
         <div class="carrito-messages">
@@ -21,38 +24,66 @@
             <div class="carrito-items">
                 {% for item in items %}
                 <article class="carrito-item">
-                    <div class="carrito-item__info">
-                        <h2 class="carrito-item__nombre">{{ item.producto.nombre }}</h2>
-                        <p class="carrito-item__precio">Precio unitario: ${{ item.producto.precio|formato_moneda }}</p>
-                        <p class="carrito-item__subtotal">Subtotal: ${{ item.subtotal|formato_moneda }}</p>
+                    <div class="carrito-item__media">
+                        {% if item.producto.imagen %}
+                            <img src="{{ item.producto.imagen }}" alt="{{ item.producto.nombre }}" loading="lazy">
+                        {% else %}
+                            <div class="carrito-item__placeholder" aria-hidden="true">FERREMAX</div>
+                        {% endif %}
                     </div>
 
-                    <form class="carrito-item__update" method="post" action="{% url 'actualizar_item_carrito' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="item_id" value="{{ item.pk }}">
-                        <input type="number" name="cantidad" value="{{ item.cantidad }}"
-                               min="1" max="{{ item.producto.stock }}">
-                        <button type="submit" class="btn btn--outline btn--sm">Actualizar</button>
-                    </form>
+                    <div class="carrito-item__info">
+                        <h2 class="carrito-item__nombre">{{ item.producto.nombre }}</h2>
 
-                    <form class="carrito-item__delete" method="post" action="{% url 'eliminar_item_carrito' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="item_id" value="{{ item.pk }}">
-                        <button type="submit" class="btn btn--danger btn--sm">Eliminar</button>
-                    </form>
+                        <div class="carrito-item__pricing">
+                            {% if item.precio_unitario < item.producto.precio %}
+                                <span class="carrito-item__badge">OFERTA</span>
+                                <p class="carrito-item__price-normal">${{ item.producto.precio|formato_moneda }}</p>
+                            {% endif %}
+                            <p class="carrito-item__price-current">${{ item.precio_unitario|formato_moneda }}</p>
+                        </div>
+
+                        <p class="carrito-item__price-label">Precio unitario aplicado</p>
+                    </div>
+
+                    <div class="carrito-item__meta">
+                        <p class="carrito-item__subtotal-label">Subtotal del producto</p>
+                        <p class="carrito-item__subtotal">${{ item.subtotal|formato_moneda }}</p>
+
+                        <div class="carrito-item__actions">
+                            <form class="carrito-item__update" method="post" action="{% url 'actualizar_item_carrito' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.pk }}">
+                                <label class="carrito-item__qty-label" for="cantidad-{{ item.pk }}">Cantidad</label>
+                                <input id="cantidad-{{ item.pk }}" type="number" name="cantidad" value="{{ item.cantidad }}"
+                                       min="1" max="{{ item.producto.stock }}">
+                                <button type="submit" class="btn btn--outline">Actualizar</button>
+                            </form>
+
+                            <form class="carrito-item__delete" method="post" action="{% url 'eliminar_item_carrito' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.pk }}">
+                                <button type="submit" class="btn btn--danger">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+
                 </article>
                 {% endfor %}
             </div>
 
             <aside class="carrito-resumen">
                 <h2 class="carrito-resumen__title">Resumen</h2>
+                <div class="carrito-resumen__line carrito-resumen__line--count">
+                    <span>Productos</span><strong>{{ items|length }}</strong>
+                </div>
                 <div class="carrito-resumen__line">
                     <span>Subtotal</span><strong>${{ subtotal|formato_moneda }}</strong>
                 </div>
                 <div class="carrito-resumen__line carrito-resumen__line--total">
                     <span>Total</span><strong>${{ total|formato_moneda }}</strong>
                 </div>
-                <a href="{% url 'checkout' %}" class="btn btn--primary btn--full">Ir al checkout &rarr;</a>
+                <a href="{% url 'checkout' %}" class="btn btn--primary btn--full carrito-resumen__checkout">Ir al checkout &rarr;</a>
                 <a href="{% url 'catalogo' %}" class="btn btn--link">Seguir comprando</a>
             </aside>
 

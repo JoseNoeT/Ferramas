@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load static %}
+{% load static ecommerce_tags %}
 
 {% block content %}
 	{% include "components/hero.html" %}
@@ -9,22 +9,26 @@
 			<h2 id="categorias-title">Categorias destacadas</h2>
 		</div>
 		<div class="category-grid">
-			<article class="category-card">
-				<img class="category-card__img" src="https://copilot.microsoft.com/th/id/BCO.de71dd7e-2a66-4a73-87b8-6e6877d254bf.png" alt="Herramientas">
-				<h3 class="category-card__name">🔧 Herramientas</h3>
-			</article>
-			<article class="category-card">
-				<img class="category-card__img" src="https://copilot.microsoft.com/th/id/BCO.bc58fe18-321b-4813-84a2-b7cab88b3e23.png" alt="Pinturas">
-				<h3 class="category-card__name">🎨 Pinturas</h3>
-			</article>
-			<article class="category-card">
-				<img class="category-card__img" src="https://copilot.microsoft.com/th/id/BCO.b9ecc998-a4e8-47c0-a0b3-a3c7b71f1280.png" alt="Materiales Eléctricos">
-				<h3 class="category-card__name">⚡ Materiales Eléctricos</h3>
-			</article>
-			<article class="category-card">
-				<img class="category-card__img" src="https://copilot.microsoft.com/th/id/BCO.810f1fd0-9b83-4028-be29-5351bf261788.png" alt="Seguridad">
-				<h3 class="category-card__name">🦺 Seguridad</h3>
-			</article>
+			<a class="category-card" href="{% url 'catalogo' %}" aria-label="Explorar categoria Herramientas">
+				<div class="category-card__icon" aria-hidden="true">🔧</div>
+				<h3 class="category-card__name">Herramientas</h3>
+				<p>Taladros, llaves, sierras y mas.</p>
+			</a>
+			<a class="category-card" href="{% url 'catalogo' %}" aria-label="Explorar categoria Pinturas">
+				<div class="category-card__icon" aria-hidden="true">🎨</div>
+				<h3 class="category-card__name">Pinturas</h3>
+				<p>Interior, exterior y accesorios de aplicacion.</p>
+			</a>
+			<a class="category-card" href="{% url 'catalogo' %}" aria-label="Explorar categoria Materiales Electricos">
+				<div class="category-card__icon" aria-hidden="true">⚡</div>
+				<h3 class="category-card__name">Materiales Electricos</h3>
+				<p>Cables, protecciones y soluciones para tu proyecto.</p>
+			</a>
+			<a class="category-card" href="{% url 'catalogo' %}" aria-label="Explorar categoria Seguridad">
+				<div class="category-card__icon" aria-hidden="true">🦺</div>
+				<h3 class="category-card__name">Seguridad</h3>
+				<p>Elementos de proteccion personal y obra.</p>
+			</a>
 		</div>
 	</section>
 
@@ -43,7 +47,63 @@
 
 		<div class="product-grid">
 			{% for producto in productos_destacados %}
-				{% include "components/product-card.html" with producto=producto %}
+			<article class="home-product-card">
+				<div class="home-product-card__media">
+					{% if producto.imagen %}
+						<img src="{{ producto.imagen }}" alt="{{ producto.nombre }}" loading="lazy">
+					{% else %}
+						<div class="home-product-card__placeholder" aria-hidden="true">FERREMAX</div>
+					{% endif %}
+
+					{% if producto.en_oferta and producto.precio_oferta and producto.precio_oferta < producto.precio %}
+					<span class="home-product-card__badge">OFERTA</span>
+					{% endif %}
+				</div>
+
+				<div class="home-product-card__body">
+					{% if producto.categoria %}
+					<p class="home-product-card__category">{{ producto.categoria.nombre }}</p>
+					{% endif %}
+					<h3>{{ producto.nombre }}</h3>
+
+					<div class="home-product-card__pricing">
+						{% if producto.en_oferta and producto.precio_oferta and producto.precio_oferta < producto.precio %}
+						<p class="home-product-card__price-normal">${{ producto.precio|formato_moneda }}</p>
+						<p class="home-product-card__price-offer">${{ producto.precio_oferta|formato_moneda }}</p>
+						{% else %}
+						<p class="home-product-card__price-offer">${{ producto.precio|formato_moneda }}</p>
+						{% endif %}
+					</div>
+
+					<p class="home-product-card__stock{% if producto.stock == 0 %} home-product-card__stock--agotado{% endif %}">
+						{% if producto.stock > 0 %}Stock: {{ producto.stock }}{% else %}Agotado{% endif %}
+					</p>
+
+					<div class="home-product-card__actions">
+						{% if user.is_authenticated %}
+						<a href="{% url 'producto_detalle' producto.slug %}" class="home-product-card__link">Ver detalle producto</a>
+						{% else %}
+						<a href="{% url 'login' %}?next={% url 'producto_detalle' producto.slug %}" class="home-product-card__link">Inicia sesion para ver detalle</a>
+						{% endif %}
+
+						{% if user.is_authenticated %}
+							{% if producto.stock > 0 %}
+							<form method="post" action="{% url 'agregar_al_carrito' %}" class="home-product-card__form">
+								{% csrf_token %}
+								<input type="hidden" name="producto_id" value="{{ producto.pk }}">
+								<input type="hidden" name="cantidad" value="1">
+								<input type="hidden" name="next" value="carrito">
+								<button type="submit" class="home-product-card__button">Agregar al carrito</button>
+							</form>
+							{% else %}
+							<span class="home-product-card__hint">Producto sin stock disponible</span>
+							{% endif %}
+						{% else %}
+							<a href="{% url 'registro' %}?next={% url 'producto_detalle' producto.slug %}" class="home-product-card__button home-product-card__button--link">Registrate para comprar</a>
+						{% endif %}
+					</div>
+				</div>
+			</article>
 			{% empty %}
 				<p>No hay productos destacados disponibles en este momento.</p>
 			{% endfor %}
@@ -57,27 +117,36 @@
 
 		<div class="benefits-grid">
 			<article class="benefit-card">
-				<h3>Despacho a domicilio</h3>
-				<p>Entrega segura en todo Chile para tus compras online.</p>
+				<h3>🚚 Despacho a domicilio</h3>
+				<p>Recibe tus compras en casa con seguimiento y cobertura nacional.</p>
 			</article>
 			<article class="benefit-card">
-				<h3>Retiro en tienda</h3>
-				<p>Compra online y retira en sucursal de forma rapida.</p>
+				<h3>🏬 Retiro en tienda</h3>
+				<p>Compra online y retira en sucursal cuando te acomode.</p>
 			</article>
 			<article class="benefit-card">
-				<h3>Multiples medios de pago</h3>
-				<p>Paga con tarjetas, transferencia y opciones digitales.</p>
+				<h3>💳 Multiples medios de pago</h3>
+				<p>Paga con tarjeta, transferencia y alternativas habilitadas.</p>
+			</article>
+			<article class="benefit-card">
+				<h3>🎯 Puntos FERREMAS</h3>
+				<p>Acumula y revisa tus puntos para obtener beneficios en tus compras.</p>
+			</article>
+			<article class="benefit-card">
+				<h3>🧾 FerreCredito Maestro/PYME</h3>
+				<p>Solicita cupo y revisa estado para financiar compras de tu negocio.</p>
+			</article>
+			<article class="benefit-card">
+				<h3>🛠️ Servicios Maestro/PYME</h3>
+				<p>Conecta con servicios especializados para tus proyectos.</p>
 			</article>
 		</div>
 	</section>
 
 	<section class="promo-banner" id="promociones" aria-label="Promociones destacadas">
 		<p class="promo-banner__eyebrow">Promociones</p>
-		<h2>Semana constructor: descuentos exclusivos en herramientas electricas</h2>
-		<a href="#catalogo" class="promo-banner__link">Aprovechar ofertas</a>
+		<h2>Ofertas vigentes por tiempo limitado</h2>
+		<p class="promo-banner__copy">Descubre precios especiales en productos seleccionados antes de que finalicen.</p>
+		<a href="/ofertas/" class="promo-banner__link">Ver ofertas</a>
 	</section>
-{% endblock %}
-
-{% block page_scripts %}
-	<script src="{% static 'js/pages/home.js' %}"></script>
 {% endblock %}

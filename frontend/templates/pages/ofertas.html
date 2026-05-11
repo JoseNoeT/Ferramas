@@ -1,0 +1,87 @@
+{% extends "base/base.html" %}
+{% load ecommerce_tags %}
+
+{% block title %}Ofertas | FERREMAX{% endblock %}
+
+{% block content %}
+<section class="ofertas-section" aria-labelledby="ofertas-title">
+    <div class="ofertas-container">
+        <header class="ofertas-hero">
+            <div class="ofertas-hero__copy">
+                <p class="ofertas-hero__eyebrow">Temporada FERREMAX</p>
+                <h1 id="ofertas-title">Productos en oferta</h1>
+                <p>Precios promocionales vigentes en productos seleccionados.</p>
+            </div>
+            <div class="ofertas-hero__actions" aria-label="Acciones principales de ofertas">
+                <a class="btn btn--outline ofertas-hero__btn" href="{% url 'catalogo' %}">Ver catalogo</a>
+                <a class="btn btn--primary ofertas-hero__btn" href="{% url 'carrito' %}">Ir al carrito</a>
+            </div>
+        </header>
+
+        {% if productos %}
+        <div class="ofertas-grid">
+            {% for producto in productos %}
+            <article class="oferta-card" aria-label="{{ producto.nombre }}">
+                <div class="oferta-card__media">
+                    <span class="oferta-card__badge">OFERTA</span>
+                    {% if producto.precio_oferta and producto.precio and producto.precio > producto.precio_oferta %}
+                        {% widthratio producto.precio_oferta producto.precio 100 as porcentaje_restante %}
+                        <span class="oferta-card__badge oferta-card__badge--discount">-{{ porcentaje_restante|add:"-100"|cut:"-" }}%</span>
+                    {% endif %}
+
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}" loading="lazy">
+                    {% else %}
+                        <div class="product-card__placeholder" aria-hidden="true">FERREMAX</div>
+                    {% endif %}
+                </div>
+
+                <div class="oferta-card__body">
+                    <h2>{{ producto.nombre|truncatechars:50 }}</h2>
+                    <p class="oferta-card__description">{{ producto.descripcion|truncatechars:110 }}</p>
+
+                    <div class="oferta-card__pricing">
+                        <p class="oferta-card__price-normal">${{ producto.precio|formato_moneda }}</p>
+                        <p class="oferta-card__price-offer">
+                            ${{ producto.precio_oferta|default:producto.precio|formato_moneda }}
+                        </p>
+                    </div>
+
+                    <p class="oferta-card__stock{% if producto.stock == 0 %} oferta-card__stock--agotado{% endif %}">
+                        {% if producto.stock > 0 %}Stock disponible: {{ producto.stock }}{% else %}Sin stock{% endif %}
+                    </p>
+
+                    <div class="oferta-card__actions">
+                        <a href="{% url 'producto_detalle' producto.slug %}" class="oferta-card__link">Ver producto</a>
+
+                        {% if user.is_authenticated %}
+                            {% if producto.stock > 0 %}
+                            <form method="post" action="{% url 'agregar_al_carrito' %}" class="oferta-card__form">
+                                {% csrf_token %}
+                                <input type="hidden" name="producto_id" value="{{ producto.pk }}">
+                                <input type="hidden" name="cantidad" value="1">
+                                <input type="hidden" name="next" value="carrito">
+                                <button type="submit" class="oferta-card__button">Agregar al carrito</button>
+                            </form>
+                            {% else %}
+                            <span class="oferta-card__hint">Producto sin stock disponible</span>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}?next={% url 'producto_detalle' producto.slug %}" class="oferta-card__button oferta-card__button--link">
+                                Inicia sesion para comprar
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="ofertas-empty">
+            <p>No hay productos en oferta actualmente.</p>
+            <a class="btn btn--primary" href="{% url 'catalogo' %}">Volver al catalogo</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

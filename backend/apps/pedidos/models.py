@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from apps.catalogo.models import Producto
+from apps.catalogo.services import obtener_precio_efectivo
 
 
 class Carrito(models.Model):
@@ -38,8 +39,12 @@ class ItemCarrito(models.Model):
         return f"{self.cantidad}x {self.producto}"
 
     @property
+    def precio_unitario(self):
+        return obtener_precio_efectivo(self.producto)
+
+    @property
     def subtotal(self):
-        return self.producto.precio * self.cantidad
+        return self.precio_unitario * self.cantidad
 
 
 class Pedido(models.Model):

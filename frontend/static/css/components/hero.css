@@ -168,6 +168,195 @@
 	line-height: 1.45;
 }
 
+.hero__promo--slider {
+	display: grid;
+	gap: 0.8rem;
+	height: 100%;
+	padding: 1.2rem 1rem 0.9rem;
+	grid-template-rows: auto 1fr auto;
+	min-height: 0;
+}
+
+.hero__promo-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 0.75rem;
+}
+
+.hero__promo-link {
+	display: inline-block;
+	padding: 0.45rem 0.75rem;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.16);
+	color: #ffffff;
+	font-size: 0.78rem;
+	font-weight: 700;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.hero__card--secondary {
+	height: 440px;
+	max-height: 440px;
+	min-height: 440px;
+	overflow: hidden;
+}
+
+.hero__card--secondary .hero__card-body {
+	height: 100%;
+	padding: 1.25rem 1rem 0.9rem;
+}
+
+.hero__card--secondary .hero__promo-discount {
+	font-size: 1.45rem;
+	margin-top: 0.1rem;
+}
+
+.hero-offers {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	gap: 0.45rem;
+	min-height: 0;
+}
+
+.hero-offers__viewport {
+	overflow: hidden;
+	min-height: 0;
+}
+
+.hero-offers__track {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 0;
+	will-change: transform;
+	transition: transform 0.45s ease;
+	height: 100%;
+}
+
+.hero-offers__item {
+	flex: 0 0 100%;
+	max-width: 100%;
+	display: flex;
+	flex-direction: column;
+	border-radius: 10px;
+	background: rgba(255, 255, 255, 0.14);
+	padding: 0.6rem;
+	min-width: 0;
+}
+
+.hero-offers__media {
+	width: 100%;
+	height: 145px;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.hero-offers__media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.hero-offers__placeholder {
+	width: 100%;
+	height: 100%;
+	display: grid;
+	place-items: center;
+	font-size: 0.72rem;
+	font-weight: 700;
+	color: rgba(255, 255, 255, 0.9);
+	background: rgba(0, 0, 0, 0.28);
+}
+
+.hero-offers__body h3 {
+	font-size: 0.84rem;
+	line-height: 1.3;
+	margin: 0.45rem 0 0.3rem;
+	min-height: 2.2em;
+	overflow: hidden;
+	color: #ffffff;
+}
+
+.hero-offers__prices {
+	margin: 0 0 0.3rem;
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+}
+
+.hero-offers__price-normal {
+	font-size: 0.72rem;
+	text-decoration: line-through;
+	opacity: 0.82;
+}
+
+.hero-offers__price-offer {
+	font-size: 0.95rem;
+	font-weight: 800;
+	color: #ffffff;
+}
+
+.hero-offers__stock {
+	margin: 0.25rem 0 0.45rem;
+	font-size: 0.76rem;
+	color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-offers__action {
+	display: inline-block;
+	padding: 0.34rem 0.5rem;
+	border-radius: 7px;
+	background: #ffffff;
+	color: #7f1d1d;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-decoration: none;
+	align-self: flex-start;
+}
+
+.hero-offers__nav {
+	width: 28px;
+	height: 28px;
+	border: none;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.2);
+	color: #ffffff;
+	font-size: 1.05rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.hero-offers__dots {
+	display: flex;
+	justify-content: center;
+	gap: 0.35rem;
+	margin-top: 0.25rem;
+}
+
+.hero-offers__dot {
+	width: 7px;
+	height: 7px;
+	border: none;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.42);
+	cursor: pointer;
+}
+
+.hero-offers__dot.is-active {
+	background: #ffffff;
+}
+
+.hero-offers__empty {
+	margin: 0;
+	padding: 0.55rem 0.75rem;
+	border-radius: 8px;
+	font-size: 0.86rem;
+	background: rgba(255, 255, 255, 0.12);
+	color: rgba(255, 255, 255, 0.95);
+}
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
@@ -179,6 +368,25 @@
 
 	.hero__card {
 		min-height: 320px;
+	}
+
+	.hero__promo-head {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.hero__card--secondary {
+		height: 420px;
+		max-height: 420px;
+		min-height: 420px;
+	}
+
+	.hero-offers__item {
+		flex: 0 0 100%;
+	}
+
+	.hero-offers__media {
+		height: 135px;
 	}
 }
 
@@ -193,5 +401,19 @@
 
 	.hero__subtitle {
 		font-size: 0.96rem;
+	}
+
+	.hero__promo--slider {
+		padding: 1rem 0.8rem 0.75rem;
+	}
+
+	.hero__card--secondary {
+		height: 405px;
+		max-height: 405px;
+		min-height: 405px;
+	}
+
+	.hero-offers__media {
+		height: 130px;
 	}
 }

@@ -1,7 +1,23 @@
 from django.db import transaction
+from django.utils import timezone
 
 from apps.catalogo.forms import CategoriaForm, ProductoForm
 from apps.catalogo.models import Categoria, Producto
+
+
+def obtener_precio_efectivo(producto, ahora=None):
+    """Retorna precio de oferta vigente o precio normal del producto."""
+    ahora = ahora or timezone.now()
+    if (
+        producto.activo
+        and producto.en_oferta
+        and producto.precio_oferta is not None
+        and producto.fecha_inicio_oferta is not None
+        and producto.fecha_fin_oferta is not None
+        and producto.fecha_inicio_oferta <= ahora <= producto.fecha_fin_oferta
+    ):
+        return producto.precio_oferta
+    return producto.precio
 
 
 def obtener_productos_activos():

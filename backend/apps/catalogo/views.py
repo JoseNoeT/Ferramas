@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from apps.catalogo import services as catalogo_services
 from apps.catalogo.forms import CategoriaForm, ProductoForm
@@ -31,6 +32,22 @@ def producto_detalle_view(request, slug):
     if producto is None:
         raise Http404("Producto no encontrado.")
     return render(request, "pages/producto.html", {"producto": producto})
+
+
+@login_required
+def ofertas_view(request):
+    ahora = timezone.now()
+    productos = (
+        Producto.objects.filter(
+            activo=True,
+            en_oferta=True,
+            fecha_inicio_oferta__lte=ahora,
+            fecha_fin_oferta__gte=ahora,
+        )
+        .select_related("categoria")
+        .order_by("nombre")
+    )
+    return render(request, "pages/ofertas.html", {"productos": productos})
 
 
 @_requiere_admin

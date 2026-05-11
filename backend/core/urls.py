@@ -13,6 +13,7 @@ urlpatterns = [
 	path("admin/", admin.site.urls),
 	path("", include("apps.usuarios.urls")),
 	path("", include("apps.catalogo.urls")),
+	path("", include("apps.catalogo.web_urls")),
 	path("", include("apps.pedidos.urls")),
 	path("maestros/", include(maestros_web_urls.urlpatterns)),
 	path("credito/", include("apps.credito.web_urls")),

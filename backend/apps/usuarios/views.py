@@ -67,11 +67,26 @@ def _requiere_contador(view_func):
 
 
 def home_view(request):
+    ahora = timezone.now()
     productos_destacados = catalogo_services.obtener_productos_activos()[:4]
+    productos_oferta = (
+        Producto.objects.select_related("categoria")
+        .filter(
+            activo=True,
+            en_oferta=True,
+            precio_oferta__isnull=False,
+            fecha_inicio_oferta__lte=ahora,
+            fecha_fin_oferta__gte=ahora,
+        )
+        .order_by("nombre")[:10]
+    )
     return render(
         request,
         "pages/home.html",
-        {"productos_destacados": productos_destacados},
+        {
+            "productos_destacados": productos_destacados,
+            "productos_oferta": productos_oferta,
+        },
     )
 
 

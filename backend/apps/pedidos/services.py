@@ -1,5 +1,6 @@
 from django.db import transaction
 
+from apps.catalogo.services import obtener_precio_efectivo
 from apps.catalogo.models import Producto
 from apps.pedidos.models import Carrito, ItemCarrito, ItemPedido, Pedido
 
@@ -134,7 +135,7 @@ def crear_pedido_desde_carrito(usuario, tipo_entrega):
             pedido=pedido,
             producto=item.producto,
             cantidad=item.cantidad,
-            precio_unitario=item.producto.precio,
+            precio_unitario=obtener_precio_efectivo(item.producto),
         )
     carrito.items.all().delete()
     return pedido

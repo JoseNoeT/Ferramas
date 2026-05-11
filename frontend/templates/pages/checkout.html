@@ -34,7 +34,7 @@
                         <tr>
                             <td>{{ item.producto.nombre }}</td>
                             <td>{{ item.cantidad }}</td>
-                            <td>${{ item.producto.precio|formato_moneda }}</td>
+                            <td>${{ item.precio_unitario|formato_moneda }}</td>
                             <td>${{ item.subtotal|formato_moneda }}</td>
                         </tr>
                         {% endfor %}

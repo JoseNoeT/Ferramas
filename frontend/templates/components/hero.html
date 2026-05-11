@@ -1,4 +1,4 @@
-{% load static %}
+{% load static ecommerce_tags %}
 <section class="hero" aria-labelledby="home-hero-title">
 
 	<!-- Card principal: mensaje de marca + CTA sobre hero.png -->
@@ -16,10 +16,51 @@
 	<div class="hero__card hero__card--secondary">
 		<img class="hero__card-bg" src="{% static 'img/banners/hero1.png' %}" alt="">
 		<div class="hero__card-body">
-			<div class="hero__promo">
-				<p class="hero__promo-label">Oferta de temporada</p>
-				<p class="hero__promo-discount">Hasta 40% dcto.</p>
-				<p class="hero__promo-copy">Equipos y accesorios seleccionados</p>
+			<div class="hero__promo hero__promo--slider">
+				<div class="hero__promo-head">
+					<div>
+						<p class="hero__promo-label">Oferta de temporada</p>
+						<p class="hero__promo-discount">Hasta 40% dcto.</p>
+						<p class="hero__promo-copy">Productos seleccionados con precio especial</p>
+					</div>
+					<a class="hero__promo-link" href="/ofertas/">Ver todas las ofertas</a>
+				</div>
+
+				{% if productos_oferta %}
+				<div class="hero-offers" data-season-slider>
+					<button class="hero-offers__nav" type="button" aria-label="Oferta anterior" data-season-prev>‹</button>
+					<div class="hero-offers__viewport">
+						<div class="hero-offers__track" data-season-track>
+							{% for producto in productos_oferta %}
+							<article class="hero-offers__item">
+								<div class="hero-offers__media">
+									{% if producto.imagen %}
+										<img src="{{ producto.imagen }}" alt="{{ producto.nombre }}" loading="lazy">
+									{% else %}
+										<div class="hero-offers__placeholder" aria-hidden="true">FERREMAX</div>
+									{% endif %}
+								</div>
+								<div class="hero-offers__body">
+									<h3>{{ producto.nombre|truncatechars:32 }}</h3>
+									<p class="hero-offers__prices">
+										<span class="hero-offers__price-normal">${{ producto.precio|formato_moneda }}</span>
+										<span class="hero-offers__price-offer">${{ producto.precio_oferta|formato_moneda }}</span>
+									</p>
+									<p class="hero-offers__stock">
+										{% if producto.stock > 0 %}Stock: {{ producto.stock }}{% else %}Sin stock{% endif %}
+									</p>
+									<a class="hero-offers__action" href="{% url 'producto_detalle' producto.slug %}">Ver producto</a>
+								</div>
+							</article>
+							{% endfor %}
+						</div>
+					</div>
+					<button class="hero-offers__nav" type="button" aria-label="Siguiente oferta" data-season-next>›</button>
+				</div>
+				<div class="hero-offers__dots" data-season-dots aria-label="Indicadores de ofertas"></div>
+				{% else %}
+				<p class="hero-offers__empty">No hay productos en oferta actualmente.</p>
+				{% endif %}
 			</div>
 		</div>
 	</div>
