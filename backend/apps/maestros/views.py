@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import viewsets
 
 from apps.maestros.forms import (
@@ -10,8 +11,10 @@ from apps.maestros.forms import (
 )
 from apps.maestros.models import PerfilMaestroPyme, ServicioMaestro, SolicitudAsesoria
 from apps.maestros.services import (
+    aprobar_maestro_pyme,
     crear_servicio_maestro,
     crear_solicitud_asesoria,
+    rechazar_maestro_pyme,
     registrar_maestro_pyme,
 )
 from apps.usuarios.views import _requiere_admin
@@ -135,22 +138,46 @@ def mis_servicios_maestro_view(request):
 
 
 def servicios_maestros_view(request):
-    return render(request, "pages/servicios-maestros.html")
+    servicios = (
+        ServicioMaestro.objects.filter(
+            activo=True,
+            maestro__estado=PerfilMaestroPyme.Estado.APROBADO,
+        )
+        .select_related("maestro", "maestro__usuario")
+        .order_by("-creado_en")
+    )
+    return render(
+        request,
+        "pages/servicios-maestros.html",
+        {
+            "servicios": servicios,
+            "total_servicios": servicios.count(),
+        },
+    )
 
 
 @login_required
 def solicitud_asesoria_maestro_view(request):
-    servicio_demo = ServicioMaestro.objects.filter(activo=True).select_related("maestro").first()
+    messages.info(request, "Selecciona un servicio para solicitar asesoría.")
+    return redirect("servicios_maestros")
+
+
+@login_required
+def solicitud_asesoria_maestro_detalle_view(request, servicio_id):
+    servicio = get_object_or_404(
+        ServicioMaestro.objects.select_related("maestro", "maestro__usuario"),
+        pk=servicio_id,
+        activo=True,
+        maestro__estado=PerfilMaestroPyme.Estado.APROBADO,
+    )
 
     if request.method == "POST":
         form = SolicitudAsesoriaForm(request.POST)
-        if not servicio_demo:
-            messages.error(request, "No hay servicios activos disponibles para solicitar asesoría.")
-        elif form.is_valid():
+        if form.is_valid():
             try:
-                crear_solicitud_asesoria(request.user, servicio_demo, form.cleaned_data)
+                crear_solicitud_asesoria(request.user, servicio, form.cleaned_data)
                 messages.success(request, "Solicitud de asesoría creada correctamente.")
-                form = SolicitudAsesoriaForm()
+                return redirect("solicitud_asesoria_maestro_detalle", servicio_id=servicio.pk)
             except ValueError:
                 messages.error(request, "El servicio seleccionado no se encuentra disponible.")
         else:
@@ -163,11 +190,55 @@ def solicitud_asesoria_maestro_view(request):
         "pages/solicitud-asesoria-maestro.html",
         {
             "form": form,
-            "servicio_demo": servicio_demo,
+            "servicio": servicio,
+            "cargo_confirmacion": 5000,
         },
     )
 
 
 @_requiere_admin
 def admin_maestros_view(request):
-    return render(request, "dashboard/admin-maestros.html")
+    perfiles = (
+        PerfilMaestroPyme.objects.select_related("usuario")
+        .prefetch_related("servicios")
+        .all()
+        .order_by("-creado_en")
+    )
+    total_perfiles = perfiles.count()
+    total_pendientes = perfiles.filter(estado=PerfilMaestroPyme.Estado.PENDIENTE).count()
+    total_aprobados = perfiles.filter(estado=PerfilMaestroPyme.Estado.APROBADO).count()
+    total_rechazados = perfiles.filter(estado=PerfilMaestroPyme.Estado.RECHAZADO).count()
+
+    return render(
+        request,
+        "dashboard/admin-maestros.html",
+        {
+            "perfiles": perfiles,
+            "total_perfiles": total_perfiles,
+            "total_pendientes": total_pendientes,
+            "total_aprobados": total_aprobados,
+            "total_rechazados": total_rechazados,
+        },
+    )
+
+
+@_requiere_admin
+def aprobar_maestro_pyme_admin_view(request, pk):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    perfil = get_object_or_404(PerfilMaestroPyme, pk=pk)
+    aprobar_maestro_pyme(perfil)
+    messages.success(request, f"Perfil Maestro/PYME de '{perfil.usuario.email}' aprobado correctamente.")
+    return redirect("admin_maestros")
+
+
+@_requiere_admin
+def rechazar_maestro_pyme_admin_view(request, pk):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    perfil = get_object_or_404(PerfilMaestroPyme, pk=pk)
+    rechazar_maestro_pyme(perfil)
+    messages.success(request, f"Perfil Maestro/PYME de '{perfil.usuario.email}' rechazado correctamente.")
+    return redirect("admin_maestros")
