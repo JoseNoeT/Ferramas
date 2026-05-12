@@ -8,8 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.catalogo.models import Producto
+from apps.maestros.models import PerfilMaestroPyme, SolicitudAsesoria
 from apps.pedidos import services as pedidos_services
 from apps.pedidos.models import Pedido
+from apps.puntos import services as puntos_services
 from apps.pedidos.serializers import (
     AgregarCarritoSerializer,
     CrearPedidoSerializer,
@@ -82,11 +84,58 @@ def eliminar_item_carrito_view(request):
 
 @login_required
 def checkout_view(request):
+    def obtener_solicitud_pendiente_desde_session():
+        solicitud_id = request.session.get("solicitud_asesoria_pendiente_id")
+        if not solicitud_id:
+            return None
+
+        solicitud = (
+            SolicitudAsesoria.objects.select_related("servicio__maestro")
+            .filter(
+                pk=solicitud_id,
+                cliente=request.user,
+                servicio__activo=True,
+                servicio__maestro__estado=PerfilMaestroPyme.Estado.APROBADO,
+            )
+            .first()
+        )
+        if not solicitud:
+            request.session.pop("solicitud_asesoria_pendiente_id", None)
+            request.session.modified = True
+            return None
+        return solicitud
+
+    cuenta_puntos = puntos_services.obtener_o_crear_cuenta_puntos(request.user)
     resumen = pedidos_services.obtener_resumen_carrito(request.user)
+    solicitud_pendiente = obtener_solicitud_pendiente_desde_session()
+    cargo_asesoria_pendiente = solicitud_pendiente.cargo_confirmacion if solicitud_pendiente else 0
+    total_con_asesoria = resumen["total"] + cargo_asesoria_pendiente
+
+    resumen["solicitud_asesoria_pendiente"] = solicitud_pendiente
+    resumen["cargo_asesoria_pendiente"] = cargo_asesoria_pendiente
+    resumen["total_con_asesoria"] = total_con_asesoria
+    resumen["saldo_puntos"] = cuenta_puntos.saldo
+
     if request.method == "POST":
         tipo_entrega = request.POST.get("tipo_entrega", Pedido.TipoEntrega.RETIRO)
+        puntos_a_usar = request.POST.get("puntos_a_usar", 0)
         try:
             pedido = pedidos_services.crear_pedido_desde_carrito(request.user, tipo_entrega)
+
+            solicitud_pendiente_post = obtener_solicitud_pendiente_desde_session()
+            if solicitud_pendiente_post:
+                pedidos_services.agregar_asesoria_a_pedido(pedido, solicitud_pendiente_post)
+                request.session.pop("solicitud_asesoria_pendiente_id", None)
+                request.session.modified = True
+
+            if int(puntos_a_usar or 0) > 0:
+                puntos_services.aplicar_puntos(request.user, pedido, puntos_a_usar)
+            else:
+                pedido.total_final = pedido.total
+                pedido.save(update_fields=["total_final"])
+
+            puntos_services.acumular_puntos_por_pedido(request.user, pedido)
+
             messages.success(request, f"Pedido #{pedido.pk} generado correctamente.")
             return redirect("confirmacion", pk=pedido.pk)
         except ValueError as exc:
@@ -98,7 +147,10 @@ def checkout_view(request):
 def pedido_confirmacion_view(request, pk):
     try:
         pedido = (
-            Pedido.objects.prefetch_related("items__producto")
+            Pedido.objects.prefetch_related(
+                "items__producto",
+                "items__solicitud_asesoria__servicio__maestro__usuario",
+            )
             .get(pk=pk, usuario=request.user)
         )
     except Pedido.DoesNotExist:

@@ -5,6 +5,18 @@ from apps.catalogo.models import Producto
 from apps.pedidos.models import Carrito, ItemCarrito, ItemPedido, Pedido
 
 
+def _recalcular_totales_pedido(pedido):
+    subtotal = sum(item.subtotal for item in pedido.items.all())
+    pedido.subtotal = subtotal
+    pedido.total = subtotal
+    if pedido.puntos_usados == 0:
+        pedido.total_final = subtotal
+        pedido.save(update_fields=["subtotal", "total", "total_final"])
+    else:
+        pedido.save(update_fields=["subtotal", "total"])
+    return pedido
+
+
 def obtener_o_crear_carrito(usuario):
     """Retorna el carrito del usuario, creandolo si no existe."""
     carrito, _ = Carrito.objects.get_or_create(usuario=usuario)
@@ -129,13 +141,29 @@ def crear_pedido_desde_carrito(usuario, tipo_entrega):
         tipo_entrega=tipo_entrega,
         subtotal=subtotal,
         total=subtotal,
+        total_final=subtotal,
     )
     for item in items:
         ItemPedido.objects.create(
             pedido=pedido,
+            tipo_linea=ItemPedido.TipoLinea.PRODUCTO,
             producto=item.producto,
             cantidad=item.cantidad,
             precio_unitario=obtener_precio_efectivo(item.producto),
         )
     carrito.items.all().delete()
+    return pedido
+
+
+@transaction.atomic
+def agregar_asesoria_a_pedido(pedido, solicitud_asesoria):
+    ItemPedido.objects.create(
+        pedido=pedido,
+        tipo_linea=ItemPedido.TipoLinea.ASESORIA,
+        solicitud_asesoria=solicitud_asesoria,
+        descripcion=f"Confirmacion asesoria Maestro/PYME: {solicitud_asesoria.servicio.titulo}",
+        cantidad=1,
+        precio_unitario=solicitud_asesoria.cargo_confirmacion,
+    )
+    _recalcular_totales_pedido(pedido)
     return pedido

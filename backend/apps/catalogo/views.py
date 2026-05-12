@@ -24,13 +24,11 @@ def _requiere_admin(view_func):
     return wrapper
 
 
-@login_required
 def catalogo_view(request):
     productos = catalogo_services.obtener_productos_activos()
     return render(request, "pages/catalogo.html", {"productos": productos})
 
 
-@login_required
 def producto_detalle_view(request, slug):
     producto = catalogo_services.obtener_producto_por_slug(slug)
     if producto is None:
@@ -38,7 +36,6 @@ def producto_detalle_view(request, slug):
     return render(request, "pages/producto.html", {"producto": producto})
 
 
-@login_required
 def ofertas_view(request):
     ahora = timezone.now()
     productos = (

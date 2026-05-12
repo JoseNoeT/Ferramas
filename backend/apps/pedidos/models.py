@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from apps.catalogo.models import Producto
@@ -75,6 +76,9 @@ class Pedido(models.Model):
     )
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    puntos_usados = models.PositiveIntegerField(default=0)
+    descuento_puntos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_final = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -85,12 +89,38 @@ class Pedido(models.Model):
     def __str__(self):
         return f"Pedido #{self.pk} — {self.usuario}"
 
+    def save(self, *args, **kwargs):
+        if self.puntos_usados == 0 and self.descuento_puntos == 0:
+            self.total_final = self.total
+        return super().save(*args, **kwargs)
+
 
 class ItemPedido(models.Model):
+    class TipoLinea(models.TextChoices):
+        PRODUCTO = "producto", "Producto"
+        ASESORIA = "asesoria", "Asesoria Maestro/PYME"
+
     pedido = models.ForeignKey(
         Pedido, on_delete=models.CASCADE, related_name="items"
     )
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    tipo_linea = models.CharField(
+        max_length=20,
+        choices=TipoLinea.choices,
+        default=TipoLinea.PRODUCTO,
+    )
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    solicitud_asesoria = models.ForeignKey(
+        "maestros.SolicitudAsesoria",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    descripcion = models.CharField(max_length=255, blank=True, default="")
     cantidad = models.PositiveIntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -99,7 +129,28 @@ class ItemPedido(models.Model):
         verbose_name_plural = "Items de Pedido"
 
     def __str__(self):
-        return f"{self.cantidad}x {self.producto} en Pedido #{self.pedido_id}"
+        if self.tipo_linea == self.TipoLinea.ASESORIA:
+            if self.descripcion:
+                detalle = self.descripcion
+            elif self.solicitud_asesoria_id:
+                detalle = self.solicitud_asesoria.servicio.titulo
+            else:
+                detalle = "Asesoria"
+            return f"{self.cantidad}x {detalle} en Pedido #{self.pedido_id}"
+
+        if self.producto_id:
+            return f"{self.cantidad}x {self.producto.nombre} en Pedido #{self.pedido_id}"
+        return f"{self.cantidad}x Item sin producto en Pedido #{self.pedido_id}"
+
+    def clean(self):
+        if self.tipo_linea == self.TipoLinea.PRODUCTO and not self.producto_id:
+            raise ValidationError("Las lineas de tipo producto requieren un producto asociado.")
+        if self.tipo_linea == self.TipoLinea.ASESORIA and not self.solicitud_asesoria_id:
+            raise ValidationError("Las lineas de tipo asesoria requieren una solicitud de asesoria asociada.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
 
     @property
     def subtotal(self):

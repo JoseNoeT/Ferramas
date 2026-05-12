@@ -17,6 +17,7 @@ from apps.maestros.services import (
     rechazar_maestro_pyme,
     registrar_maestro_pyme,
 )
+from apps.pedidos import services as pedidos_services
 from apps.usuarios.views import _requiere_admin
 
 
@@ -175,9 +176,22 @@ def solicitud_asesoria_maestro_detalle_view(request, servicio_id):
         form = SolicitudAsesoriaForm(request.POST)
         if form.is_valid():
             try:
-                crear_solicitud_asesoria(request.user, servicio, form.cleaned_data)
-                messages.success(request, "Solicitud de asesoría creada correctamente.")
-                return redirect("solicitud_asesoria_maestro_detalle", servicio_id=servicio.pk)
+                solicitud = crear_solicitud_asesoria(request.user, servicio, form.cleaned_data)
+                request.session["solicitud_asesoria_pendiente_id"] = solicitud.id
+                messages.success(
+                    request,
+                    "Solicitud de asesoría creada. Se agregará como confirmación de $5.000 al finalizar tu compra.",
+                )
+
+                resumen_carrito = pedidos_services.obtener_resumen_carrito(request.user)
+                if resumen_carrito["items"]:
+                    return redirect("checkout")
+
+                messages.info(
+                    request,
+                    "Tu solicitud de asesoría quedó guardada. Agrega productos al carrito para finalizar tu compra.",
+                )
+                return redirect("catalogo")
             except ValueError:
                 messages.error(request, "El servicio seleccionado no se encuentra disponible.")
         else:
