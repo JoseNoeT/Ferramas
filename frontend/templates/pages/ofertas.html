@@ -6,71 +6,143 @@
 {% block content %}
 <section class="ofertas-section" aria-labelledby="ofertas-title">
     <div class="ofertas-container">
-        <header class="ofertas-hero">
-            <div class="ofertas-hero__copy">
-                <p class="ofertas-hero__eyebrow">Temporada FERREMAX</p>
-                <h1 id="ofertas-title">Productos en oferta</h1>
-                <p>Precios promocionales vigentes en productos seleccionados.</p>
-            </div>
-            <div class="ofertas-hero__actions" aria-label="Acciones principales de ofertas">
-                <a class="btn btn--outline ofertas-hero__btn" href="{% url 'catalogo' %}">Ver catalogo</a>
-                <a class="btn btn--primary ofertas-hero__btn" href="{% url 'carrito' %}">Ir al carrito</a>
+        <!-- HEADER HERO -->
+        <header class="ofertas-header">
+            <div class="ofertas-header__content">
+                <p class="ofertas-header__label">⏱️ Tiempo limitado</p>
+                <h1 id="ofertas-title">Ofertas Especiales FERREMAX</h1>
+                <p class="ofertas-header__description">Descuentos exclusivos en productos seleccionados. ¡Aprovecha mientras dure!</p>
             </div>
         </header>
 
+        {% if productos_destacados %}
+        <!-- SLIDER DE PRODUCTOS DESTACADOS -->
+        <div class="ofertas-slider-wrapper">
+            <h2 class="ofertas-slider__title">Lo Más Vendido en Oferta</h2>
+            <div class="ofertas-slider" id="ofertas-slider">
+                {% for item in productos_destacados %}
+                <article class="ofertas-slide" data-slide="{{ forloop.counter0 }}">
+                    <div class="ofertas-slide__image">
+                        {% if item.obj.imagen %}
+                            <img src="{{ item.obj.imagen }}" alt="{{ item.obj.nombre }}" loading="lazy">
+                        {% else %}
+                            <div class="ofertas-slide__placeholder">{{ item.obj.nombre|truncatechars:20 }}</div>
+                        {% endif %}
+                        <span class="ofertas-slide__discount">-{{ item.descuento_porcentaje }}%</span>
+                    </div>
+                    <div class="ofertas-slide__content">
+                        <h3>{{ item.obj.nombre|truncatechars:40 }}</h3>
+                        <div class="ofertas-slide__pricing">
+                            <span class="precio-anterior">${{ item.obj.precio|formato_moneda }}</span>
+                            <span class="precio-oferta">${{ item.obj.precio_oferta|default:item.obj.precio|formato_moneda }}</span>
+                        </div>
+                        <a href="{% url 'producto_detalle' item.obj.slug %}" class="ofertas-slide__cta">Ver producto</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            <!-- CONTROLES DEL SLIDER -->
+            <div class="ofertas-slider__controls">
+                <button class="slider-btn slider-btn--prev" id="slider-prev" aria-label="Anterior">◀</button>
+                <div class="slider-dots">
+                    {% for item in productos_destacados %}
+                    <button class="slider-dot {% if forloop.first %}active{% endif %}" data-slide="{{ forloop.counter0 }}" aria-label="Ir a producto {{ forloop.counter }}"></button>
+                    {% endfor %}
+                </div>
+                <button class="slider-btn slider-btn--next" id="slider-next" aria-label="Siguiente">▶</button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- NAVEGACIÓN DE CATEGORÍAS -->
+        <nav class="ofertas-categories" aria-label="Categorías de ofertas">
+            <a href="?categoria=todas&ordenar={{ ordenamiento_actual }}" class="category-tag {% if not categoria_actual or categoria_actual == 'todas' %}active{% endif %}">
+                Todas
+            </a>
+            {% for categoria in categorias %}
+                <a href="?categoria={{ categoria }}&ordenar={{ ordenamiento_actual }}" class="category-tag {% if categoria_actual == categoria %}active{% endif %}">
+                    {{ categoria }}
+                </a>
+            {% endfor %}
+        </nav>
+
+        <!-- FILTROS Y ORDENAMIENTO -->
+        <div class="ofertas-filters">
+            <form method="get" class="filters-form" id="ofertas-filter-form">
+                {% if categoria_actual and categoria_actual != 'todas' %}
+                    <input type="hidden" name="categoria" value="{{ categoria_actual }}">
+                {% endif %}
+
+                <div class="filter-group">
+                    <label for="ordenamiento">Ordenar por:</label>
+                    <select id="ordenamiento" name="ordenar" onchange="document.getElementById('ofertas-filter-form').submit();">
+                        <option value="descuento" {% if ordenamiento_actual == 'descuento' %}selected{% endif %}>Mayor descuento</option>
+                        <option value="precio_menor" {% if ordenamiento_actual == 'precio_menor' %}selected{% endif %}>Menor precio</option>
+                        <option value="precio_mayor" {% if ordenamiento_actual == 'precio_mayor' %}selected{% endif %}>Mayor precio</option>
+                        <option value="nombre" {% if ordenamiento_actual == 'nombre' %}selected{% endif %}>Nombre (A-Z)</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- GRID DE PRODUCTOS -->
         {% if productos %}
         <div class="ofertas-grid">
-            {% for producto in productos %}
-            <article class="oferta-card" aria-label="{{ producto.nombre }}">
-                <div class="oferta-card__media">
-                    <span class="oferta-card__badge">OFERTA</span>
-                    {% if producto.precio_oferta and producto.precio and producto.precio > producto.precio_oferta %}
-                        {% widthratio producto.precio_oferta producto.precio 100 as porcentaje_restante %}
-                        <span class="oferta-card__badge oferta-card__badge--discount">-{{ porcentaje_restante|add:"-100"|cut:"-" }}%</span>
-                    {% endif %}
-
-                    {% if producto.imagen %}
-                        <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}" loading="lazy">
+            {% for item in productos %}
+            <article class="oferta-card" aria-label="{{ item.obj.nombre }}">
+                <div class="oferta-card__image-container">
+                    {% if item.obj.imagen %}
+                        <img src="{{ item.obj.imagen }}" alt="{{ item.obj.nombre }}" loading="lazy" class="oferta-card__image">
                     {% else %}
-                        <div class="product-card__placeholder" aria-hidden="true">FERREMAX</div>
+                        <div class="oferta-card__placeholder">{{ item.obj.nombre|truncatechars:20 }}</div>
                     {% endif %}
+                    <div class="oferta-card__badges">
+                        <span class="badge badge--discount">-{{ item.descuento_porcentaje }}%</span>
+                        {% if item.obj.stock <= 5 and item.obj.stock > 0 %}
+                            <span class="badge badge--urgent">¡Últimas unidades!</span>
+                        {% elif item.obj.stock == 0 %}
+                            <span class="badge badge--agotado">Agotado</span>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="oferta-card__body">
-                    <h2>{{ producto.nombre|truncatechars:50 }}</h2>
-                    <p class="oferta-card__description">{{ producto.descripcion|truncatechars:110 }}</p>
+                    <h3 class="oferta-card__title">{{ item.obj.nombre|truncatechars:50 }}</h3>
+                    {% if item.obj.categoria %}
+                        <p class="oferta-card__category">{{ item.obj.categoria.nombre }}</p>
+                    {% endif %}
+                    <p class="oferta-card__description">{{ item.obj.descripcion|truncatechars:90 }}</p>
 
                     <div class="oferta-card__pricing">
-                        <p class="oferta-card__price-normal">${{ producto.precio|formato_moneda }}</p>
-                        <p class="oferta-card__price-offer">
-                            ${{ producto.precio_oferta|default:producto.precio|formato_moneda }}
-                        </p>
+                        <span class="precio-normal">${{ item.obj.precio|formato_moneda }}</span>
+                        <span class="precio-destacado">${{ item.obj.precio_oferta|default:item.obj.precio|formato_moneda }}</span>
                     </div>
 
-                    <p class="oferta-card__stock{% if producto.stock == 0 %} oferta-card__stock--agotado{% endif %}">
-                        {% if producto.stock > 0 %}Stock disponible: {{ producto.stock }}{% else %}Sin stock{% endif %}
-                    </p>
+                    <div class="oferta-card__stock">
+                        {% if item.obj.stock > 0 %}
+                            <p class="stock-disponible">Stock: {{ item.obj.stock }} unidades</p>
+                        {% else %}
+                            <p class="stock-agotado">Sin stock disponible</p>
+                        {% endif %}
+                    </div>
 
                     <div class="oferta-card__actions">
-                        <a href="{% url 'producto_detalle' producto.slug %}" class="oferta-card__link">Ver producto</a>
-
                         {% if user.is_authenticated %}
-                            {% if producto.stock > 0 %}
-                            <form method="post" action="{% url 'agregar_al_carrito' %}" class="oferta-card__form">
+                            {% if item.obj.stock > 0 %}
+                            <form method="post" action="{% url 'agregar_al_carrito' %}" class="action-form">
                                 {% csrf_token %}
-                                <input type="hidden" name="producto_id" value="{{ producto.pk }}">
+                                <input type="hidden" name="producto_id" value="{{ item.obj.pk }}">
                                 <input type="hidden" name="cantidad" value="1">
                                 <input type="hidden" name="next" value="carrito">
-                                <button type="submit" class="oferta-card__button">Agregar al carrito</button>
+                                <button type="submit" class="btn btn--primary btn--add-cart">🛒 Agregar</button>
                             </form>
                             {% else %}
-                            <span class="oferta-card__hint">Producto sin stock disponible</span>
+                            <button class="btn btn--disabled" disabled>Agotado</button>
                             {% endif %}
                         {% else %}
-                            <a href="{% url 'login' %}?next={% url 'producto_detalle' producto.slug %}" class="oferta-card__button oferta-card__button--link">
-                                Inicia sesion para comprar
-                            </a>
+                            <a href="{% url 'login' %}?next={% url 'ofertas' %}" class="btn btn--primary btn--login">Inicia sesión</a>
                         {% endif %}
+                        <a href="{% url 'producto_detalle' item.obj.slug %}" class="btn btn--outline">Ver detalle</a>
                     </div>
                 </div>
             </article>
@@ -78,10 +150,73 @@
         </div>
         {% else %}
         <div class="ofertas-empty">
-            <p>No hay productos en oferta actualmente.</p>
-            <a class="btn btn--primary" href="{% url 'catalogo' %}">Volver al catalogo</a>
+            <div class="empty-icon">📦</div>
+            <h2>No hay ofertas disponibles</h2>
+            <p>{% if categoria_actual %}Intenta con otra categoría o{% else %}No hay{% endif %} productos en oferta actualmente.</p>
+            <a href="{% url 'catalogo' %}" class="btn btn--primary">Ver catálogo completo</a>
         </div>
         {% endif %}
     </div>
 </section>
+
+<!-- SCRIPT DEL SLIDER AUTOMÁTICO -->
+<script>
+    (function() {
+        const slider = document.getElementById('ofertas-slider');
+        if (!slider) return;
+
+        const slides = slider.querySelectorAll('.ofertas-slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        const prevBtn = document.getElementById('slider-prev');
+        const nextBtn = document.getElementById('slider-next');
+        let currentIndex = 0;
+        let autoplayInterval;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % slides.length;
+            showSlide(currentIndex);
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            showSlide(currentIndex);
+        }
+
+        function startAutoplay() {
+            autoplayInterval = setInterval(nextSlide, 5000);
+        }
+
+        function resetAutoplay() {
+            clearInterval(autoplayInterval);
+            startAutoplay();
+        }
+
+        // Event listeners
+        prevBtn.addEventListener('click', () => { prevSlide(); resetAutoplay(); });
+        nextBtn.addEventListener('click', () => { nextSlide(); resetAutoplay(); });
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                currentIndex = i;
+                showSlide(i);
+                resetAutoplay();
+            });
+        });
+
+        // Autoplay
+        startAutoplay();
+
+        // Pausar al pasar el mouse
+        slider.addEventListener('mouseenter', () => clearInterval(autoplayInterval));
+        slider.addEventListener('mouseleave', startAutoplay);
+    })();
+</script>
 {% endblock %}

@@ -1,0 +1,369 @@
+/* ============================================================================
+   FerreCrédito Solicitation Page
+   ============================================================================ */
+
+.ferrecredito-section {
+	padding: 2rem 1rem 3rem;
+	background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+	min-height: 100vh;
+}
+
+.ferrecredito-container {
+	max-width: 820px;
+	margin: 0 auto;
+}
+
+/* Header Section */
+.ferrecredito-header {
+	margin-bottom: 1.8rem;
+	text-align: center;
+}
+
+.ferrecredito-header h1 {
+	margin: 0 0 0.4rem;
+	font-size: 2.2rem;
+	font-weight: 900;
+	color: var(--color-dark);
+	letter-spacing: -0.5px;
+}
+
+.ferrecredito-header p {
+	margin: 0;
+	font-size: 1rem;
+	color: #616161;
+	line-height: 1.5;
+	max-width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Success/Error Messages */
+.ferrecredito-messages {
+	margin-bottom: 1.5rem;
+}
+
+.ferrecredito-messages .alert {
+	padding: 0.95rem 1rem;
+	border-radius: 10px;
+	border-left: 4px solid;
+	font-size: 0.95rem;
+	animation: slideInDown 0.3s ease;
+}
+
+.ferrecredito-messages .alert--success {
+	background: #ecfdf5;
+	border-left-color: #10b981;
+	color: #065f46;
+}
+
+.ferrecredito-messages .alert--error {
+	background: #fef2f2;
+	border-left-color: #ef4444;
+	color: #7f1d1d;
+}
+
+@keyframes slideInDown {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Conditions Info Box (Ley de Proximidad + Jerarquía) */
+.ferrecredito-conditions {
+	background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+	border: 2px solid #bfdbfe;
+	border-radius: 12px;
+	padding: 1.4rem;
+	margin-bottom: 2rem;
+	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+}
+
+.ferrecredito-conditions h2 {
+	margin: 0 0 0.8rem;
+	font-size: 1.25rem;
+	font-weight: 800;
+	color: var(--color-dark);
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.ferrecredito-conditions h2::before {
+	content: "✓";
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	background: #3b82f6;
+	color: white;
+	border-radius: 50%;
+	font-weight: 900;
+	font-size: 0.9rem;
+}
+
+.ferrecredito-conditions ul {
+	margin: 0;
+	padding-left: 1.2rem;
+	display: grid;
+	gap: 0.6rem;
+	list-style: none;
+}
+
+.ferrecredito-conditions ul li {
+	position: relative;
+	padding-left: 0.5rem;
+	font-size: 0.95rem;
+	color: #1e40af;
+	line-height: 1.5;
+}
+
+.ferrecredito-conditions ul li::before {
+	content: "•";
+	position: absolute;
+	left: -0.8rem;
+	color: #3b82f6;
+	font-weight: bold;
+}
+
+/* Form Container */
+.ferrecredito-form-wrapper {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 14px;
+	padding: 1.6rem;
+	box-shadow: 0 10px 30px rgba(51, 51, 51, 0.08);
+}
+
+.ferrecredito-form-title {
+	margin: 0 0 1.2rem;
+	font-size: 1.3rem;
+	font-weight: 800;
+	color: var(--color-dark);
+}
+
+.ferrecredito-form {
+	display: grid;
+	gap: 1rem;
+}
+
+/* Form Field Groups (Proximidad law) */
+.ferrecredito-form__group {
+	display: grid;
+	gap: 1rem;
+}
+
+.ferrecredito-form__group-title {
+	font-size: 0.85rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #6b7280;
+	margin-bottom: 0.2rem;
+	padding-left: 0.2rem;
+}
+
+/* 2-column grid for responsive form (Fitts + Proximidad) */
+.ferrecredito-form__group--multi {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1rem;
+}
+
+.ferrecredito-form__field {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.ferrecredito-form__field label {
+	font-size: 0.92rem;
+	font-weight: 700;
+	color: var(--color-dark);
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.ferrecredito-form__field label .required {
+	color: #ef4444;
+	font-size: 1.2rem;
+	line-height: 1;
+}
+
+.ferrecredito-form__field input,
+.ferrecredito-form__field select,
+.ferrecredito-form__field textarea {
+	width: 100%;
+	padding: 0.8rem 0.95rem;
+	border: 1.5px solid #d1d5db;
+	border-radius: 10px;
+	font-size: 0.98rem;
+	background: #fafafa;
+	font-family: inherit;
+	transition: all 0.15s ease;
+}
+
+.ferrecredito-form__field input:hover,
+.ferrecredito-form__field select:hover,
+.ferrecredito-form__field textarea:hover {
+	border-color: #bfdbfe;
+	background: #f9fafb;
+}
+
+.ferrecredito-form__field input:focus,
+.ferrecredito-form__field select:focus,
+.ferrecredito-form__field textarea:focus {
+	outline: none;
+	border-color: var(--color-primary);
+	background: #ffffff;
+	box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.1);
+}
+
+.ferrecredito-form__field input::placeholder {
+	color: #9ca3af;
+}
+
+.ferrecredito-form__field textarea {
+	resize: vertical;
+	min-height: 100px;
+	line-height: 1.5;
+}
+
+/* Form Errors */
+.ferrecredito-form__field .errorlist {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	color: #dc2626;
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+.ferrecredito-form__field .errorlist li {
+	padding: 0.35rem 0;
+}
+
+/* CTA Section (Ley de Fitts + Jerarquía) */
+.ferrecredito-form__actions {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 1rem;
+	margin-top: 1.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid #e5e7eb;
+}
+
+.ferrecredito-form__submit {
+	min-height: 52px;
+	padding: 1rem 2rem;
+	border: none;
+	border-radius: 12px;
+	background: linear-gradient(135deg, var(--color-primary), #da6f00);
+	color: #ffffff;
+	font-size: 1rem;
+	font-weight: 800;
+	cursor: pointer;
+	box-shadow: 0 10px 24px rgba(245, 124, 0, 0.3);
+	transition: all 0.2s ease;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6rem;
+}
+
+.ferrecredito-form__submit::before {
+	content: "→";
+	font-size: 1.2rem;
+}
+
+.ferrecredito-form__submit:hover {
+	filter: brightness(1.08);
+	transform: translateY(-2px);
+	box-shadow: 0 14px 32px rgba(245, 124, 0, 0.35);
+}
+
+.ferrecredito-form__submit:active {
+	transform: translateY(0px);
+}
+
+.ferrecredito-form__submit:focus-visible {
+	outline: 3px solid rgba(245, 124, 0, 0.5);
+	outline-offset: 2px;
+}
+
+.ferrecredito-form__reset {
+	min-height: 52px;
+	padding: 1rem 1.5rem;
+	border: 2px solid #e5e7eb;
+	border-radius: 12px;
+	background: transparent;
+	color: var(--color-dark);
+	font-size: 0.95rem;
+	font-weight: 700;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.ferrecredito-form__reset:hover {
+	border-color: #d1d5db;
+	background: #f9fafb;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+	.ferrecredito-section {
+		padding: 1.5rem 1rem 2rem;
+	}
+
+	.ferrecredito-header h1 {
+		font-size: 1.8rem;
+	}
+
+	.ferrecredito-form-wrapper {
+		padding: 1.2rem;
+	}
+
+	.ferrecredito-form__group--multi {
+		grid-template-columns: 1fr;
+	}
+
+	.ferrecredito-form__actions {
+		grid-template-columns: 1fr;
+	}
+
+	.ferrecredito-form__submit,
+	.ferrecredito-form__reset {
+		width: 100%;
+	}
+
+	.ferrecredito-conditions {
+		padding: 1rem;
+	}
+
+	.ferrecredito-conditions h2 {
+		font-size: 1.1rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.ferrecredito-header h1 {
+		font-size: 1.5rem;
+	}
+
+	.ferrecredito-form__submit,
+	.ferrecredito-form__reset {
+		min-height: 48px;
+		font-size: 0.9rem;
+	}
+
+	.ferrecredito-form__field label {
+		font-size: 0.85rem;
+	}
+}

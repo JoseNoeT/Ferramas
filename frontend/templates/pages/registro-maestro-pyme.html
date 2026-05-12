@@ -1,89 +1,155 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<section class="auth-section">
-    <div class="auth-card">
-        <h1 class="auth-card__title">Registro Maestro/PYME</h1>
-        <p class="auth-card__subtitle">
-            FERREMAX incorpora maestros y pymes para fortalecer su red de servicios y
-            mejorar la experiencia de compra para clientes y empresas.
-        </p>
+<section class="registro-section">
+    <div class="registro-container">
+        <header class="registro-header">
+            <h1 class="registro-header__title">Registro Maestro/PYME</h1>
+            <p class="registro-header__subtitle">
+                Únete a FERREMAX para ofrecer servicios profesionales, acceder a descuentos y ampliar tu alcance comercial.
+            </p>
+        </header>
 
         {% if messages %}
+        <div class="registro-alerts" aria-live="polite">
             {% for message in messages %}
-                <p class="auth-card__alert auth-card__alert--{{ message.tags }}">{{ message }}</p>
+                {% if 'success' in message.tags %}
+                <p class="registro-alert registro-alert--success">Solicitud recibida, nos pondremos en contacto contigo pronto.</p>
+                {% else %}
+                <p class="registro-alert registro-alert--{{ message.tags }}">{{ message }}</p>
+                {% endif %}
             {% endfor %}
+        </div>
         {% endif %}
 
-        <section class="auth-card__benefits" aria-label="Beneficios del registro">
-            <h2>Beneficios</h2>
-            <ul>
-                <li>30% descuento primera compra</li>
-                <li>Acceso a FerreCredito</li>
-                <li>Publicacion de servicios</li>
-                <li>Posibilidad de recibir contactos de clientes</li>
-            </ul>
+        <section class="registro-benefits" aria-label="Beneficios del registro">
+            <h2 class="registro-benefits__title">Beneficios de ser Maestro/PYME</h2>
+            <div class="registro-benefits__grid">
+                <article class="registro-benefits__item">
+                    <h3>30% de descuento inicial</h3>
+                    <p>Activa tu cuenta y aprovecha precio preferente en tu primera compra.</p>
+                </article>
+                <article class="registro-benefits__item">
+                    <h3>Acceso a FerreCrédito</h3>
+                    <p>Financia herramientas, materiales e insumos para crecer más rápido.</p>
+                </article>
+                <article class="registro-benefits__item">
+                    <h3>Más visibilidad profesional</h3>
+                    <p>Publica tus servicios y recibe contactos de clientes en tu zona.</p>
+                </article>
+            </div>
         </section>
 
-        <form class="auth-form" method="post" action="{% url 'registro_maestro_pyme' %}" novalidate>
-            {% csrf_token %}
+        <div class="registro-form-wrapper">
+            <form class="registro-form" method="post" action="{% url 'registro_maestro_pyme' %}" novalidate>
+                {% csrf_token %}
 
-            <div class="auth-form__field">
-                <label for="id_nombre">Nombre</label>
-                <input id="id_nombre" name="nombre" type="text" required>
+                {% if form.non_field_errors %}
+                <div class="registro-form__global-errors" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="registro-form__group">
+                    <h2 class="registro-form__group-title">Información profesional</h2>
+
+                    <div class="registro-form__grid registro-form__grid--two">
+                        <div class="registro-form__field">
+                            <label for="{{ form.tipo.id_for_label }}">Tipo <span class="required">*</span></label>
+                            {{ form.tipo }}
+                            {{ form.tipo.errors }}
+                        </div>
+
+                        <div class="registro-form__field">
+                            <label for="{{ form.rubro.id_for_label }}">Rubro <span class="required">*</span></label>
+                            {{ form.rubro }}
+                            {{ form.rubro.errors }}
+                        </div>
+                    </div>
+
+                    <div class="registro-form__grid registro-form__grid--two">
+                        <div class="registro-form__field">
+                            <label for="{{ form.oficio.id_for_label }}">Oficio <span class="required">*</span></label>
+                            {{ form.oficio }}
+                            {{ form.oficio.errors }}
+                        </div>
+
+                        <div class="registro-form__field">
+                            <label for="{{ form.nombre_empresa.id_for_label }}">Nombre empresa (opcional)</label>
+                            {{ form.nombre_empresa }}
+                            {{ form.nombre_empresa.errors }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="registro-form__group">
+                    <h2 class="registro-form__group-title">Datos de contacto y ubicación</h2>
+
+                    <div class="registro-form__grid registro-form__grid--two">
+                        <div class="registro-form__field">
+                            <label for="{{ form.rut.id_for_label }}">RUT <span class="required">*</span></label>
+                            {{ form.rut }}
+                            {{ form.rut.errors }}
+                        </div>
+
+                        <div class="registro-form__field">
+                            <label for="{{ form.telefono.id_for_label }}">Teléfono <span class="required">*</span></label>
+                            {{ form.telefono }}
+                            {{ form.telefono.errors }}
+                        </div>
+                    </div>
+
+                    <div class="registro-form__field registro-form__field--full">
+                        <label for="{{ form.direccion.id_for_label }}">Dirección o comuna <span class="required">*</span></label>
+                        {{ form.direccion }}
+                        {{ form.direccion.errors }}
+                    </div>
+                </div>
+
+                <p id="submit-status" class="registro-form__status" aria-live="polite"></p>
+
+                <button class="registro-form__submit" type="submit" id="registro-submit-btn">
+                    <span aria-hidden="true">✓</span>
+                    Enviar solicitud
+                </button>
+            </form>
+
+            <div class="registro-actions">
+                <a class="registro-actions__catalog" href="{% url 'catalogo' %}">Ver catálogo</a>
             </div>
-
-            <div class="auth-form__field">
-                <label for="id_apellido">Apellido</label>
-                <input id="id_apellido" name="apellido" type="text" required>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_email">Email</label>
-                <input id="id_email" name="email" type="email" required>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_telefono">Telefono</label>
-                <input id="id_telefono" name="telefono" type="tel" required>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_tipo">Tipo</label>
-                <select id="id_tipo" name="tipo" required>
-                    <option value="">Selecciona una opcion</option>
-                    <option value="maestro">Maestro</option>
-                    <option value="pyme">PYME</option>
-                </select>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_rubro">Rubro u oficio</label>
-                <input id="id_rubro" name="rubro" type="text" required>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_empresa">Nombre empresa (opcional)</label>
-                <input id="id_empresa" name="empresa" type="text">
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_rut">RUT</label>
-                <input id="id_rut" name="rut" type="text" required>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_direccion">Direccion</label>
-                <input id="id_direccion" name="direccion" type="text" required>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_observacion">Observacion</label>
-                <textarea id="id_observacion" name="observacion" rows="4"></textarea>
-            </div>
-
-            <button class="auth-form__submit" type="submit">Enviar solicitud</button>
-        </form>
+        </div>
     </div>
 </section>
+
+<script>
+    (function () {
+        var placeholders = {
+            id_rut: "12.345.678-9",
+            id_telefono: "+56 9 1234 5678",
+            id_direccion: "Ej: Av. Principal 1234, Santiago",
+            id_oficio: "Ej: Electricista, Gasfiter, Constructor",
+            id_nombre_empresa: "Ej: Soluciones Integrales SpA"
+        };
+
+        Object.keys(placeholders).forEach(function (id) {
+            var field = document.getElementById(id);
+            if (field && !field.getAttribute("placeholder")) {
+                field.setAttribute("placeholder", placeholders[id]);
+            }
+        });
+
+        var form = document.querySelector(".registro-form");
+        var status = document.getElementById("submit-status");
+        var submitBtn = document.getElementById("registro-submit-btn");
+
+        if (form && status && submitBtn) {
+            form.addEventListener("submit", function () {
+                status.textContent = "Solicitud recibida, nos pondremos en contacto contigo pronto.";
+                status.classList.add("registro-form__status--visible");
+                submitBtn.classList.add("registro-form__submit--loading");
+                submitBtn.setAttribute("aria-busy", "true");
+            });
+        }
+    })();
+</script>
 {% endblock %}

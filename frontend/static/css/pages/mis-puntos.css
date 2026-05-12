@@ -1,0 +1,525 @@
+/* ============================================================================
+   Mis Puntos FERREMAS Page
+   ============================================================================ */
+
+.puntos-section {
+	padding: 2rem 1rem 3rem;
+	background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+	min-height: 100vh;
+}
+
+.puntos-container {
+	max-width: 1050px;
+	margin: 0 auto;
+}
+
+/* Header Section */
+.puntos-header {
+	margin-bottom: 2rem;
+	text-align: center;
+}
+
+.puntos-header h1 {
+	margin: 0 0 0.4rem;
+	font-size: 2.2rem;
+	font-weight: 900;
+	color: var(--color-dark);
+	letter-spacing: -0.5px;
+}
+
+.puntos-header p {
+	margin: 0;
+	font-size: 1rem;
+	color: #616161;
+	line-height: 1.5;
+}
+
+/* Summary Cards Grid (Ley de Proximidad + Jerarquía) */
+.puntos-summary-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1.25rem;
+	margin-bottom: 2.5rem;
+}
+
+/* Main Summary Card - Saldo Disponible */
+.puntos-card {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 14px;
+	padding: 1.6rem;
+	box-shadow: 0 10px 30px rgba(51, 51, 51, 0.08);
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	transition: all 0.3s ease;
+	text-align: center;
+}
+
+.puntos-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 14px 40px rgba(51, 51, 51, 0.12);
+}
+
+/* Primary Card - Saldo Disponible */
+.puntos-card--primary {
+	background: linear-gradient(135deg, #fff5e6 0%, #fffaef 100%);
+	border: 2px solid #fcd34d;
+	grid-column: 1 / -1;
+	padding: 2rem;
+}
+
+.puntos-card__label {
+	font-size: 0.85rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	color: #6b7280;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6rem;
+}
+
+.puntos-card__label::before {
+	content: "⭐";
+	font-size: 1.2rem;
+}
+
+.puntos-card__value {
+	font-size: 3.2rem;
+	font-weight: 900;
+	color: var(--color-primary);
+	line-height: 1;
+	margin: 0.5rem 0 0;
+}
+
+.puntos-card__unit {
+	font-size: 1rem;
+	color: #6b7280;
+	font-weight: 600;
+}
+
+/* Secondary Cards */
+.puntos-card--secondary {
+	background: linear-gradient(135deg, #f0fdf4 0%, #f7fee7 100%);
+	border: 2px solid #86efac;
+}
+
+.puntos-card--secondary .puntos-card__value {
+	color: #16a34a;
+	font-size: 2.4rem;
+}
+
+.puntos-card--secondary .puntos-card__label::before {
+	content: "📈";
+}
+
+/* Used Points Card */
+.puntos-card--used {
+	background: linear-gradient(135deg, #fef2f2 0%, #fef9f3 100%);
+	border: 2px solid #fca5a5;
+}
+
+.puntos-card--used .puntos-card__value {
+	color: #dc2626;
+	font-size: 2.4rem;
+}
+
+.puntos-card--used .puntos-card__label::before {
+	content: "📉";
+}
+
+/* Info Message */
+.puntos-info-box {
+	background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+	border: 2px solid #bfdbfe;
+	border-radius: 12px;
+	padding: 1.2rem;
+	margin-bottom: 2rem;
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+.puntos-info-box::before {
+	content: "💡";
+	font-size: 1.6rem;
+	flex-shrink: 0;
+}
+
+.puntos-info-text {
+	color: #1e40af;
+	font-size: 0.95rem;
+	line-height: 1.6;
+}
+
+.puntos-info-text strong {
+	color: var(--color-dark);
+	font-weight: 700;
+}
+
+/* Historial Table Container */
+.puntos-historial {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 14px;
+	overflow: hidden;
+	box-shadow: 0 10px 30px rgba(51, 51, 51, 0.08);
+	margin-bottom: 2rem;
+}
+
+.puntos-historial-title {
+	padding: 1.5rem;
+	border-bottom: 2px solid #f3f4f6;
+	font-size: 1.25rem;
+	font-weight: 800;
+	color: var(--color-dark);
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin: 0;
+}
+
+.puntos-historial-title::before {
+	content: "📋";
+	font-size: 1.4rem;
+}
+
+/* Responsive Table */
+.puntos-table-wrapper {
+	overflow-x: auto;
+}
+
+.puntos-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+}
+
+.puntos-table thead {
+	background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+.puntos-table th {
+	padding: 1rem;
+	text-align: left;
+	font-weight: 800;
+	color: var(--color-dark);
+	border-bottom: 2px solid #e5e7eb;
+	text-transform: uppercase;
+	font-size: 0.8rem;
+	letter-spacing: 0.5px;
+}
+
+.puntos-table td {
+	padding: 1.2rem 1rem;
+	border-bottom: 1px solid #f3f4f6;
+	color: #374151;
+}
+
+.puntos-table tbody tr {
+	transition: background-color 0.2s ease;
+}
+
+.puntos-table tbody tr:hover {
+	background-color: #f9fafb;
+}
+
+.puntos-table tbody tr:last-child td {
+	border-bottom: none;
+}
+
+/* Highlight columns */
+.puntos-table__compra {
+	font-weight: 700;
+	color: var(--color-dark);
+}
+
+.puntos-table__ganados {
+	color: #16a34a;
+	font-weight: 700;
+}
+
+.puntos-table__usados {
+	color: #dc2626;
+	font-weight: 700;
+}
+
+.puntos-table__saldo {
+	font-weight: 800;
+	color: var(--color-primary);
+	background: rgba(245, 124, 0, 0.05);
+	border-radius: 6px;
+	padding: 0.5rem;
+	display: inline-block;
+	min-width: 70px;
+	text-align: center;
+}
+
+.puntos-table__fecha {
+	color: #9ca3af;
+	font-size: 0.9rem;
+}
+
+/* Empty State */
+.puntos-empty {
+	text-align: center;
+	padding: 3rem 1.5rem;
+}
+
+.puntos-empty__icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.puntos-empty__title {
+	font-size: 1.3rem;
+	font-weight: 800;
+	color: var(--color-dark);
+	margin-bottom: 0.5rem;
+}
+
+.puntos-empty__text {
+	color: #6b7280;
+	margin-bottom: 1.5rem;
+}
+
+/* CTA Section (Ley de Fitts) */
+.puntos-actions {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.puntos-btn {
+	min-height: 54px;
+	padding: 1rem 2rem;
+	border: none;
+	border-radius: 12px;
+	font-size: 0.95rem;
+	font-weight: 800;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6rem;
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Primary Button - Checkout */
+.puntos-btn--primary {
+	background: linear-gradient(135deg, var(--color-primary), #da6f00);
+	color: #ffffff;
+	box-shadow: 0 10px 24px rgba(245, 124, 0, 0.3);
+	grid-column: 1 / -1;
+}
+
+.puntos-btn--primary::before {
+	content: "🛒";
+	font-size: 1.1rem;
+}
+
+.puntos-btn--primary:hover {
+	filter: brightness(1.08);
+	transform: translateY(-2px);
+	box-shadow: 0 14px 32px rgba(245, 124, 0, 0.35);
+}
+
+.puntos-btn--primary:active {
+	transform: translateY(0px);
+}
+
+/* Secondary Button - Home */
+.puntos-btn--secondary {
+	background: #f3f4f6;
+	color: var(--color-dark);
+	border: 2px solid #e5e7eb;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.puntos-btn--secondary::before {
+	content: "🏠";
+	font-size: 1.1rem;
+}
+
+.puntos-btn--secondary:hover {
+	background: #e5e7eb;
+	border-color: #d1d5db;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.puntos-btn--secondary:active {
+	transform: translateY(0px);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+	.puntos-container {
+		max-width: 100%;
+	}
+
+	.puntos-summary-grid {
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 1rem;
+	}
+
+	.puntos-card {
+		padding: 1.2rem;
+	}
+
+	.puntos-card--primary {
+		padding: 1.5rem;
+	}
+
+	.puntos-card__value {
+		font-size: 2.4rem;
+	}
+
+	.puntos-card--primary .puntos-card__value {
+		font-size: 2.8rem;
+	}
+}
+
+@media (max-width: 768px) {
+	.puntos-section {
+		padding: 1.5rem 1rem 2rem;
+	}
+
+	.puntos-header h1 {
+		font-size: 1.8rem;
+	}
+
+	.puntos-header p {
+		font-size: 0.9rem;
+	}
+
+	.puntos-summary-grid {
+		grid-template-columns: 1fr;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.puntos-card {
+		padding: 1.2rem;
+	}
+
+	.puntos-card--primary {
+		padding: 1.5rem;
+	}
+
+	.puntos-card__value {
+		font-size: 2.2rem;
+	}
+
+	.puntos-card--primary .puntos-card__value {
+		font-size: 2.6rem;
+	}
+
+	.puntos-card__label {
+		font-size: 0.8rem;
+	}
+
+	.puntos-historial-title {
+		padding: 1.2rem;
+		font-size: 1.1rem;
+	}
+
+	.puntos-table th,
+	.puntos-table td {
+		padding: 0.8rem 0.6rem;
+		font-size: 0.85rem;
+	}
+
+	.puntos-table th {
+		font-size: 0.75rem;
+	}
+
+	.puntos-actions {
+		grid-template-columns: 1fr;
+		gap: 0.8rem;
+	}
+
+	.puntos-btn {
+		min-height: 50px;
+		padding: 0.9rem 1.2rem;
+		font-size: 0.9rem;
+	}
+
+	.puntos-btn--primary {
+		grid-column: 1 / -1;
+	}
+
+	.puntos-info-box {
+		padding: 1rem;
+		font-size: 0.9rem;
+	}
+
+	.puntos-info-box::before {
+		font-size: 1.4rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.puntos-header h1 {
+		font-size: 1.5rem;
+	}
+
+	.puntos-card__value {
+		font-size: 1.8rem;
+	}
+
+	.puntos-card--primary .puntos-card__value {
+		font-size: 2.2rem;
+	}
+
+	.puntos-btn {
+		min-height: 48px;
+		padding: 0.8rem 1rem;
+		font-size: 0.85rem;
+	}
+
+	.puntos-btn::before {
+		font-size: 0.9rem;
+	}
+
+	.puntos-card__label {
+		font-size: 0.75rem;
+		gap: 0.4rem;
+	}
+
+	.puntos-table {
+		font-size: 0.8rem;
+	}
+
+	.puntos-table th,
+	.puntos-table td {
+		padding: 0.6rem 0.4rem;
+	}
+
+	.puntos-historial-title {
+		font-size: 1rem;
+		padding: 1rem;
+	}
+}
+
+/* Print Styles */
+@media print {
+	.puntos-section {
+		background: white;
+	}
+
+	.puntos-card {
+		page-break-inside: avoid;
+	}
+
+	.puntos-actions {
+		display: none;
+	}
+}

@@ -1,0 +1,378 @@
+/* ============================================================================
+   Panel Maestro/PYME Dashboard
+   ============================================================================ */
+
+.maestro-panel-section {
+	padding: 2rem 1rem 3rem;
+	background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+	min-height: 100vh;
+}
+
+.maestro-panel-container {
+	max-width: 1100px;
+	margin: 0 auto;
+}
+
+/* Header Section */
+.maestro-panel-header {
+	margin-bottom: 2rem;
+	text-align: center;
+}
+
+.maestro-panel-header h1 {
+	margin: 0 0 0.4rem;
+	font-size: 2.2rem;
+	font-weight: 900;
+	color: var(--color-dark);
+	letter-spacing: -0.5px;
+}
+
+.maestro-panel-header p {
+	margin: 0;
+	font-size: 0.95rem;
+	color: #616161;
+	line-height: 1.6;
+	max-width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Status Badge */
+.maestro-panel-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	background: #fef3c7;
+	border: 1px solid #fcd34d;
+	padding: 0.6rem 1rem;
+	border-radius: 20px;
+	font-size: 0.85rem;
+	font-weight: 700;
+	color: #92400e;
+	margin-top: 1rem;
+}
+
+.maestro-panel-status::before {
+	content: "⏳";
+	font-size: 1rem;
+}
+
+/* Main Content Grid */
+.maestro-panel-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	gap: 1.5rem;
+	margin-bottom: 2rem;
+}
+
+/* Benefits Cards */
+.maestro-benefits {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 14px;
+	padding: 1.5rem;
+	box-shadow: 0 10px 30px rgba(51, 51, 51, 0.08);
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.maestro-benefits-title {
+	margin: 0;
+	font-size: 1.3rem;
+	font-weight: 800;
+	color: var(--color-dark);
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.maestro-benefits-title::before {
+	content: "⭐";
+	font-size: 1.4rem;
+}
+
+.maestro-benefits-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.maestro-benefits-list li {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.8rem;
+	font-size: 0.95rem;
+	color: #374151;
+	line-height: 1.5;
+}
+
+.maestro-benefits-list li::before {
+	content: "✓";
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	background: linear-gradient(135deg, var(--color-primary), #da6f00);
+	color: white;
+	border-radius: 50%;
+	font-weight: 900;
+	font-size: 0.75rem;
+	flex-shrink: 0;
+	margin-top: 0.1rem;
+}
+
+/* Summary/Status Info Card */
+.maestro-summary {
+	background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+	border: 2px solid #bfdbfe;
+	border-radius: 14px;
+	padding: 1.5rem;
+	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+}
+
+.maestro-summary-title {
+	margin: 0 0 1rem;
+	font-size: 1.2rem;
+	font-weight: 800;
+	color: var(--color-dark);
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.maestro-summary-title::before {
+	content: "📊";
+	font-size: 1.3rem;
+}
+
+.maestro-summary-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.maestro-summary-list li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.7rem 0;
+	border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+	font-size: 0.95rem;
+	color: #1e40af;
+}
+
+.maestro-summary-list li:last-child {
+	border-bottom: none;
+}
+
+.maestro-summary-list strong {
+	font-weight: 700;
+	color: var(--color-dark);
+}
+
+/* CTA Section - Action Buttons (Ley de Fitts + Jerarquía) */
+.maestro-actions {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 14px;
+	padding: 1.8rem;
+	box-shadow: 0 10px 30px rgba(51, 51, 51, 0.08);
+}
+
+.maestro-actions-title {
+	margin: 0 0 1.2rem;
+	font-size: 1.2rem;
+	font-weight: 800;
+	color: var(--color-dark);
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.maestro-actions-title::before {
+	content: "🎯";
+	font-size: 1.3rem;
+}
+
+.maestro-actions-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 1rem;
+}
+
+/* Primary CTA Button */
+.maestro-btn {
+	min-height: 54px;
+	padding: 1rem 1.5rem;
+	border: none;
+	border-radius: 12px;
+	font-size: 0.95rem;
+	font-weight: 800;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6rem;
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Primary CTA - Publicar Servicio */
+.maestro-btn--primary {
+	background: linear-gradient(135deg, var(--color-primary), #da6f00);
+	color: #ffffff;
+	box-shadow: 0 10px 24px rgba(245, 124, 0, 0.3);
+	grid-column: 1 / -1;
+}
+
+.maestro-btn--primary:hover {
+	filter: brightness(1.08);
+	transform: translateY(-2px);
+	box-shadow: 0 14px 32px rgba(245, 124, 0, 0.35);
+}
+
+.maestro-btn--primary:active {
+	transform: translateY(0px);
+}
+
+.maestro-btn--primary::before {
+	content: "➕";
+	font-size: 1.1rem;
+}
+
+/* Secondary CTA Buttons */
+.maestro-btn--secondary {
+	background: #f3f4f6;
+	color: var(--color-dark);
+	border: 2px solid #e5e7eb;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.maestro-btn--secondary:hover {
+	background: #e5e7eb;
+	border-color: #d1d5db;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.maestro-btn--secondary:active {
+	transform: translateY(0px);
+}
+
+/* Specific Button Icons */
+.maestro-btn--secondary[href*="servicios"]::before {
+	content: "📋";
+	font-size: 1.1rem;
+}
+
+.maestro-btn--secondary[href*="estado"]::before {
+	content: "💳";
+	font-size: 1.1rem;
+}
+
+.maestro-btn--secondary[href*="home"]::before {
+	content: "⬅";
+	font-size: 1rem;
+}
+
+/* Desktop: Stack primary button on top */
+@media (min-width: 769px) {
+	.maestro-actions-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
+	}
+
+	.maestro-btn--primary {
+		grid-column: 1 / -1;
+		margin-bottom: 0.5rem;
+	}
+}
+
+/* Responsive Grid for Content */
+@media (max-width: 1024px) {
+	.maestro-panel-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.maestro-summary {
+		grid-column: auto;
+	}
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+	.maestro-panel-section {
+		padding: 1.5rem 1rem 2rem;
+	}
+
+	.maestro-panel-header h1 {
+		font-size: 1.8rem;
+	}
+
+	.maestro-panel-header p {
+		font-size: 0.9rem;
+	}
+
+	.maestro-panel-grid {
+		grid-template-columns: 1fr;
+		gap: 1.2rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.maestro-benefits,
+	.maestro-summary,
+	.maestro-actions {
+		padding: 1.2rem;
+	}
+
+	.maestro-actions-grid {
+		grid-template-columns: 1fr;
+		gap: 0.8rem;
+	}
+
+	.maestro-btn {
+		min-height: 50px;
+		padding: 0.9rem 1.2rem;
+		font-size: 0.9rem;
+	}
+
+	.maestro-btn--primary {
+		grid-column: 1 / -1;
+	}
+}
+
+@media (max-width: 480px) {
+	.maestro-panel-header h1 {
+		font-size: 1.5rem;
+	}
+
+	.maestro-benefits-title,
+	.maestro-summary-title,
+	.maestro-actions-title {
+		font-size: 1.1rem;
+	}
+
+	.maestro-btn {
+		min-height: 48px;
+		padding: 0.8rem 1rem;
+		font-size: 0.85rem;
+	}
+
+	.maestro-btn::before {
+		font-size: 0.9rem;
+	}
+
+	.maestro-benefits-list li,
+	.maestro-summary-list li {
+		font-size: 0.9rem;
+	}
+}

@@ -1,0 +1,303 @@
+.registro-section {
+    min-height: calc(100vh - 120px);
+    padding: 2rem 1rem 2.5rem;
+    background:
+        radial-gradient(circle at 10% 0%, rgba(245, 124, 0, 0.12), transparent 35%),
+        radial-gradient(circle at 95% 20%, rgba(2, 132, 199, 0.1), transparent 30%),
+        #f8fafc;
+}
+
+.registro-container {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    display: grid;
+    gap: 1.4rem;
+}
+
+.registro-header {
+    background: linear-gradient(120deg, #fff5eb, #ffffff);
+    border: 1px solid #ffd9b0;
+    border-radius: 16px;
+    padding: 1.4rem 1.2rem;
+}
+
+.registro-header__title {
+    margin: 0;
+    color: #222222;
+    font-size: clamp(1.7rem, 2.5vw, 2.2rem);
+    line-height: 1.1;
+}
+
+.registro-header__subtitle {
+    margin: 0.7rem 0 0;
+    color: #4b5563;
+    font-size: 1rem;
+    max-width: 68ch;
+}
+
+.registro-alerts {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.registro-alert {
+    margin: 0;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    padding: 0.82rem 1rem;
+    font-size: 0.95rem;
+}
+
+.registro-alert--success {
+    background: #ecfdf3;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.registro-alert--error {
+    background: #fff1f2;
+    border-color: #fda4af;
+    color: #9f1239;
+}
+
+.registro-alert--warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.registro-benefits {
+    border-radius: 16px;
+    border: 1px solid #c7e7ff;
+    background: linear-gradient(125deg, #f0f9ff, #ffffff);
+    padding: 1.2rem;
+}
+
+.registro-benefits__title {
+    margin: 0 0 0.9rem;
+    color: #0c4a6e;
+    font-size: 1.25rem;
+}
+
+.registro-benefits__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.registro-benefits__item {
+    background: #ffffff;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 0.85rem 0.85rem;
+}
+
+.registro-benefits__item h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    color: #0f172a;
+}
+
+.registro-benefits__item p {
+    margin: 0.45rem 0 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.registro-form-wrapper {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+    padding: 1.2rem;
+}
+
+.registro-form {
+    display: grid;
+    gap: 1.1rem;
+}
+
+.registro-form__group {
+    display: grid;
+    gap: 0.9rem;
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.registro-form__group-title {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.05rem;
+}
+
+.registro-form__grid {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.registro-form__grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.registro-form__field {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.registro-form__field label {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.registro-form__field .required {
+    color: #dc2626;
+}
+
+.registro-form__field input,
+.registro-form__field select,
+.registro-form__field textarea {
+    width: 100%;
+    min-height: 46px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+    font-size: 0.98rem;
+    color: #0f172a;
+    background: #ffffff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-sizing: border-box;
+}
+
+.registro-form__field textarea {
+    min-height: 100px;
+}
+
+.registro-form__field input:focus,
+.registro-form__field select:focus,
+.registro-form__field textarea:focus {
+    outline: none;
+    border-color: #f57c00;
+    box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.2);
+}
+
+.registro-form__field .errorlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.84rem;
+    color: #b91c1c;
+}
+
+.registro-form__global-errors {
+    margin: 0;
+    border-radius: 10px;
+    border: 1px solid #fca5a5;
+    background: #fff1f2;
+    color: #9f1239;
+    padding: 0.8rem;
+}
+
+.registro-form__global-errors .errorlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.registro-form__status {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #166534;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.registro-form__status--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.registro-form__submit {
+    min-height: 52px;
+    border: none;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #f57c00, #d96b00);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.registro-form__submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(245, 124, 0, 0.35);
+}
+
+.registro-form__submit--loading {
+    opacity: 0.92;
+}
+
+.registro-actions {
+    margin-top: 1rem;
+}
+
+.registro-actions__catalog {
+    display: inline-flex;
+    width: 100%;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    border: 1px solid #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.registro-actions__catalog:hover {
+    background: #dbeafe;
+}
+
+@media (max-width: 900px) {
+    .registro-benefits__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .registro-section {
+        padding: 1.2rem 0.85rem 1.8rem;
+    }
+
+    .registro-form__grid--two {
+        grid-template-columns: 1fr;
+    }
+
+    .registro-form__submit,
+    .registro-actions__catalog {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .registro-header,
+    .registro-benefits,
+    .registro-form-wrapper {
+        padding: 1rem;
+    }
+
+    .registro-benefits__grid {
+        grid-template-columns: 1fr;
+    }
+}

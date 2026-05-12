@@ -1,31 +1,66 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<section class="auth-section">
-    <div class="auth-card">
-        <h1 class="auth-card__title">Panel Maestro/PYME</h1>
-        <p class="auth-card__subtitle">
-            Bienvenido al panel inicial para maestros y pymes de FERREMAX.
-            Esta vista es demostrativa y la logica funcional sera implementada en etapas posteriores.
-        </p>
+<section class="maestro-panel-section">
+    <div class="maestro-panel-container">
+        <header class="maestro-panel-header">
+            <h1>Panel Maestro/PYME</h1>
+            {% if not perfil_maestro %}
+                <p>Aún no tienes perfil Maestro/PYME.</p>
+                <a class="maestro-btn maestro-btn--primary" href="{% url 'registro_maestro_pyme' %}">Registrarme como Maestro/PYME</a>
+            {% else %}
+                <p>Gestiona tu perfil y el estado de tus servicios publicados.</p>
+                <div class="maestro-panel-status">Estado: {{ perfil_maestro.get_estado_display }}</div>
+            {% endif %}
+        </header>
 
-        <section class="auth-card__benefits" aria-label="Resumen del panel maestro pyme">
-            <h2>Resumen</h2>
-            <ul>
-                <li><strong>Estado de registro:</strong> En revision inicial</li>
-                <li><strong>Beneficio 30% primera compra:</strong> Disponible al aprobar registro</li>
-                <li><strong>FerreCredito:</strong> Modulo informativo en preparacion</li>
-                <li><strong>Publicacion de servicios:</strong> Pendiente de habilitacion</li>
-                <li><strong>Contactos recibidos:</strong> 0 contactos por ahora</li>
-            </ul>
-        </section>
+        {% if perfil_maestro %}
+            <div class="maestro-panel-grid">
+                <div class="maestro-benefits">
+                    <h2 class="maestro-benefits-title">Datos de tu perfil</h2>
+                    <ul class="maestro-benefits-list">
+                        <li><strong>Tipo:</strong> {{ perfil_maestro.get_tipo_display }}</li>
+                        <li><strong>Estado:</strong> {{ perfil_maestro.get_estado_display }}</li>
+                        <li><strong>Rubro:</strong> {{ perfil_maestro.rubro }}</li>
+                        <li><strong>Oficio:</strong> {{ perfil_maestro.oficio|default:'-' }}</li>
+                        <li><strong>Empresa:</strong> {{ perfil_maestro.nombre_empresa|default:'-' }}</li>
+                        <li><strong>Telefono:</strong> {{ perfil_maestro.telefono }}</li>
+                        <li><strong>Direccion:</strong> {{ perfil_maestro.direccion }}</li>
+                        <li>
+                            <strong>Descuento primera compra usado:</strong>
+                            {{ perfil_maestro.descuento_primera_compra_usado|yesno:'Si,No' }}
+                        </li>
+                    </ul>
+                </div>
 
-        <div class="auth-form" aria-label="Acciones panel maestro pyme">
-            <a class="auth-form__submit" href="{% url 'publicar_servicio_maestro' %}">Publicar servicio</a>
-            <a class="auth-form__submit" href="{% url 'mis_servicios_maestro' %}">Ver mis servicios</a>
-            <a class="auth-form__submit" href="{% url 'estado_ferrecredito' %}">Ver estado FerreCredito</a>
-            <a class="auth-form__submit" href="{% url 'home' %}">Volver al inicio</a>
-        </div>
+                <div class="maestro-summary">
+                    <h2 class="maestro-summary-title">Resumen real</h2>
+                    <ul class="maestro-summary-list">
+                        <li><span>Total servicios:</span> <strong>{{ total_servicios }}</strong></li>
+                        <li><span>Servicios activos:</span> <strong>{{ servicios_activos }}</strong></li>
+                        <li><span>Total solicitudes:</span> <strong>{{ total_solicitudes }}</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="maestro-actions">
+                <h2 class="maestro-actions-title">Acciones principales</h2>
+
+                {% if perfil_maestro.estado == 'pendiente' %}
+                    <p>Tu perfil está pendiente de aprobación.</p>
+                {% elif perfil_maestro.estado == 'rechazado' %}
+                    <p>Solicitud rechazada.</p>
+                    <a class="maestro-btn maestro-btn--secondary" href="{% url 'registro_maestro_pyme' %}">Actualizar solicitud</a>
+                {% elif perfil_maestro.estado == 'aprobado' %}
+                    <div class="maestro-actions-grid">
+                        <a class="maestro-btn maestro-btn--primary" href="{% url 'publicar_servicio_maestro' %}">Publicar servicio</a>
+                        <a class="maestro-btn maestro-btn--secondary" href="{% url 'mis_servicios_maestro' %}">Ver mis servicios</a>
+                        <a class="maestro-btn maestro-btn--secondary" href="{% url 'estado_ferrecredito' %}">Ver estado FerreCrédito</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
     </div>
 </section>
 {% endblock %}

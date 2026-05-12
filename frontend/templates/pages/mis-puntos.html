@@ -1,65 +1,101 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<section class="auth-section">
-    <div class="auth-card">
-        <h1 class="auth-card__title">Mis puntos FERREMAS</h1>
-        <p class="auth-card__subtitle">Resumen visual de puntos acumulados y uso en compras.</p>
+<section class="puntos-section">
+    <div class="puntos-container">
+        <header class="puntos-header">
+            <h1>Mis Puntos FERREMAS</h1>
+            <p>Acumula puntos en cada compra y úsalos para obtener descuentos</p>
+        </header>
 
-        <section class="auth-card__benefits" aria-label="Resumen de puntos">
-            <h2>Resumen</h2>
-            <ul>
-                <li><strong>Saldo disponible:</strong> 1.250 puntos</li>
-                <li><strong>Puntos ganados:</strong> 2.000</li>
-                <li><strong>Puntos usados:</strong> 750</li>
-            </ul>
-        </section>
+        <div class="puntos-summary-grid">
+            <div class="puntos-card puntos-card--primary">
+                <div class="puntos-card__label">Saldo Disponible</div>
+                <div class="puntos-card__value">{{ saldo }} <span class="puntos-card__unit">pts</span></div>
+                <p style="margin: 0.5rem 0 0; font-size: 0.9rem; color: #6b7280;">
+                    Listos para usar en tu próxima compra
+                </p>
+            </div>
 
-        <section class="auth-card__benefits" aria-label="Historial de movimientos de puntos">
-            <h2>Historial demo</h2>
-            <table class="checkout-tabla">
-                <thead>
-                    <tr>
-                        <th>Compra</th>
-                        <th>Puntos ganados</th>
-                        <th>Puntos usados</th>
-                        <th>Saldo resultante</th>
-                        <th>Fecha</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Pedido #120</td>
-                        <td>+500</td>
-                        <td>0</td>
-                        <td>500</td>
-                        <td>2026-05-02</td>
-                    </tr>
-                    <tr>
-                        <td>Pedido #124</td>
-                        <td>+700</td>
-                        <td>-250</td>
-                        <td>950</td>
-                        <td>2026-05-05</td>
-                    </tr>
-                    <tr>
-                        <td>Pedido #130</td>
-                        <td>+800</td>
-                        <td>-500</td>
-                        <td>1.250</td>
-                        <td>2026-05-09</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+            <div class="puntos-card puntos-card--secondary">
+                <div class="puntos-card__label">Puntos Ganados</div>
+                <div class="puntos-card__value">{{ total_ganados }} <span class="puntos-card__unit">pts</span></div>
+            </div>
 
-        <p>
-            Los puntos se acumulan por cada compra y pueden aplicarse en checkout para reducir el total.
-        </p>
+            <div class="puntos-card puntos-card--used">
+                <div class="puntos-card__label">Puntos Usados</div>
+                <div class="puntos-card__value">{{ total_usados }} <span class="puntos-card__unit">pts</span></div>
+            </div>
+        </div>
 
-        <div class="auth-form" aria-label="Acciones de puntos">
-            <a class="auth-form__submit" href="{% url 'checkout' %}">Ir al checkout</a>
-            <a class="auth-form__submit" href="{% url 'home' %}">Volver al inicio</a>
+        <div class="puntos-info-box">
+            <div class="puntos-info-text">
+                <strong>¿Cómo funcionan los puntos?</strong> Acumulas 1 punto por cada peso gastado. 
+                Puedes aplicarlos en el <strong>checkout</strong> para reducir el total de tu compra. 
+                Los puntos se acumulan automáticamente según el total final pagado de cada pedido.
+            </div>
+        </div>
+
+        <div class="puntos-historial">
+            <h2 class="puntos-historial-title">Historial de Movimientos</h2>
+            
+            {% if movimientos %}
+            <div class="puntos-table-wrapper">
+                <table class="puntos-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Puntos</th>
+                            <th>Saldo Resultante</th>
+                            <th>Pedido</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mov in movimientos %}
+                        <tr>
+                            <td class="puntos-table__fecha">{{ mov.creado_en|date:'d/m/Y H:i' }}</td>
+                            <td>{{ mov.get_tipo_display }}</td>
+                            <td>
+                                {% if mov.tipo == 'usado' %}
+                                    -{{ mov.puntos }}
+                                {% else %}
+                                    +{{ mov.puntos }}
+                                {% endif %}
+                            </td>
+                            <td class="puntos-table__saldo">{{ mov.saldo_resultante }}</td>
+                            <td>
+                                {% if mov.pedido %}
+                                    #{{ mov.pedido.pk }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ mov.descripcion|default:'-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="puntos-empty">
+                <div class="puntos-empty__icon">📭</div>
+                <h3 class="puntos-empty__title">Aún no tienes movimientos de puntos</h3>
+                <p class="puntos-empty__text">Realiza tu primera compra para comenzar a acumular puntos.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="puntos-actions">
+            <a class="puntos-btn puntos-btn--primary" href="{% url 'checkout' %}" 
+               aria-label="Ir al checkout para usar tus puntos">
+                Ir al Checkout
+            </a>
+            <a class="puntos-btn puntos-btn--secondary" href="{% url 'home' %}" 
+               aria-label="Volver al inicio">
+                Volver al Inicio
+            </a>
         </div>
     </div>
 </section>

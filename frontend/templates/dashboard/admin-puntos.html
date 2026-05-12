@@ -5,31 +5,37 @@
     <div class="dashboard-panel">
         <div class="dashboard-panel__header">
             <h1>Gestion de puntos</h1>
-            <p>Control visual de acumulacion y uso de puntos por cliente.</p>
+            <p>Control de cuentas de puntos de clientes.</p>
+        </div>
+
+        <div class="dashboard-panel__stats">
+            <p><strong>Total cuentas:</strong> {{ total_cuentas }}</p>
+            <p><strong>Total puntos en circulacion:</strong> {{ total_puntos_circulacion }}</p>
+            <p><strong>Total movimientos:</strong> {{ total_movimientos }}</p>
         </div>
 
         <table class="checkout-tabla">
             <thead>
                 <tr>
                     <th>Cliente</th>
-                    <th>Puntos acumulados</th>
-                    <th>Puntos usados</th>
-                    <th>Saldo disponible</th>
+                    <th>Saldo</th>
+                    <th>Cantidad movimientos</th>
+                    <th>Actualizado</th>
                 </tr>
             </thead>
             <tbody>
+                {% for cuenta in cuentas %}
                 <tr>
-                    <td>Cliente Demo 1</td>
-                    <td>2.100</td>
-                    <td>600</td>
-                    <td>1.500</td>
+                    <td>{{ cuenta.usuario.email }}</td>
+                    <td>{{ cuenta.saldo }}</td>
+                    <td>{{ cuenta.cantidad_movimientos }}</td>
+                    <td>{{ cuenta.actualizado_en|date:'d/m/Y H:i' }}</td>
                 </tr>
+                {% empty %}
                 <tr>
-                    <td>Cliente Demo 2</td>
-                    <td>1.750</td>
-                    <td>250</td>
-                    <td>1.500</td>
+                    <td colspan="4">No hay cuentas de puntos registradas.</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -37,7 +43,7 @@
             <div class="dashboard-panel__header">
                 <h2>Informacion</h2>
             </div>
-            <p>Los puntos seran acumulados por compras y podran descontarse en checkout.</p>
+            <p>Los puntos se acumulan por compra y se descuentan al confirmar checkout, respetando saldo disponible.</p>
         </div>
     </div>
 </section>

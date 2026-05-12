@@ -17,39 +17,40 @@
         <form class="auth-form" method="post" action="{% url 'publicar_servicio_maestro' %}" novalidate>
             {% csrf_token %}
 
+            {% if form.non_field_errors %}
             <div class="auth-form__field">
-                <label for="id_titulo">Titulo del servicio</label>
-                <input id="id_titulo" name="titulo" type="text" required>
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="auth-form__field">
+                <label for="{{ form.titulo.id_for_label }}">Titulo del servicio</label>
+                {{ form.titulo }}
+                {{ form.titulo.errors }}
             </div>
 
             <div class="auth-form__field">
-                <label for="id_rubro">Rubro</label>
-                <input id="id_rubro" name="rubro" type="text" required>
+                <label for="{{ form.rubro.id_for_label }}">Rubro</label>
+                {{ form.rubro }}
+                {{ form.rubro.errors }}
             </div>
 
             <div class="auth-form__field">
-                <label for="id_descripcion">Descripcion</label>
-                <textarea id="id_descripcion" name="descripcion" rows="4" required></textarea>
+                <label for="{{ form.descripcion.id_for_label }}">Descripcion</label>
+                {{ form.descripcion }}
+                {{ form.descripcion.errors }}
             </div>
 
             <div class="auth-form__field">
-                <label for="id_zona">Comuna o zona de atencion</label>
-                <input id="id_zona" name="zona" type="text" required>
+                <label for="{{ form.zona_atencion.id_for_label }}">Comuna o zona de atencion</label>
+                {{ form.zona_atencion }}
+                {{ form.zona_atencion.errors }}
             </div>
 
             <div class="auth-form__field">
-                <label for="id_telefono">Telefono de contacto</label>
-                <input id="id_telefono" name="telefono" type="tel" required>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_email">Email</label>
-                <input id="id_email" name="email" type="email" required>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_precio">Precio referencial (opcional)</label>
-                <input id="id_precio" name="precio" type="text">
+                <label for="{{ form.precio_referencial.id_for_label }}">Precio referencial (opcional)</label>
+                {{ form.precio_referencial }}
+                {{ form.precio_referencial.errors }}
             </div>
 
             <button class="auth-form__submit" type="submit">Publicar servicio</button>

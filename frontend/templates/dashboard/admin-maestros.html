@@ -5,45 +5,67 @@
     <div class="dashboard-panel">
         <div class="dashboard-panel__header">
             <h1>Gestion Maestro/PYME</h1>
-            <p>Panel visual demostrativo para revision y validacion administrativa.</p>
+            <p>Revision administrativa de perfiles Maestro/PYME registrados.</p>
+        </div>
+
+        <div class="dashboard-panel__stats">
+            <p><strong>Total perfiles:</strong> {{ total_perfiles }}</p>
+            <p><strong>Pendientes:</strong> {{ total_pendientes }}</p>
+            <p><strong>Aprobados:</strong> {{ total_aprobados }}</p>
+            <p><strong>Rechazados:</strong> {{ total_rechazados }}</p>
         </div>
 
         <table class="checkout-tabla">
             <thead>
                 <tr>
-                    <th>Nombre</th>
+                    <th>Email</th>
                     <th>Tipo</th>
+                    <th>RUT</th>
                     <th>Rubro</th>
+                    <th>Oficio</th>
+                    <th>Empresa</th>
+                    <th>Telefono</th>
                     <th>Estado</th>
+                    <th>Creado</th>
                     <th>Servicios publicados</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Juan Perez</td>
-                    <td>Maestro</td>
-                    <td>Gasfiteria</td>
-                    <td>Pendiente</td>
-                    <td>2</td>
-                    <td>
-                        <a class="btn btn--primary" href="#">Aprobar</a>
-                        <a class="btn btn--outline" href="#">Rechazar</a>
-                        <a class="btn btn--link" href="#">Ver detalle</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Constructora Demo SpA</td>
-                    <td>PYME</td>
-                    <td>Remodelaciones</td>
-                    <td>Aprobado</td>
-                    <td>5</td>
-                    <td>
-                        <a class="btn btn--primary" href="#">Aprobar</a>
-                        <a class="btn btn--outline" href="#">Rechazar</a>
-                        <a class="btn btn--link" href="#">Ver detalle</a>
-                    </td>
-                </tr>
+                {% for perfil in perfiles %}
+                    <tr>
+                        <td>{{ perfil.usuario.email }}</td>
+                        <td>{{ perfil.get_tipo_display }}</td>
+                        <td>{{ perfil.rut }}</td>
+                        <td>{{ perfil.rubro }}</td>
+                        <td>{{ perfil.oficio|default:'-' }}</td>
+                        <td>{{ perfil.nombre_empresa|default:'-' }}</td>
+                        <td>{{ perfil.telefono }}</td>
+                        <td>{{ perfil.get_estado_display }}</td>
+                        <td>{{ perfil.creado_en|date:'d/m/Y H:i' }}</td>
+                        <td>{{ perfil.servicios.count }}</td>
+                        <td>
+                            {% if perfil.estado == 'pendiente' %}
+                                <form method="post" action="{% url 'admin_maestro_aprobar' perfil.pk %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn--primary">Aprobar</button>
+                                </form>
+                                <form method="post" action="{% url 'admin_maestro_rechazar' perfil.pk %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn--outline">Rechazar</button>
+                                </form>
+                            {% elif perfil.estado == 'aprobado' %}
+                                <span class="badge">Aprobado</span>
+                            {% elif perfil.estado == 'rechazado' %}
+                                <span class="badge">Rechazado</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="11">No hay perfiles Maestro/PYME registrados.</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

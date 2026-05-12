@@ -4,21 +4,42 @@
 <section class="auth-section">
     <div class="auth-card">
         <h1 class="auth-card__title">Mis servicios publicados</h1>
-        <p class="auth-card__subtitle">Vista demostrativa de servicios para Maestro/PYME.</p>
+        <p class="auth-card__subtitle">Listado real de tus servicios como Maestro/PYME.</p>
 
-        <div class="auth-card__benefits" aria-label="Listado de servicios de ejemplo">
-            <h2>Servicios demo</h2>
-            <ul>
-                <li><strong>Instalacion electrica domiciliaria</strong> - Zona: Santiago Centro - Estado: Publicado</li>
-                <li><strong>Reparacion de filtraciones</strong> - Zona: Maipu y Cerrillos - Estado: En revision</li>
-                <li><strong>Pintura interior y exterior</strong> - Zona: Providencia - Estado: Publicado</li>
-            </ul>
-        </div>
+        {% if not perfil_maestro %}
+            <div class="auth-card__benefits" aria-label="Sin perfil Maestro/PYME">
+                <p>Aún no tienes perfil Maestro/PYME.</p>
+                <a class="auth-form__submit" href="{% url 'registro_maestro_pyme' %}">Registrarme como Maestro/PYME</a>
+            </div>
+        {% else %}
+            {% if servicios %}
+                <div class="auth-card__benefits" aria-label="Listado de servicios publicados">
+                    <ul>
+                        {% for servicio in servicios %}
+                            <li>
+                                <strong>{{ servicio.titulo }}</strong><br>
+                                <span>{{ servicio.descripcion }}</span><br>
+                                <span>Rubro: {{ servicio.rubro }}</span><br>
+                                <span>Zona de atención: {{ servicio.zona_atencion }}</span><br>
+                                <span>Precio referencial: {{ servicio.precio_referencial|default:'-' }}</span><br>
+                                <span>Activo: {{ servicio.activo|yesno:'Si,No' }}</span><br>
+                                <span>Creado: {{ servicio.creado_en|date:'d/m/Y H:i' }}</span><br>
+                                <span>Actualizado: {{ servicio.actualizado_en|date:'d/m/Y H:i' }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <div class="auth-card__benefits" aria-label="Sin servicios publicados">
+                    <p>Aún no has publicado servicios.</p>
+                </div>
+            {% endif %}
 
-        <div class="auth-form" aria-label="Acciones de mis servicios">
-            <a class="auth-form__submit" href="{% url 'publicar_servicio_maestro' %}">Publicar nuevo servicio</a>
-            <a class="auth-form__submit" href="{% url 'panel_maestro_pyme' %}">Volver al panel</a>
-        </div>
+            <div class="auth-form" aria-label="Acciones de mis servicios">
+                <a class="auth-form__submit" href="{% url 'publicar_servicio_maestro' %}">Publicar nuevo servicio</a>
+                <a class="auth-form__submit" href="{% url 'panel_maestro_pyme' %}">Volver al panel</a>
+            </div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

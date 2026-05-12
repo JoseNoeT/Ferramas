@@ -1,30 +1,58 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<section class="auth-section">
-    <div class="auth-card">
-        <h1 class="auth-card__title">Servicios de Maestros y PYMES</h1>
-        <p class="auth-card__subtitle">
-            Solicita una asesoria inicial para conectar con maestros y pymes de confianza en FERREMAX.
-        </p>
+<section class="servicios-section">
+    <div class="servicios-container">
+        <header class="servicios-header">
+            <h1>Servicios de Maestros y PYMES</h1>
+            <p>Explora servicios reales publicados por perfiles Maestro/PYME aprobados.</p>
+            <p><strong>Total disponibles:</strong> {{ total_servicios }}</p>
+        </header>
 
-        <section class="auth-card__benefits" aria-label="Costo de confirmacion de asesoria">
-            <h2>Confirmacion de asesoria</h2>
-            <p>Costo de confirmacion: <strong>$5.000</strong> (flujo de pago aun no implementado).</p>
-        </section>
+        <div class="servicios-confirmation">
+            <h2 class="servicios-confirmation__title">Cargo por Confirmación de Asesoría</h2>
+            <div class="servicios-confirmation__price-box">
+                <span class="servicios-confirmation__price-label">Monto a Confirmar</span>
+                <p class="servicios-confirmation__price-amount">$5.000</p>
+            </div>
+            <p class="servicios-confirmation__description">
+                Este cargo corresponde únicamente a la <strong>confirmación de contacto inicial</strong> con el maestro o PYME. 
+                El pago final del servicio profesional se realiza directamente entre tú y el profesional, fuera de los sistemas de FERREMAX.
+            </p>
+        </div>
 
-        <section class="auth-card__benefits" aria-label="Servicios disponibles de ejemplo">
-            <h2>Servicios destacados</h2>
-            <ul>
-                <li><strong>Maestro gasfiteria urgente</strong> - Cobertura: RM - Tiempo estimado: 24 horas</li>
-                <li><strong>Instalacion de ceramicas</strong> - Cobertura: Quinta Region - Tiempo estimado: 48 horas</li>
-                <li><strong>Asesoria para remodelacion PYME</strong> - Cobertura: Nacional remoto/presencial</li>
-            </ul>
-        </section>
-
-        <div class="auth-form" aria-label="Acciones para solicitar asesoria">
-            <a class="auth-form__submit" href="{% url 'solicitud_asesoria_maestro' %}">Solicitar asesoria</a>
-            <a class="auth-form__submit" href="{% url 'home' %}">Volver al inicio</a>
+        <div class="servicios-reference">
+            <h2 class="servicios-reference__title">Servicios disponibles</h2>
+            {% if servicios %}
+                <ul class="servicios-reference__list">
+                    {% for servicio in servicios %}
+                        <li class="servicios-reference__item">
+                            <div>
+                                <strong>{{ servicio.titulo }}</strong><br>
+                                {{ servicio.descripcion }}<br>
+                                <strong>Rubro servicio:</strong> {{ servicio.rubro }}<br>
+                                <strong>Zona:</strong> {{ servicio.zona_atencion }}<br>
+                                {% if servicio.precio_referencial %}
+                                    <strong>Precio referencial:</strong> ${{ servicio.precio_referencial }}<br>
+                                {% endif %}
+                                <strong>Perfil:</strong> {{ servicio.maestro.get_tipo_display }}<br>
+                                <strong>Rubro perfil:</strong> {{ servicio.maestro.rubro }}<br>
+                                <strong>Oficio:</strong> {{ servicio.maestro.oficio|default:'-' }}<br>
+                                {% if servicio.maestro.nombre_empresa %}
+                                    <strong>Empresa:</strong> {{ servicio.maestro.nombre_empresa }}<br>
+                                {% endif %}
+                                <a class="servicios-btn servicios-btn--primary" href="{% url 'solicitud_asesoria_maestro_detalle' servicio.id %}">Solicitar asesoría</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No hay servicios Maestro/PYME disponibles actualmente.</p>
+                <div class="servicios-actions">
+                    <a class="servicios-btn servicios-btn--secondary" href="{% url 'catalogo' %}">Ir al catálogo</a>
+                    <a class="servicios-btn servicios-btn--secondary" href="{% url 'home' %}">Volver al inicio</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </section>

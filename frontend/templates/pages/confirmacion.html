@@ -16,7 +16,7 @@
             <table class="confirmacion-tabla">
                 <thead>
                     <tr>
-                        <th>Producto</th>
+                        <th>Detalle</th>
                         <th>Cant.</th>
                         <th>Precio unit.</th>
                         <th>Subtotal</th>
@@ -25,7 +25,13 @@
                 <tbody>
                     {% for item in pedido.items.all %}
                     <tr>
-                        <td>{{ item.producto.nombre }}</td>
+                        <td>
+                            {% if item.tipo_linea == 'asesoria' %}
+                                {{ item.descripcion|default:'Confirmacion de asesoria Maestro/PYME' }}
+                            {% else %}
+                                {{ item.producto.nombre }}
+                            {% endif %}
+                        </td>
                         <td>{{ item.cantidad }}</td>
                         <td>${{ item.precio_unitario|formato_moneda }}</td>
                         <td>${{ item.subtotal|formato_moneda }}</td>
@@ -40,29 +46,28 @@
                 </tfoot>
             </table>
 
-            <section class="confirmacion__detalle-extra" aria-label="Datos de contacto Maestro PYME">
-                <h2>Datos de contacto Maestro/PYME</h2>
-                <ul>
-                    <li><strong>Nombre maestro/pyme:</strong> Maestro Instalador Demo</li>
-                    <li><strong>Rubro:</strong> Instalacion y reparacion</li>
-                    <li><strong>Telefono:</strong> +56 9 1234 5678</li>
-                    <li><strong>Email:</strong> maestro.demo@ferremax.cl</li>
-                    <li><strong>Zona de atencion:</strong> Region Metropolitana</li>
-                </ul>
-                <p>
-                    Estos datos se incluiran en el voucher cuando el cliente contrate una asesoria
-                    de Maestro/PYME.
-                </p>
-            </section>
-
-            <section class="confirmacion__detalle-extra" aria-label="Asesoria Maestro PYME">
-                <h2>Asesoria Maestro/PYME</h2>
-                <p><strong>Cargo de confirmacion: $5.000</strong></p>
-                <p>
-                    El pago final del servicio profesional se realiza directamente entre cliente y
-                    Maestro/PYME, fuera de los sistemas de FERREMAS.
-                </p>
-            </section>
+            {% for item in pedido.items.all %}
+                {% if item.tipo_linea == 'asesoria' and item.solicitud_asesoria %}
+                    <section class="confirmacion__detalle-extra" aria-label="Datos de contacto Maestro PYME">
+                        <h2>Asesoria Maestro/PYME</h2>
+                        <ul>
+                            <li><strong>Servicio:</strong> {{ item.solicitud_asesoria.servicio.titulo }}</li>
+                            <li><strong>Maestro/PYME:</strong> {{ item.solicitud_asesoria.servicio.maestro.get_tipo_display }}</li>
+                            <li><strong>Rubro:</strong> {{ item.solicitud_asesoria.servicio.maestro.rubro }}</li>
+                            <li><strong>Oficio:</strong> {{ item.solicitud_asesoria.servicio.maestro.oficio|default:'-' }}</li>
+                            <li><strong>Telefono:</strong> {{ item.solicitud_asesoria.servicio.maestro.telefono }}</li>
+                            {% if item.solicitud_asesoria.servicio.maestro.usuario.email %}
+                                <li><strong>Email:</strong> {{ item.solicitud_asesoria.servicio.maestro.usuario.email }}</li>
+                            {% endif %}
+                            <li><strong>Cargo confirmacion:</strong> ${{ item.solicitud_asesoria.cargo_confirmacion|formato_moneda }}</li>
+                        </ul>
+                        <p>
+                            El pago final del servicio profesional se realiza directamente entre cliente y
+                            Maestro/PYME, fuera de los sistemas de FERREMAS.
+                        </p>
+                    </section>
+                {% endif %}
+            {% endfor %}
 
             <p class="confirmacion__nota-extra">
                 El correo mixto cliente-maestro sera implementado posteriormente desde el modulo

@@ -1,0 +1,66 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="perfil-page">
+    <h1>Mi Perfil</h1>
+    <div class="perfil__datos-usuario">
+        <h2>Datos de usuario</h2>
+        <ul>
+            <li><strong>Email:</strong> {{ user.email }}</li>
+            <li><strong>Rol:</strong> {{ user.get_rol_display }}</li>
+            {% if user.fecha_creacion %}
+                <li><strong>Fecha de creación:</strong> {{ user.fecha_creacion|date:"d/m/Y H:i" }}</li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="perfil__formulario">
+        <h2>Editar datos básicos</h2>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Guardar cambios</button>
+        </form>
+    </div>
+
+    <div class="perfil__maestro-pyme">
+        <h2>Perfil Maestro/PYME</h2>
+        {% if es_maestro_pyme and perfil_maestro_pyme %}
+            <ul>
+                <li><strong>Tipo:</strong> {{ perfil_maestro_pyme.get_tipo_display }}</li>
+                <li><strong>Estado:</strong> {{ perfil_maestro_pyme.get_estado_display }}</li>
+                <li><strong>Rubro:</strong> {{ perfil_maestro_pyme.rubro }}</li>
+                <li><strong>Oficio:</strong> {{ perfil_maestro_pyme.oficio }}</li>
+                <li><strong>Nombre empresa:</strong> {{ perfil_maestro_pyme.nombre_empresa }}</li>
+                <li><strong>Teléfono:</strong> {{ perfil_maestro_pyme.telefono }}</li>
+                <li><strong>Dirección:</strong> {{ perfil_maestro_pyme.direccion }}</li>
+                <li><strong>Descuento primera compra usado:</strong> {{ perfil_maestro_pyme.descuento_primera_compra_usado|yesno:"Sí,No" }}</li>
+            </ul>
+            {% if perfil_maestro_pyme.estado == "pendiente" %}
+                <div class="perfil__estado-pendiente">
+                    <p>Estado: <strong>Pendiente de aprobación</strong></p>
+                    <a href="{% url 'panel_maestro_pyme' %}" class="btn">Ir a Panel Maestro/PYME</a>
+                </div>
+            {% elif perfil_maestro_pyme.estado == "aprobado" %}
+                <div class="perfil__estado-aprobado">
+                    <p>Estado: <strong>Aprobado</strong></p>
+                    <a href="{% url 'panel_maestro_pyme' %}" class="btn">Panel Maestro/PYME</a>
+                    <a href="{% url 'publicar_servicio_maestro' %}" class="btn">Publicar servicio</a>
+                    <a href="{% url 'mis_servicios_maestro' %}" class="btn">Mis servicios</a>
+                    <a href="{% url 'estado_ferrecredito' %}" class="btn">Estado FerreCrédito</a>
+                </div>
+            {% elif perfil_maestro_pyme.estado == "rechazado" %}
+                <div class="perfil__estado-rechazado">
+                    <p>Estado: <strong>Rechazado</strong></p>
+                    <a href="{% url 'registro_maestro_pyme' %}" class="btn">Actualizar solicitud</a>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="perfil__sin-maestro">
+                <p>Aún no tienes perfil Maestro/PYME</p>
+                <a href="{% url 'registro_maestro_pyme' %}" class="btn">Crear perfil Maestro/PYME</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

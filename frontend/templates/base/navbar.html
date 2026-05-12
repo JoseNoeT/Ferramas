@@ -14,32 +14,39 @@
 				<li><a href="{% url 'admin_productos_dashboard' %}">Productos</a></li>
 				<li><a href="{% url 'admin_categorias_dashboard' %}">Categorias</a></li>
 				<li><a href="{% url 'admin_usuarios_dashboard' %}">Usuarios</a></li>
+				<li><a href="{% url 'admin_maestros' %}">Maestros</a></li>
+				<li><a href="{% url 'admin_credito' %}">Crédito</a></li>
+				<li><a href="{% url 'admin_puntos' %}">Puntos</a></li>
+				<li><a href="{% url 'admin_encuestas' %}">Encuestas</a></li>
 			{% else %}
 				<li><a href="/">Inicio</a></li>
 				<li><a href="{% url 'catalogo' %}">Catalogo</a></li>
-				<li class="navbar__dropdown">
-					<button type="button" class="navbar__dropdown-toggle" aria-haspopup="true" aria-expanded="false">Beneficios</button>
-					<div class="navbar__dropdown-menu">
-						<a href="{% url 'mis_puntos' %}">Mis puntos</a>
-						<a href="{% url 'servicios_maestros' %}">Servicios Maestros</a>
-						<a href="{% url 'registro_maestro_pyme' %}">Maestro/PYME</a>
-						<a href="{% url 'panel_maestro_pyme' %}">Panel Maestro/PYME</a>
-						<a href="{% url 'solicitud_ferrecredito' %}">FerreCrédito</a>
-					</div>
-				</li>
+				<li><a href="{% url 'servicios_maestros' %}">Servicios Maestros</a></li>
 				<li><a href="/ofertas/">Ofertas</a></li>
-				<li><a href="#contacto">Contacto</a></li>
+				<li><a href="{% url 'contacto' %}">Contacto</a></li>
+				{% if user.is_authenticated and user.rol == 'cliente' %}
+					<li><a href="{% url 'mis_puntos' %}">Mis puntos</a></li>
+					<li><a href="{% url 'registro_maestro_pyme' %}">Registro Maestro/PYME</a></li>
+					<li><a href="{% url 'panel_maestro_pyme' %}">Panel Maestro/PYME</a></li>
+					<li><a href="{% url 'estado_ferrecredito' %}">Estado FerreCrédito</a></li>
+				{% else %}
+					<li><a href="{% url 'registro' %}">Registro</a></li>
+				{% endif %}
 			{% endif %}
 		</ul>
 
 		<div class="navbar__actions">
+			{% if user.is_authenticated and user.rol == 'cliente' %}
+				<a class="navbar__register-maestro" href="{% url 'registro_maestro_pyme' %}">Registro Maestro/PYME</a>
+			{% endif %}
 			{% if user.is_authenticated %}
-				<span class="navbar__user">{{ user.email }}</span>
-				<a class="navbar__logout" href="{% url 'logout' %}">Cerrar sesion</a>
+				   <a class="navbar__perfil" href="{% url 'perfil_usuario' %}">Mi perfil</a>
+				   <span class="navbar__user">{{ user.email }}</span>
+				   <a class="navbar__logout" href="{% url 'logout' %}">Cerrar sesion</a>
 			{% else %}
 				<a class="navbar__login" href="{% url 'login' %}">Iniciar sesion</a>
 			{% endif %}
-			{% if not user.is_authenticated or user.rol == 'cliente' %}
+			{% if user.is_authenticated and user.rol == 'cliente' %}
 				<a class="navbar__cart" href="{% url 'carrito' %}" aria-label="Abrir carrito">Carrito ({{ carrito_items_total }})</a>
 			{% endif %}
 		</div>
@@ -103,6 +110,30 @@
 		.navbar__dropdown-menu a:hover {
 			background-color: #f5f5f5;
 			color: #0066cc;
+		}
+
+		.navbar__register-maestro {
+			text-decoration: none;
+			padding: 0.5rem 0.75rem;
+			border-radius: 8px;
+			background: #fff4e8;
+			border: 1px solid #f8c08a;
+			color: #9a4c00;
+			font-weight: 700;
+			white-space: nowrap;
+			transition: transform 0.15s ease, box-shadow 0.15s ease;
+		}
+
+		.navbar__register-maestro:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 6px 14px rgba(245, 124, 0, 0.2);
+		}
+
+		@media (max-width: 640px) {
+			.navbar__register-maestro {
+				width: 100%;
+				text-align: center;
+			}
 		}
 	</style>
 </header>

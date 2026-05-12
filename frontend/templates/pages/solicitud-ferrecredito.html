@@ -1,90 +1,193 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<section class="page-section">
-    <div class="container" style="max-width: 860px; margin: 2rem auto;">
-        <header style="margin-bottom: 1.5rem;">
+<section class="ferrecredito-section">
+    <div class="ferrecredito-container">
+        <!-- Header -->
+        <header class="ferrecredito-header">
             <h1>Solicitud FerreCrédito</h1>
-            <p>
-                FerreCrédito es una cuenta corriente interna de FERREMAS disponible para
-                Maestros/PYMES aprobados.
-            </p>
+            <p>Acceso a crédito flexible para Maestros/PYMES aprobados</p>
         </header>
 
+        <!-- Messages -->
         {% if messages %}
-        <div style="margin-bottom: 1rem;">
+        <div class="ferrecredito-messages">
             {% for message in messages %}
             <p class="alert alert--{{ message.tags }}">{{ message }}</p>
             {% endfor %}
         </div>
         {% endif %}
 
-        <section style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
-            <h2 style="margin-top: 0;">Condiciones informativas</h2>
-            <ul style="margin-bottom: 0;">
-                <li>Uso exclusivo para Maestro/PYME.</li>
-                <li>Compra a crédito en cuotas mensuales.</li>
-                <li>Requiere estar al día para una segunda compra.</li>
-                <li>Sujeto a cupo aprobado por administrador.</li>
+        <!-- Conditions Info Box -->
+        <section class="ferrecredito-conditions">
+            <h2>Solo para Maestro/PYME Aprobado</h2>
+            <ul>
+                <li>Cuenta corriente interna para compras a crédito en cuotas mensuales</li>
+                <li>Acceso exclusivo a maestros y pymes con estado aprobado</li>
+                <li>Cupo definido según tu perfil y evaluación</li>
+                <li>Requiere estar al día para solicitudes adicionales</li>
             </ul>
         </section>
 
-        <form method="post" action="{% url 'solicitud_ferrecredito' %}" style="display: grid; gap: 1rem;">
-            {% csrf_token %}
+        <!-- Form Container -->
+        <div class="ferrecredito-form-wrapper">
+            <h2 class="ferrecredito-form-title">Completa tu solicitud</h2>
 
-            <label>
-                Nombre o razón social
-                <input type="text" name="nombre_razon_social" required>
-            </label>
+            <form method="post" action="{% url 'solicitud_ferrecredito' %}" class="ferrecredito-form" novalidate>
+                {% csrf_token %}
 
-            <label>
-                RUT
-                <input type="text" name="rut" required>
-            </label>
+                <!-- Información Personal -->
+                <div class="ferrecredito-form__group">
+                    <div class="ferrecredito-form__group-title">Información Personal</div>
+                    
+                    <div class="ferrecredito-form__group--multi">
+                        <div class="ferrecredito-form__field">
+                            <label for="nombre_razon_social">
+                                Nombre o Razón Social
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="nombre_razon_social"
+                                name="nombre_razon_social" 
+                                placeholder="Tu nombre completo o empresa"
+                                required>
+                        </div>
 
-            <label>
-                Tipo
-                <select name="tipo" required>
-                    <option value="">Seleccione una opción</option>
-                    <option value="maestro">Maestro</option>
-                    <option value="pyme">PYME</option>
-                </select>
-            </label>
+                        <div class="ferrecredito-form__field">
+                            <label for="rut">
+                                RUT
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="rut"
+                                name="rut" 
+                                placeholder="12.345.678-9"
+                                required>
+                        </div>
+                    </div>
 
-            <label>
-                Rubro u oficio
-                <input type="text" name="rubro_oficio" required>
-            </label>
+                    <div class="ferrecredito-form__group--multi">
+                        <div class="ferrecredito-form__field">
+                            <label for="tipo">
+                                Tipo
+                                <span class="required">*</span>
+                            </label>
+                            <select id="tipo" name="tipo" required>
+                                <option value="">Selecciona tu tipo</option>
+                                <option value="maestro">Maestro</option>
+                                <option value="pyme">PYME</option>
+                            </select>
+                        </div>
 
-            <label>
-                Monto de crédito solicitado
-                <input type="number" name="monto_solicitado" min="0" step="1" required>
-            </label>
+                        <div class="ferrecredito-form__field">
+                            <label for="rubro_oficio">
+                                Rubro u Oficio
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="rubro_oficio"
+                                name="rubro_oficio" 
+                                placeholder="Ej: Construcción, Electricidad"
+                                required>
+                        </div>
+                    </div>
+                </div>
 
-            <label>
-                Número de cuotas estimadas
-                <input type="number" name="cuotas_estimadas" min="1" step="1" required>
-            </label>
+                <!-- Detalles de Crédito -->
+                <div class="ferrecredito-form__group">
+                    <div class="ferrecredito-form__group-title">Detalles de Crédito</div>
+                    
+                    <div class="ferrecredito-form__group--multi">
+                        <div class="ferrecredito-form__field">
+                            <label for="monto_solicitado">
+                                Monto Solicitado (CLP)
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="monto_solicitado"
+                                name="monto_solicitado" 
+                                min="0" 
+                                step="1000"
+                                placeholder="500000"
+                                required>
+                        </div>
 
-            <label>
-                Teléfono
-                <input type="tel" name="telefono" required>
-            </label>
+                        <div class="ferrecredito-form__field">
+                            <label for="cuotas_estimadas">
+                                Número de Cuotas
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="cuotas_estimadas"
+                                name="cuotas_estimadas" 
+                                min="1" 
+                                max="12"
+                                step="1"
+                                placeholder="6"
+                                required>
+                        </div>
+                    </div>
+                </div>
 
-            <label>
-                Email
-                <input type="email" name="email" required>
-            </label>
+                <!-- Datos de Contacto -->
+                <div class="ferrecredito-form__group">
+                    <div class="ferrecredito-form__group-title">Datos de Contacto</div>
+                    
+                    <div class="ferrecredito-form__group--multi">
+                        <div class="ferrecredito-form__field">
+                            <label for="telefono">
+                                Teléfono
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="telefono"
+                                name="telefono" 
+                                placeholder="+56912345678"
+                                required>
+                        </div>
 
-            <label>
-                Observación
-                <textarea name="observacion" rows="4" placeholder="Detalle adicional de la solicitud"></textarea>
-            </label>
+                        <div class="ferrecredito-form__field">
+                            <label for="email">
+                                Email
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email"
+                                name="email" 
+                                placeholder="tu@email.com"
+                                required>
+                        </div>
+                    </div>
+                </div>
 
-            <div>
-                <button type="submit">Enviar solicitud</button>
-            </div>
-        </form>
+                <!-- Observación -->
+                <div class="ferrecredito-form__group">
+                    <div class="ferrecredito-form__field">
+                        <label for="observacion">
+                            Observación Adicional
+                        </label>
+                        <textarea 
+                            id="observacion"
+                            name="observacion" 
+                            rows="4" 
+                            placeholder="Cuéntanos sobre tu negocio y necesidad de crédito..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="ferrecredito-form__actions">
+                    <button type="submit" class="ferrecredito-form__submit">Enviar Solicitud</button>
+                    <button type="reset" class="ferrecredito-form__reset">Limpiar</button>
+                </div>
+            </form>
+        </div>
     </div>
 </section>
 {% endblock %}

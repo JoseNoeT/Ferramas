@@ -44,8 +44,30 @@
                             <td colspan="3"><strong>Total</strong></td>
                             <td><strong>${{ total|formato_moneda }}</strong></td>
                         </tr>
+                        {% if solicitud_asesoria_pendiente %}
+                        <tr class="checkout-tabla__total">
+                            <td colspan="3"><strong>Confirmación asesoría Maestro/PYME</strong></td>
+                            <td><strong>${{ cargo_asesoria_pendiente|formato_moneda }}</strong></td>
+                        </tr>
+                        <tr class="checkout-tabla__total">
+                            <td colspan="3"><strong>Total con asesoría</strong></td>
+                            <td><strong>${{ total_con_asesoria|formato_moneda }}</strong></td>
+                        </tr>
+                        {% endif %}
                     </tfoot>
                 </table>
+
+                {% if solicitud_asesoria_pendiente %}
+                <div style="margin-top: 1rem; padding: 1rem; border: 1px solid #d1d5db; border-radius: 8px;">
+                    <h3 style="margin-top: 0;">Asesoría pendiente para este checkout</h3>
+                    <p><strong>Servicio:</strong> {{ solicitud_asesoria_pendiente.servicio.titulo }}</p>
+                    <p><strong>Maestro/PYME:</strong> {{ solicitud_asesoria_pendiente.servicio.maestro.get_tipo_display }}</p>
+                    <p><strong>Rubro:</strong> {{ solicitud_asesoria_pendiente.servicio.maestro.rubro }}</p>
+                    <p><strong>Oficio:</strong> {{ solicitud_asesoria_pendiente.servicio.maestro.oficio|default:'-' }}</p>
+                    <p><strong>Cargo confirmación:</strong> ${{ cargo_asesoria_pendiente|formato_moneda }}</p>
+                    <p>El pago final del servicio profesional ocurre fuera de los sistemas de FERREMAS.</p>
+                </div>
+                {% endif %}
             </div>
 
             <div class="checkout-form-container">
@@ -74,14 +96,22 @@
 
                     <fieldset class="checkout-entrega">
                         <legend class="checkout-entrega__legend">Beneficios disponibles</legend>
-                        <p><strong>Puntos disponibles:</strong> 1.250 puntos</p>
-                        <label class="checkout-entrega__opcion">
-                            <input type="checkbox" name="usar_puntos" value="1">
+                        <p><strong>Puntos disponibles:</strong> {{ saldo_puntos }}</p>
+                        <label class="checkout-entrega__opcion" for="id_puntos_a_usar">
                             <span>
-                                <strong>Usar puntos en esta compra</strong>
-                                <small>Los puntos se descontaran del total cuando la logica backend sea implementada.</small>
+                                <strong>Aplicar puntos en esta compra</strong>
+                                <small>1 punto = $1 CLP de descuento. Puedes usar hasta tu saldo disponible y el total del pedido.</small>
+                                <small>Los puntos se aplicaran al confirmar la compra.</small>
                             </span>
                         </label>
+                        <input
+                            id="id_puntos_a_usar"
+                            type="number"
+                            name="puntos_a_usar"
+                            min="0"
+                            max="{{ saldo_puntos }}"
+                            value="0"
+                        >
                     </fieldset>
 
                     <fieldset class="checkout-entrega">
