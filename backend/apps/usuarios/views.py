@@ -742,3 +742,91 @@ def contador_dashboard_view(request):
         },
     )
 
+
+def _requiere_vendedor(view_func):
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        if request.user.rol not in [Usuario.Rol.VENDEDOR, Usuario.Rol.ADMIN]:
+            return HttpResponseForbidden("No tienes permiso para acceder a esta sección.")
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+
+
+@_requiere_vendedor
+def vendedor_dashboard_operativo_view(request):
+    Pedido = apps.get_model("pedidos", "Pedido")
+
+    total_ventas_expr = Case(
+        When(total_final__gt=0, then=F("total_final")),
+        default=F("total"),
+        output_field=DecimalField(max_digits=14, decimal_places=2),
+    )
+
+    pedidos_generados_qs = (
+        Pedido.objects.select_related("usuario")
+        .prefetch_related(
+            "items__producto",
+            "items__solicitud_asesoria",
+            "items__solicitud_asesoria__servicio",
+        )
+        .filter(estado=Pedido.Estado.GENERADO)
+        .order_by("-creado_en")
+    )
+    pedidos_aprobados_qs = (
+        Pedido.objects.select_related("usuario")
+        .filter(estado=Pedido.Estado.APROBADO)
+        .order_by("-creado_en")
+    )
+
+    soporta_rechazado = hasattr(Pedido.Estado, "RECHAZADO")
+    pedidos_rechazados_qs = Pedido.objects.none()
+    if soporta_rechazado:
+        pedidos_rechazados_qs = (
+            Pedido.objects.select_related("usuario")
+            .filter(estado=Pedido.Estado.RECHAZADO)
+            .order_by("-creado_en")
+        )
+
+    estados_relevantes = [Pedido.Estado.GENERADO, Pedido.Estado.APROBADO]
+    if soporta_rechazado:
+        estados_relevantes.append(Pedido.Estado.RECHAZADO)
+
+    pedidos_relevantes_qs = Pedido.objects.select_related("usuario").filter(
+        estado__in=estados_relevantes
+    )
+
+    total_ventas_aprobadas = (
+        pedidos_aprobados_qs.aggregate(total=Sum(total_ventas_expr)).get("total") or 0
+    )
+
+    return render(
+        request,
+        "dashboard/vendedor.html",
+        {
+            "pedidos_generados": pedidos_generados_qs,
+            "pedidos_aprobados": pedidos_aprobados_qs,
+            "pedidos_rechazados": pedidos_rechazados_qs,
+            "total_generados": pedidos_generados_qs.count(),
+            "total_aprobados": pedidos_aprobados_qs.count(),
+            "total_rechazados": pedidos_rechazados_qs.count() if soporta_rechazado else None,
+            "total_ventas_aprobadas": total_ventas_aprobadas,
+            "pedidos_recientes": pedidos_relevantes_qs.order_by("-creado_en")[:10],
+            "soporta_rechazado": soporta_rechazado,
+        },
+    )
+
+
+def _aplicar_parche_vendedor_dashboard():
+    """Enruta el callback de vendedor al dashboard operativo definido en esta app."""
+    try:
+        from apps.pedidos import views as pedidos_views
+
+        pedidos_views.vendedor_dashboard_view = vendedor_dashboard_operativo_view
+    except Exception:
+        # No interrumpe el arranque si el modulo no esta disponible en este contexto.
+        pass
+
+
+_aplicar_parche_vendedor_dashboard()
+

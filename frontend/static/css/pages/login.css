@@ -79,6 +79,34 @@
     background: #ffffff;
 }
 
+.auth-form__password-group {
+    position: relative;
+}
+
+.auth-form__password-group input {
+    padding-right: 5.4rem;
+}
+
+.auth-form__toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 0.45rem;
+    transform: translateY(-50%);
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #444444;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.35rem 0.55rem;
+    cursor: pointer;
+}
+
+.auth-form__toggle-password:hover {
+    background: #f7f7f7;
+}
+
 .auth-form__error {
     font-size: 0.83rem;
     color: var(--color-accent);

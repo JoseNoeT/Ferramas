@@ -1,16 +1,186 @@
 {% extends "base/base.html" %}
+{% load ecommerce_tags %}
 
 {% block content %}
 <section class="dashboard-admin">
 	<header class="dashboard-admin__header">
 		<div>
-			<h1>Dashboard de Contador</h1>
-			<p>Panel interno para gestión contable y conciliaciones.</p>
+			<h1>Dashboard Contador</h1>
+			<p>Resumen financiero y cuentas FerreCrédito</p>
 		</div>
 	</header>
 
-	<div class="dashboard-admin__form">
-		<p>Tu rol fue reconocido correctamente. Esta sección está lista para integrar reportes contables en la siguiente iteración.</p>
-	</div>
+	{% if messages %}
+	<ul class="dashboard-admin__messages">
+		{% for message in messages %}
+		<li class="dashboard-admin__message dashboard-admin__message--{{ message.tags }}">{{ message }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
+	<form method="get" class="dashboard-admin__form" style="margin-bottom: 1rem;">
+		<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+			<div class="dashboard-admin__field">
+				<label for="id_fecha_desde">Fecha desde</label>
+				<input id="id_fecha_desde" type="date" name="fecha_desde" value="{{ filtros.fecha_desde }}">
+			</div>
+			<div class="dashboard-admin__field">
+				<label for="id_fecha_hasta">Fecha hasta</label>
+				<input id="id_fecha_hasta" type="date" name="fecha_hasta" value="{{ filtros.fecha_hasta }}">
+			</div>
+			<div class="dashboard-admin__field">
+				<label for="id_estado_pedido">Estado pedido</label>
+				<select id="id_estado_pedido" name="estado_pedido">
+					<option value="">Todos</option>
+					{% for estado, etiqueta in estados_pedido %}
+						<option value="{{ estado }}" {% if filtros.estado_pedido == estado %}selected{% endif %}>{{ etiqueta }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="dashboard-admin__field">
+				<label for="id_estado_cuota">Estado cuota</label>
+				<select id="id_estado_cuota" name="estado_cuota">
+					<option value="">Pendiente/Vencida</option>
+					{% for estado, etiqueta in estados_cuota %}
+						<option value="{{ estado }}" {% if filtros.estado_cuota == estado %}selected{% endif %}>{{ etiqueta }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+		<div class="dashboard-admin__form-actions" style="margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+			<button type="submit" class="btn btn--primary">Filtrar</button>
+			<a href="{% url 'contador_dashboard' %}" class="btn btn--secondary">Limpiar filtros</a>
+			<a href="?fecha_desde={{ filtros.fecha_desde }}&fecha_hasta={{ filtros.fecha_hasta }}&estado_pedido={{ filtros.estado_pedido }}&estado_cuota={{ filtros.estado_cuota }}&export=csv" class="btn btn--secondary">Exportar pedidos CSV</a>
+			<a href="?fecha_desde={{ filtros.fecha_desde }}&fecha_hasta={{ filtros.fecha_hasta }}&estado_pedido={{ filtros.estado_pedido }}&estado_cuota={{ filtros.estado_cuota }}&export=cuotas_csv" class="btn btn--secondary">Exportar cuotas CSV</a>
+		</div>
+	</form>
+
+	<section class="dashboard-panel" style="margin-bottom: 1rem;">
+		<div class="dashboard-panel__stats" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem;">
+			<article style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem;">
+				<p><strong>Total ventas</strong></p>
+				<p>${{ total_ventas|formato_moneda }}</p>
+			</article>
+			<article style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem;">
+				<p><strong>Ventas del mes</strong></p>
+				<p>${{ ventas_mes|formato_moneda }}</p>
+			</article>
+			<article style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem;">
+				<p><strong>Pedidos del mes</strong></p>
+				<p>{{ pedidos_mes }}</p>
+			</article>
+			<article style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem;">
+				<p><strong>Deuda FerreCrédito</strong></p>
+				<p>${{ total_deuda_credito|formato_moneda }}</p>
+			</article>
+			<article style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:0.75rem;">
+				<p><strong>Monto vencido</strong></p>
+				<p>${{ monto_vencido|formato_moneda }}</p>
+				<small>Cuotas vencidas: {{ cuotas_vencidas }}</small>
+			</article>
+			<article style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:0.75rem;">
+				<p><strong>Cuentas crédito activas</strong></p>
+				<p>{{ cuentas_credito_activas }}</p>
+			</article>
+		</div>
+		<p style="margin-top:0.75rem;">
+			<strong>Total pedidos:</strong> {{ total_pedidos }} |
+			<strong>Crédito usado:</strong> ${{ total_credito_usado|formato_moneda }} |
+			<strong>Cupo aprobado:</strong> ${{ total_cupo_aprobado|formato_moneda }}
+		</p>
+	</section>
+
+	<section class="dashboard-panel" style="margin-bottom: 1rem;">
+		<div class="dashboard-panel__header">
+			<h2>Últimos pedidos</h2>
+		</div>
+		{% if ultimos_pedidos %}
+			<div style="overflow-x:auto;">
+				<table class="checkout-tabla">
+					<thead>
+						<tr>
+							<th>Pedido</th>
+							<th>Cliente</th>
+							<th>Estado</th>
+							<th>Total</th>
+							<th>Fecha</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for pedido in ultimos_pedidos %}
+							<tr>
+								<td>#{{ pedido.pk }}</td>
+								<td>{{ pedido.usuario.email|default:'-' }}</td>
+								<td>{{ pedido.get_estado_display }}</td>
+								<td>
+									{% if pedido.total_final and pedido.total_final > 0 %}
+										${{ pedido.total_final|formato_moneda }}
+									{% else %}
+										${{ pedido.total|formato_moneda }}
+									{% endif %}
+								</td>
+								<td>{{ pedido.creado_en|date:'d/m/Y H:i' }}</td>
+								<td>Ref #{{ pedido.pk }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% else %}
+			<p>No hay pedidos registrados para mostrar.</p>
+		{% endif %}
+	</section>
+
+	<section class="dashboard-panel">
+		<div class="dashboard-panel__header">
+			<h2>Cuotas pendientes/vencidas</h2>
+		</div>
+		{% if cuotas_recientes %}
+			<div style="overflow-x:auto;">
+				<table class="checkout-tabla">
+					<thead>
+						<tr>
+							<th>Maestro/PYME</th>
+							<th>Monto</th>
+							<th>Vencimiento</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for cuota in cuotas_recientes %}
+							<tr>
+								<td>{{ cuota.cuenta.maestro.usuario.email|default:'-' }}</td>
+								<td>${{ cuota.monto|formato_moneda }}</td>
+								<td>{{ cuota.fecha_vencimiento|date:'d/m/Y' }}</td>
+								<td>{{ cuota.get_estado_display }}</td>
+								<td style="display:flex; gap:0.35rem; flex-wrap:wrap;">
+									{% if soporta_estado_pagada and cuota.estado != 'pagada' %}
+										<form method="post" action="{% url 'contador_dashboard' %}">
+											{% csrf_token %}
+											<input type="hidden" name="accion" value="marcar_pagada">
+											<input type="hidden" name="cuota_id" value="{{ cuota.pk }}">
+											<button type="submit" class="btn btn--success">Marcar pagada</button>
+										</form>
+									{% endif %}
+									{% if cuota.estado == 'pendiente' %}
+										<form method="post" action="{% url 'contador_dashboard' %}">
+											{% csrf_token %}
+											<input type="hidden" name="accion" value="marcar_vencida">
+											<input type="hidden" name="cuota_id" value="{{ cuota.pk }}">
+											<button type="submit" class="btn btn--danger">Marcar vencida</button>
+										</form>
+									{% endif %}
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% else %}
+			<p>No hay cuotas pendientes o vencidas para mostrar.</p>
+		{% endif %}
+	</section>
 </section>
 {% endblock %}

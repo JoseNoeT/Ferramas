@@ -125,14 +125,57 @@
                             </span>
                         </label>
 
-                        <label class="checkout-entrega__opcion">
-                            <input type="radio" name="medio_pago" value="ferrecredito">
-                            <span>
-                                <strong>FerreCredito</strong>
-                                <small>Disponible solo para clientes Maestro/PYME aprobados.</small>
-                                <small>Sujeto a cupo disponible y deuda al dia.</small>
-                            </span>
-                        </label>
+                        {% if cuenta_credito %}
+                            <label class="checkout-entrega__opcion">
+                                <input
+                                    type="radio"
+                                    name="medio_pago"
+                                    value="ferrecredito"
+                                    {% if tiene_cuotas_vencidas %}disabled{% endif %}
+                                >
+                                <span>
+                                    <strong>FerreCredito</strong>
+                                    <small>Estado cuenta: {{ cuenta_credito.get_estado_display }}</small>
+                                    <small>Cupo aprobado: ${{ cuenta_credito.cupo_aprobado|formato_moneda }}</small>
+                                    <small>Saldo usado: ${{ cuenta_credito.saldo_usado|formato_moneda }}</small>
+                                    <small>Saldo disponible: ${{ saldo_disponible_credito|formato_moneda }}</small>
+                                </span>
+                            </label>
+
+                            {% if tiene_cuotas_vencidas %}
+                                <p class="alert alert--warning">Tienes cuotas vencidas. FerreCrédito está bloqueado hasta regularizar la deuda.</p>
+                            {% elif not puede_usar_ferrecredito %}
+                                <p class="alert alert--warning">Tu saldo disponible no alcanza para el total actual del checkout.</p>
+                            {% endif %}
+
+                            <label class="checkout-entrega__opcion" for="id_cantidad_cuotas">
+                                <span>
+                                    <strong>Cantidad de cuotas FerreCrédito</strong>
+                                    <small>Selecciona cuotas solo si pagas con FerreCrédito.</small>
+                                </span>
+                            </label>
+                            <select id="id_cantidad_cuotas" name="cantidad_cuotas">
+                                <option value="1">1 cuota</option>
+                                <option value="2">2 cuotas</option>
+                                <option value="3">3 cuotas</option>
+                                <option value="6">6 cuotas</option>
+                            </select>
+                        {% elif es_maestro_aprobado %}
+                            <div class="checkout-entrega__opcion">
+                                <span>
+                                    <strong>Aún no tienes cuenta FerreCrédito activa</strong>
+                                    <small>Tu perfil Maestro/PYME está aprobado, pero debes solicitar o activar tu cuenta de crédito.</small>
+                                    <small><a href="{% url 'solicitud_ferrecredito' %}">Solicitar FerreCrédito</a></small>
+                                </span>
+                            </div>
+                        {% else %}
+                            <div class="checkout-entrega__opcion">
+                                <span>
+                                    <strong>FerreCrédito no disponible</strong>
+                                    <small>Disponible solo para Maestro/PYME aprobado con cuenta de crédito activa.</small>
+                                </span>
+                            </div>
+                        {% endif %}
                     </fieldset>
 
                     <fieldset class="checkout-entrega">

@@ -5,45 +5,101 @@
     <div class="dashboard-panel">
         <div class="dashboard-panel__header">
             <h1>Gestion FerreCredito</h1>
-            <p>Vista administrativa demo para control de lineas de credito.</p>
+            <p>Gestion administrativa real de solicitudes y cuentas de crédito.</p>
         </div>
 
+        {% if messages %}
+            {% for message in messages %}
+                <p class="alert alert--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <div class="dashboard-panel__stats">
+            <p><strong>Total solicitudes:</strong> {{ total_solicitudes }}</p>
+            <p><strong>Pendientes:</strong> {{ total_pendientes }}</p>
+            <p><strong>Aprobadas:</strong> {{ total_aprobadas }}</p>
+            <p><strong>Rechazadas:</strong> {{ total_rechazadas }}</p>
+            <p><strong>Total cuentas:</strong> {{ total_cuentas }}</p>
+            <p><strong>Total cupo aprobado:</strong> ${{ total_cupo_aprobado }}</p>
+            <p><strong>Total saldo usado:</strong> ${{ total_saldo_usado }}</p>
+        </div>
+
+        <h2>Solicitudes recientes</h2>
         <table class="checkout-tabla">
             <thead>
                 <tr>
-                    <th>Maestro/PYME</th>
+                    <th>Email</th>
+                    <th>Tipo</th>
+                    <th>RUT</th>
+                    <th>Monto solicitado</th>
+                    <th>Estado</th>
                     <th>Cupo aprobado</th>
-                    <th>Saldo usado</th>
-                    <th>Estado deuda</th>
-                    <th>Estado credito</th>
+                    <th>Creado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
+                {% for solicitud in solicitudes_recientes %}
                 <tr>
-                    <td>Juan Perez</td>
-                    <td>$1.200.000</td>
-                    <td>$350.000</td>
-                    <td>Al dia</td>
-                    <td>Activo</td>
+                    <td>{{ solicitud.maestro.usuario.email }}</td>
+                    <td>{{ solicitud.maestro.get_tipo_display }}</td>
+                    <td>{{ solicitud.maestro.rut }}</td>
+                    <td>${{ solicitud.monto_solicitado }}</td>
+                    <td>{{ solicitud.get_estado_display }}</td>
+                    <td>${{ solicitud.cupo_aprobado }}</td>
+                    <td>{{ solicitud.creado_en|date:'d/m/Y H:i' }}</td>
                     <td>
-                        <a class="btn btn--primary" href="#">Ajustar cupo</a>
-                        <a class="btn btn--outline" href="#">Bloquear credito</a>
-                        <a class="btn btn--link" href="#">Ver cuotas</a>
+                        {% if solicitud.estado == 'pendiente' %}
+                            <form method="post" action="{% url 'admin_credito_aprobar' solicitud.pk %}" style="margin-bottom:0.5rem;">
+                                {% csrf_token %}
+                                <input type="number" name="cupo_aprobado" min="1" step="1000" placeholder="Cupo aprobado" required>
+                                <input type="text" name="observacion_admin" placeholder="Observación admin (opcional)">
+                                <button type="submit" class="btn btn--primary">Aprobar</button>
+                            </form>
+
+                            <form method="post" action="{% url 'admin_credito_rechazar' solicitud.pk %}">
+                                {% csrf_token %}
+                                <input type="text" name="observacion_admin" placeholder="Motivo rechazo (opcional)">
+                                <button type="submit" class="btn btn--outline">Rechazar</button>
+                            </form>
+                        {% else %}
+                            <span class="badge">{{ solicitud.get_estado_display }}</span>
+                        {% endif %}
                     </td>
                 </tr>
+                {% empty %}
                 <tr>
-                    <td>Constructora Demo SpA</td>
-                    <td>$2.500.000</td>
-                    <td>$2.000.000</td>
-                    <td>En mora</td>
-                    <td>Restringido</td>
-                    <td>
-                        <a class="btn btn--primary" href="#">Ajustar cupo</a>
-                        <a class="btn btn--outline" href="#">Bloquear credito</a>
-                        <a class="btn btn--link" href="#">Ver cuotas</a>
-                    </td>
+                    <td colspan="8">No hay solicitudes de FerreCredito registradas.</td>
                 </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Cuentas de crédito</h2>
+        <table class="checkout-tabla">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Cupo aprobado</th>
+                    <th>Saldo usado</th>
+                    <th>Saldo disponible</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cuenta in cuentas %}
+                <tr>
+                    <td>{{ cuenta.maestro.usuario.email }}</td>
+                    <td>${{ cuenta.cupo_aprobado }}</td>
+                    <td>${{ cuenta.saldo_usado }}</td>
+                    <td>${{ cuenta.saldo_disponible }}</td>
+                    <td>{{ cuenta.get_estado_display }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No hay cuentas de crédito activas todavía.</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

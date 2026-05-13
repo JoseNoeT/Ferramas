@@ -1,87 +1,111 @@
 {% extends "base/base.html" %}
+{% load ecommerce_tags %}
 
 {% block content %}
 <section class="page-section">
     <div class="container" style="max-width: 980px; margin: 2rem auto;">
         <header style="margin-bottom: 1rem;">
             <h1>Estado FerreCrédito</h1>
-            <p>Consulta visual del estado de la cuenta corriente interna FerreCrédito.</p>
+            <p>Resumen real de tu cuenta y movimientos FerreCrédito.</p>
         </header>
 
-        <section aria-label="Resumen FerreCrédito" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
-            <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
-                <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Cupo aprobado</h2>
-                <p style="margin: 0; font-weight: 700;">$500.000</p>
-            </article>
-            <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
-                <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Saldo usado</h2>
-                <p style="margin: 0; font-weight: 700;">$120.000</p>
-            </article>
-            <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
-                <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Cupo disponible</h2>
-                <p style="margin: 0; font-weight: 700;">$380.000</p>
-            </article>
-            <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
-                <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Estado deuda</h2>
-                <p style="margin: 0; font-weight: 700; color: #166534;">Al día</p>
-            </article>
-            <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
-                <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Estado crédito</h2>
-                <p style="margin: 0; font-weight: 700; color: #1d4ed8;">Activo</p>
-            </article>
-        </section>
+        {% if not request.user.perfil_maestro_pyme %}
+            <section style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                <p>No tienes perfil Maestro/PYME registrado.</p>
+                <a href="{% url 'registro_maestro_pyme' %}">Registrarme como Maestro/PYME</a>
+            </section>
+        {% elif request.user.perfil_maestro_pyme.estado != 'aprobado' %}
+            <section style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                <p>Tu perfil Maestro/PYME no está aprobado. Estado actual: <strong>{{ request.user.perfil_maestro_pyme.get_estado_display }}</strong>.</p>
+                <a href="{% url 'solicitud_ferrecredito' %}">Ir a solicitud FerreCrédito</a>
+            </section>
+        {% elif not request.user.perfil_maestro_pyme.cuenta_credito %}
+            <section style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                <p>No tienes cuenta FerreCrédito activa asociada.</p>
+                <a href="{% url 'solicitud_ferrecredito' %}">Solicitar FerreCrédito</a>
+            </section>
+        {% else %}
+            <section aria-label="Resumen FerreCrédito" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+                <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
+                    <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Cupo aprobado</h2>
+                    <p style="margin: 0; font-weight: 700;">${{ request.user.perfil_maestro_pyme.cuenta_credito.cupo_aprobado|formato_moneda }}</p>
+                </article>
+                <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
+                    <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Saldo usado</h2>
+                    <p style="margin: 0; font-weight: 700;">${{ request.user.perfil_maestro_pyme.cuenta_credito.saldo_usado|formato_moneda }}</p>
+                </article>
+                <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
+                    <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Cupo disponible</h2>
+                    <p style="margin: 0; font-weight: 700;">${{ request.user.perfil_maestro_pyme.cuenta_credito.saldo_disponible|formato_moneda }}</p>
+                </article>
+                <article style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem;">
+                    <h2 style="font-size: 1rem; margin: 0 0 0.25rem 0;">Estado crédito</h2>
+                    <p style="margin: 0; font-weight: 700; color: #1d4ed8;">{{ request.user.perfil_maestro_pyme.cuenta_credito.get_estado_display }}</p>
+                </article>
+            </section>
 
-        <section aria-label="Tabla de cuotas" style="margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.1rem; margin-bottom: 0.6rem;">Cuotas (demo)</h2>
-            <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <table style="width: 100%; border-collapse: collapse; min-width: 620px;">
-                    <thead>
-                        <tr style="background: #f1f5f9; text-align: left;">
-                            <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Compra</th>
-                            <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Cuota</th>
-                            <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Monto</th>
-                            <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Vencimiento</th>
-                            <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Pedido #130</td>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">1/3</td>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">$40.000</td>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">2026-06-05</td>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Pendiente</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Pedido #130</td>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">2/3</td>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">$40.000</td>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">2026-07-05</td>
-                            <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Pendiente</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.7rem;">Pedido #130</td>
-                            <td style="padding: 0.7rem;">3/3</td>
-                            <td style="padding: 0.7rem;">$40.000</td>
-                            <td style="padding: 0.7rem;">2026-08-05</td>
-                            <td style="padding: 0.7rem;">Pendiente</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+            <section aria-label="Tabla de cuotas" style="margin-bottom: 1.25rem;">
+                <h2 style="font-size: 1.1rem; margin-bottom: 0.6rem;">Cuotas</h2>
+                <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 620px;">
+                        <thead>
+                            <tr style="background: #f1f5f9; text-align: left;">
+                                <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Cuota</th>
+                                <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Monto</th>
+                                <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Vencimiento</th>
+                                <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cuota in request.user.perfil_maestro_pyme.cuenta_credito.cuotas.all|slice:":30" %}
+                                <tr>
+                                    <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">{{ cuota.numero_cuota }}/{{ cuota.total_cuotas }}</td>
+                                    <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">${{ cuota.monto|formato_moneda }}</td>
+                                    <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">{{ cuota.fecha_vencimiento|date:'d/m/Y' }}</td>
+                                    <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">{{ cuota.get_estado_display }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" style="padding: 0.7rem;">No tienes cuotas registradas.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-        <section aria-label="Condiciones de uso FerreCrédito" style="background: #fefce8; border: 1px solid #fde68a; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.05rem; margin-top: 0;">Información importante</h2>
-            <ul style="margin-bottom: 0;">
-                <li>Para realizar una segunda compra, el Maestro/PYME debe estar al día.</li>
-                <li>No puede superar el cupo aprobado por FERREMAS.</li>
-                <li>El administrador puede validar, incrementar o bloquear el cupo.</li>
-            </ul>
-        </section>
+            <section aria-label="Movimientos de crédito" style="margin-bottom: 1.25rem;">
+                <h2 style="font-size: 1.1rem; margin-bottom: 0.6rem;">Movimientos</h2>
+                <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 620px;">
+                        <thead>
+                            <tr style="background: #f1f5f9; text-align: left;">
+                                <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Fecha</th>
+                                <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Tipo</th>
+                                <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Monto</th>
+                                <th style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for movimiento in request.user.perfil_maestro_pyme.cuenta_credito.movimientos.all|slice:":30" %}
+                                <tr>
+                                    <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">{{ movimiento.creado_en|date:'d/m/Y H:i' }}</td>
+                                    <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">{{ movimiento.get_tipo_display }}</td>
+                                    <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">${{ movimiento.monto|formato_moneda }}</td>
+                                    <td style="padding: 0.7rem; border-bottom: 1px solid #e2e8f0;">{{ movimiento.descripcion|default:'-' }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" style="padding: 0.7rem;">No tienes movimientos registrados.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        {% endif %}
 
         <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
-            <a href="#" style="display: inline-block; padding: 0.65rem 0.9rem; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none;">Solicitar aumento de cupo</a>
             <a href="{% url 'panel_maestro_pyme' %}" style="display: inline-block; padding: 0.65rem 0.9rem; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none;">Volver al panel Maestro/PYME</a>
             <a href="{% url 'solicitud_ferrecredito' %}" style="display: inline-block; padding: 0.65rem 0.9rem; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none;">Solicitar FerreCrédito</a>
         </div>

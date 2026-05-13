@@ -1,110 +1,112 @@
 {% extends "base/base.html" %}
-{% load static ecommerce_tags %}
+{% load ecommerce_tags %}
 
 {% block content %}
-<section class="dashboard-vendedor">
-
-    <!-- ═══ Hero ═══ -->
-    <header class="dv-hero">
-        <div class="dv-hero__content">
-            <span class="dv-hero__badge">Panel de Vendedor</span>
-            <h1>Dashboard — Vendedor</h1>
-            <p>Gestiona pedidos, revisa el inventario en bodega y organiza despachos desde un solo lugar.</p>
+<section class="dashboard-admin">
+    <header class="dashboard-admin__header">
+        <div>
+            <h1>Dashboard Vendedor</h1>
+            <p>Gestion comercial de pedidos</p>
         </div>
     </header>
 
     {% if messages %}
-    <ul class="dv-messages">
+    <ul class="dashboard-admin__messages">
         {% for msg in messages %}
-        <li class="dv-message dv-message--{{ msg.tags }}">{{ msg }}</li>
+        <li class="dashboard-admin__message dashboard-admin__message--{{ msg.tags }}">{{ msg }}</li>
         {% endfor %}
     </ul>
     {% endif %}
 
-    <!-- ═══ KPI Cards [Miller: 3 métricas, fáciles de retener] ═══ -->
-    <div class="dv-stats">
-        <article class="dv-stat-card">
-            <p class="dv-stat-card__label">Productos en bodega</p>
-            <p class="dv-stat-card__value">{{ productos_bodega|length }}</p>
-            <p class="dv-stat-card__meta">Con stock disponible para la venta.</p>
-        </article>
-        <article class="dv-stat-card{% if pedidos|length > 0 %} dv-stat-card--urgente{% endif %}">
-            <p class="dv-stat-card__label">Pedidos por revisar</p>
-            <p class="dv-stat-card__value">{{ pedidos|length }}</p>
-            <p class="dv-stat-card__meta">Requieren aprobación o rechazo.</p>
-        </article>
-        <article class="dv-stat-card{% if pedidos_aprobados|length > 0 %} dv-stat-card--urgente{% endif %}">
-            <p class="dv-stat-card__label">Listos para despacho</p>
-            <p class="dv-stat-card__value">{{ pedidos_aprobados|length }}</p>
-            <p class="dv-stat-card__meta">Aprobados, pendientes de envío a bodega.</p>
-        </article>
-    </div>
-
-    <!-- ═══ Tabs [Hick: solo 3 opciones] ═══ -->
-    <nav class="dv-tabs" role="tablist">
-        <button class="dv-tabs__btn dv-tabs__btn--active" data-tab="productos" role="tab" aria-selected="true" aria-controls="tab-productos">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            Productos en Bodega
-            <span class="dv-tabs__count">{{ productos_bodega|length }}</span>
-        </button>
-        <button class="dv-tabs__btn" data-tab="pedidos" role="tab" aria-selected="false" aria-controls="tab-pedidos">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            Aprobar / Rechazar
-            <span class="dv-tabs__count{% if pedidos|length > 0 %} dv-tabs__count--urgente{% endif %}">{{ pedidos|length }}</span>
-        </button>
-        <button class="dv-tabs__btn" data-tab="despacho" role="tab" aria-selected="false" aria-controls="tab-despacho">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-            Despacho a Bodega
-            <span class="dv-tabs__count{% if pedidos_aprobados|length > 0 %} dv-tabs__count--urgente{% endif %}">{{ pedidos_aprobados|length }}</span>
-        </button>
-    </nav>
-
-    <!-- ═══ TAB 1: Productos disponibles en bodega ═══ -->
-    <div class="dv-panel dv-panel--active" id="tab-productos" role="tabpanel">
-        <div class="dv-panel__header">
-            <h2>Productos disponibles en bodega</h2>
-            <p>Inventario actual con stock disponible para la venta.</p>
+    <section class="dashboard-panel" style="margin-bottom: 1rem;">
+        <div class="dashboard-panel__stats" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem;">
+            <article style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem;">
+                <p><strong>Pedidos generados</strong></p>
+                <p>{{ total_generados }}</p>
+            </article>
+            <article style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:0.75rem;">
+                <p><strong>Pedidos aprobados</strong></p>
+                <p>{{ total_aprobados }}</p>
+            </article>
+            {% if soporta_rechazado %}
+            <article style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:0.75rem;">
+                <p><strong>Pedidos rechazados</strong></p>
+                <p>{{ total_rechazados }}</p>
+            </article>
+            {% endif %}
+            <article style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:0.75rem;">
+                <p><strong>Ventas aprobadas</strong></p>
+                <p>${{ total_ventas_aprobadas|formato_moneda }}</p>
+            </article>
         </div>
+    </section>
 
-        {% if productos_bodega %}
-        <div class="dv-search">
-            <svg class="dv-search__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="buscar-producto" class="dv-search__input" placeholder="Buscar producto por nombre o categoría…" autocomplete="off">
-            <div class="dv-search__results" id="resultados-busqueda"></div>
+    <section class="dashboard-panel" style="margin-bottom: 1rem;">
+        <div class="dashboard-panel__header">
+            <h2>Pedidos generados</h2>
+            <p>Revisa cliente, items y decide aprobacion/rechazo.</p>
         </div>
-
-        <div class="dv-table-wrap">
-            <table class="dv-table" id="tabla-productos">
+        {% if pedidos_generados %}
+        <div style="overflow-x:auto;">
+            <table class="checkout-tabla">
                 <thead>
                     <tr>
-                        <th>Producto</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Estado Stock</th>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th>Entrega</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                        <th>Items</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for p in productos_bodega %}
-                    <tr{% if p.stock <= 5 %} class="dv-row--critico"{% endif %}>
+                    {% for pedido in pedidos_generados %}
+                    <tr>
+                        <td>#{{ pedido.pk }}</td>
+                        <td>{{ pedido.usuario.email|default:'-' }}</td>
+                        <td>{{ pedido.get_tipo_entrega_display }}</td>
                         <td>
-                            <div class="dv-producto-nombre">
-                                {% if p.imagen %}
-                                <img src="{% static 'img/products/' %}{{ p.imagen }}" alt="{{ p.nombre }}" class="dv-producto-thumb">
-                                {% endif %}
-                                {{ p.nombre }}
-                            </div>
-                        </td>
-                        <td>{{ p.categoria.nombre|default:"Sin categoría" }}</td>
-                        <td>${{ p.precio|formato_moneda }}</td>
-                        <td><strong>{{ p.stock }}</strong></td>
-                        <td>
-                            {% if p.stock <= 5 %}
-                            <span class="badge badge--stock-critico">Crítico</span>
-                            {% elif p.stock <= 15 %}
-                            <span class="badge badge--stock-bajo">Bajo</span>
+                            {% if pedido.total_final and pedido.total_final > 0 %}
+                                ${{ pedido.total_final|formato_moneda }}
                             {% else %}
-                            <span class="badge badge--stock-ok">OK</span>
+                                ${{ pedido.total|formato_moneda }}
+                            {% endif %}
+                        </td>
+                        <td>{{ pedido.creado_en|date:'d/m/Y H:i' }}</td>
+                        <td>
+                            {% if pedido.items.all %}
+                            <ul style="margin:0; padding-left:1rem;">
+                                {% for item in pedido.items.all %}
+                                <li>
+                                    {% if item.producto %}
+                                        {{ item.producto.nombre }}
+                                    {% elif item.descripcion %}
+                                        {{ item.descripcion }}
+                                    {% else %}
+                                        Item #{{ item.pk }}
+                                    {% endif %}
+                                    | {{ item.get_tipo_linea_display }}
+                                    | cant: {{ item.cantidad }}
+                                    | unit: ${{ item.precio_unitario|formato_moneda }}
+                                    | sub: ${{ item.subtotal|formato_moneda }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td style="display:flex; gap:0.35rem; flex-wrap:wrap;">
+                            <form method="post" action="{% url 'aprobar_pedido' pedido.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn--success btn--sm">Aprobar</button>
+                            </form>
+                            {% if soporta_rechazado %}
+                            <form method="post" action="{% url 'rechazar_pedido' pedido.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn--danger btn--sm">Rechazar</button>
+                            </form>
                             {% endif %}
                         </td>
                     </tr>
@@ -113,147 +115,90 @@
             </table>
         </div>
         {% else %}
-        <div class="dv-empty">
-            <svg class="dv-empty__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            <p>No hay productos con stock disponible en bodega.</p>
-        </div>
+        <p>No hay pedidos en estado generado para revisar.</p>
         {% endif %}
-    </div>
+    </section>
 
-    <!-- ═══ TAB 2: Aprobar / Rechazar pedidos ═══ -->
-    <div class="dv-panel" id="tab-pedidos" role="tabpanel">
-        <div class="dv-panel__header">
-            <h2>Pedidos pendientes de revisión</h2>
-            <p>Pedidos en estado <strong>generado</strong> que requieren aprobación o rechazo.</p>
+    <section class="dashboard-panel" style="margin-bottom: 1rem;">
+        <div class="dashboard-panel__header">
+            <h2>Pedidos aprobados</h2>
         </div>
-
-        {% if pedidos %}
-        <div class="dv-table-wrap">
-            <table class="dv-table">
-                <thead>
-                    <tr>
-                        <th># Pedido</th>
-                        <th>Cliente</th>
-                        <th>Total</th>
-                        <th>Tipo entrega</th>
-                        <th>Estado</th>
-                        <th>Fecha</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pedido in pedidos %}
-                    <tr>
-                        <td><strong>#{{ pedido.pk }}</strong></td>
-                        <td>{{ pedido.usuario.email }}</td>
-                        <td>${{ pedido.total|formato_moneda }}</td>
-                        <td>{{ pedido.get_tipo_entrega_display }}</td>
-                        <td>
-                            <span class="badge badge--{{ pedido.estado }}">
-                                {{ pedido.get_estado_display }}
-                            </span>
-                        </td>
-                        <td>{{ pedido.creado_en|date:"d/m/Y H:i" }}</td>
-                        <td class="dv-actions">
-                            <form method="post" action="{% url 'aprobar_pedido' pedido.pk %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn--success btn--sm">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                                    Aprobar
-                                </button>
-                            </form>
-                            <form method="post" action="{% url 'rechazar_pedido' pedido.pk %}" data-confirm="¿Rechazar pedido #{{ pedido.pk }}?" data-confirm-text="Esta acción marcará el pedido como rechazado.">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn--danger btn--sm">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                    Rechazar
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="dv-empty">
-            <svg class="dv-empty__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            <p>No hay pedidos en estado <strong>generado</strong> por el momento.</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- ═══ TAB 3: Enviar a bodegueros / despacho ═══ -->
-    <div class="dv-panel" id="tab-despacho" role="tabpanel">
-        <div class="dv-panel__header">
-            <h2>Órdenes aprobadas — Despacho a bodega</h2>
-            <p>Pedidos aprobados listos para ser enviados a bodegueros para preparación y despacho al cliente.</p>
-        </div>
-
         {% if pedidos_aprobados %}
-        <div class="dv-table-wrap">
-            <table class="dv-table">
+        <div style="overflow-x:auto;">
+            <table class="checkout-tabla">
                 <thead>
                     <tr>
-                        <th># Pedido</th>
+                        <th>Pedido</th>
                         <th>Cliente</th>
-                        <th>Total</th>
-                        <th>Tipo entrega</th>
                         <th>Estado</th>
+                        <th>Total</th>
                         <th>Fecha</th>
-                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for pedido in pedidos_aprobados %}
                     <tr>
-                        <td><strong>#{{ pedido.pk }}</strong></td>
-                        <td>{{ pedido.usuario.email }}</td>
-                        <td>${{ pedido.total|formato_moneda }}</td>
+                        <td>#{{ pedido.pk }}</td>
+                        <td>{{ pedido.usuario.email|default:'-' }}</td>
+                        <td>{{ pedido.get_estado_display }}</td>
                         <td>
-                            {% if pedido.tipo_entrega == 'despacho' %}
-                            <span class="dv-entrega dv-entrega--despacho">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                                Despacho
-                            </span>
+                            {% if pedido.total_final and pedido.total_final > 0 %}
+                                ${{ pedido.total_final|formato_moneda }}
                             {% else %}
-                            <span class="dv-entrega dv-entrega--retiro">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                                Retiro
-                            </span>
+                                ${{ pedido.total|formato_moneda }}
                             {% endif %}
                         </td>
-                        <td>
-                            <span class="badge badge--{{ pedido.estado }}">
-                                {{ pedido.get_estado_display }}
-                            </span>
-                        </td>
-                        <td>{{ pedido.creado_en|date:"d/m/Y H:i" }}</td>
-                        <td class="dv-actions">
-                            <form method="post" action="{% url 'enviar_a_bodega' pedido.pk %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn--primary btn--sm">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                                    Enviar a Bodega
-                                </button>
-                            </form>
-                        </td>
+                        <td>{{ pedido.creado_en|date:'d/m/Y H:i' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="dv-empty">
-            <svg class="dv-empty__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-            <p>No hay pedidos <strong>aprobados</strong> pendientes de envío a bodega.</p>
-        </div>
+        <p>No hay pedidos aprobados registrados.</p>
         {% endif %}
-    </div>
+    </section>
 
+    <section class="dashboard-panel">
+        <div class="dashboard-panel__header">
+            <h2>Pedidos recientes</h2>
+        </div>
+        {% if pedidos_recientes %}
+        <div style="overflow-x:auto;">
+            <table class="checkout-tabla">
+                <thead>
+                    <tr>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th>Estado</th>
+                        <th>Entrega</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos_recientes %}
+                    <tr>
+                        <td>#{{ pedido.pk }}</td>
+                        <td>{{ pedido.usuario.email|default:'-' }}</td>
+                        <td>{{ pedido.get_estado_display }}</td>
+                        <td>{{ pedido.get_tipo_entrega_display }}</td>
+                        <td>
+                            {% if pedido.total_final and pedido.total_final > 0 %}
+                                ${{ pedido.total_final|formato_moneda }}
+                            {% else %}
+                                ${{ pedido.total|formato_moneda }}
+                            {% endif %}
+                        </td>
+                        <td>{{ pedido.creado_en|date:'d/m/Y H:i' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No hay pedidos recientes para mostrar.</p>
+        {% endif %}
+    </section>
 </section>
-{% endblock %}
-
-{% block page_scripts %}
-<script src="{% static 'js/dashboard/vendedor.js' %}"></script>
 {% endblock %}

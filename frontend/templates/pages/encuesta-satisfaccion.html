@@ -14,69 +14,48 @@
             {% endfor %}
         {% endif %}
 
-        <form class="auth-form" method="post" action="{% url 'encuesta_satisfaccion' %}" novalidate>
-            {% csrf_token %}
+        {% if pedido %}
+            <p><strong>Pedido asociado:</strong> #{{ pedido.pk }}</p>
 
-            <div class="auth-form__field">
-                <label for="id_pedido">Numero de pedido (opcional)</label>
-                <input id="id_pedido" name="numero_pedido" type="text">
+            {% if encuesta_existente %}
+                <div class="auth-card__benefits">
+                    <h2>Encuesta respondida</h2>
+                    <p><strong>Calificacion enviada:</strong> {{ encuesta_existente.calificacion }}/5</p>
+                    <p><strong>Comentario:</strong> {{ encuesta_existente.comentario|default:'-' }}</p>
+                    <p><strong>Fecha:</strong> {{ encuesta_existente.creado_en|date:'d/m/Y H:i' }}</p>
+                    <a class="auth-form__submit" href="{% url 'confirmacion' pedido.pk %}">Volver a la confirmacion</a>
+                </div>
+            {% else %}
+                <form class="auth-form" method="post" action="{% url 'encuesta_satisfaccion_pedido' pedido.pk %}" novalidate>
+                    {% csrf_token %}
+
+                    <div class="auth-form__field">
+                        <label for="id_calificacion">Calificacion (1 a 5)</label>
+                        <select id="id_calificacion" name="calificacion" required>
+                            <option value="">Selecciona un nivel</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+
+                    <div class="auth-form__field">
+                        <label for="id_comentario">Comentario (opcional)</label>
+                        <textarea id="id_comentario" name="comentario" rows="4"></textarea>
+                    </div>
+
+                    <button class="auth-form__submit" type="submit">Enviar encuesta</button>
+                </form>
+            {% endif %}
+        {% else %}
+            <div class="auth-card__benefits">
+                <h2>Encuesta no disponible</h2>
+                <p>Para responder una encuesta debes ingresar desde la confirmacion de un pedido.</p>
+                <a class="auth-form__submit" href="{% url 'home' %}">Ir al inicio</a>
             </div>
-
-            <div class="auth-form__field">
-                <label for="id_satisfaccion">Nivel de satisfaccion general (1 a 5)</label>
-                <select id="id_satisfaccion" name="satisfaccion_general" required>
-                    <option value="">Selecciona un nivel</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_calidad">Calidad de productos (1 a 5)</label>
-                <select id="id_calidad" name="calidad_productos" required>
-                    <option value="">Selecciona un nivel</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_tiempo">Tiempo de entrega/retiro (1 a 5)</label>
-                <select id="id_tiempo" name="tiempo_entrega" required>
-                    <option value="">Selecciona un nivel</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_atencion">Atencion recibida (1 a 5)</label>
-                <select id="id_atencion" name="atencion_recibida" required>
-                    <option value="">Selecciona un nivel</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-
-            <div class="auth-form__field">
-                <label for="id_comentario">Comentario</label>
-                <textarea id="id_comentario" name="comentario" rows="4"></textarea>
-            </div>
-
-            <button class="auth-form__submit" type="submit">Enviar encuesta</button>
-        </form>
+        {% endif %}
     </div>
 </section>
 {% endblock %}
