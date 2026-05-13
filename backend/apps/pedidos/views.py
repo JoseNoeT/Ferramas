@@ -1,12 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+import re
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.credito import services as credito_services
+from apps.credito.models import MovimientoCredito
 from apps.catalogo.models import Producto
 from apps.maestros.models import PerfilMaestroPyme, SolicitudAsesoria
 from apps.pedidos import services as pedidos_services
@@ -108,6 +112,7 @@ def checkout_view(request):
     cuenta_puntos = puntos_services.obtener_o_crear_cuenta_puntos(request.user)
     resumen = pedidos_services.obtener_resumen_carrito(request.user)
     solicitud_pendiente = obtener_solicitud_pendiente_desde_session()
+    perfil_maestro = PerfilMaestroPyme.objects.filter(usuario=request.user).first()
     cargo_asesoria_pendiente = solicitud_pendiente.cargo_confirmacion if solicitud_pendiente else 0
     total_con_asesoria = resumen["total"] + cargo_asesoria_pendiente
 
@@ -115,26 +120,61 @@ def checkout_view(request):
     resumen["cargo_asesoria_pendiente"] = cargo_asesoria_pendiente
     resumen["total_con_asesoria"] = total_con_asesoria
     resumen["saldo_puntos"] = cuenta_puntos.saldo
+    resumen["es_maestro_aprobado"] = (
+        perfil_maestro is not None and perfil_maestro.estado == PerfilMaestroPyme.Estado.APROBADO
+    )
+
+    cuenta_credito = credito_services.obtener_cuenta_credito_usuario(request.user)
+    cuotas_vencidas_credito = False
+    saldo_disponible_credito = 0
+    puede_usar_ferrecredito = False
+
+    if cuenta_credito:
+        cuotas_vencidas_credito = credito_services.tiene_cuotas_vencidas(cuenta_credito)
+        saldo_disponible_credito = cuenta_credito.saldo_disponible
+        puede_usar_ferrecredito = (
+            not cuotas_vencidas_credito and saldo_disponible_credito >= total_con_asesoria
+        )
+
+    resumen["cuenta_credito"] = cuenta_credito
+    resumen["puede_usar_ferrecredito"] = puede_usar_ferrecredito
+    resumen["saldo_disponible_credito"] = saldo_disponible_credito
+    resumen["tiene_cuotas_vencidas"] = cuotas_vencidas_credito
 
     if request.method == "POST":
         tipo_entrega = request.POST.get("tipo_entrega", Pedido.TipoEntrega.RETIRO)
         puntos_a_usar = request.POST.get("puntos_a_usar", 0)
+        medio_pago = request.POST.get("medio_pago", "tienda")
+        cantidad_cuotas = request.POST.get("cantidad_cuotas", 1)
         try:
-            pedido = pedidos_services.crear_pedido_desde_carrito(request.user, tipo_entrega)
+            with transaction.atomic():
+                pedido = pedidos_services.crear_pedido_desde_carrito(request.user, tipo_entrega)
 
-            solicitud_pendiente_post = obtener_solicitud_pendiente_desde_session()
-            if solicitud_pendiente_post:
-                pedidos_services.agregar_asesoria_a_pedido(pedido, solicitud_pendiente_post)
-                request.session.pop("solicitud_asesoria_pendiente_id", None)
-                request.session.modified = True
+                solicitud_pendiente_post = obtener_solicitud_pendiente_desde_session()
+                if solicitud_pendiente_post:
+                    pedidos_services.agregar_asesoria_a_pedido(pedido, solicitud_pendiente_post)
+                    request.session.pop("solicitud_asesoria_pendiente_id", None)
+                    request.session.modified = True
 
-            if int(puntos_a_usar or 0) > 0:
-                puntos_services.aplicar_puntos(request.user, pedido, puntos_a_usar)
-            else:
-                pedido.total_final = pedido.total
-                pedido.save(update_fields=["total_final"])
+                if int(puntos_a_usar or 0) > 0:
+                    puntos_services.aplicar_puntos(request.user, pedido, puntos_a_usar)
+                else:
+                    pedido.total_final = pedido.total
+                    pedido.save(update_fields=["total_final"])
 
-            puntos_services.acumular_puntos_por_pedido(request.user, pedido)
+                if medio_pago == "ferrecredito":
+                    cuenta_credito_post = credito_services.validar_uso_ferrecredito(
+                        request.user,
+                        pedido.total_final,
+                    )
+                    credito_services.registrar_compra_ferrecredito(
+                        cuenta_credito_post,
+                        pedido,
+                        pedido.total_final,
+                        cantidad_cuotas,
+                    )
+
+                puntos_services.acumular_puntos_por_pedido(request.user, pedido)
 
             messages.success(request, f"Pedido #{pedido.pk} generado correctamente.")
             return redirect("confirmacion", pk=pedido.pk)
@@ -155,7 +195,33 @@ def pedido_confirmacion_view(request, pk):
         )
     except Pedido.DoesNotExist:
         raise Http404("Pedido no encontrado.")
-    return render(request, "pages/confirmacion.html", {"pedido": pedido})
+
+    movimiento_ferrecredito = (
+        MovimientoCredito.objects.select_related("cuenta")
+        .filter(
+            cuenta__maestro__usuario=request.user,
+            tipo=MovimientoCredito.Tipo.COMPRA,
+            descripcion__contains=f"pedido #{pedido.pk}",
+        )
+        .order_by("-creado_en")
+        .first()
+    )
+
+    cantidad_cuotas_ferrecredito = None
+    if movimiento_ferrecredito:
+        match_cuotas = re.search(r"cuotas=(\d+)", movimiento_ferrecredito.descripcion or "")
+        if match_cuotas:
+            cantidad_cuotas_ferrecredito = int(match_cuotas.group(1))
+
+    return render(
+        request,
+        "pages/confirmacion.html",
+        {
+            "pedido": pedido,
+            "movimiento_ferrecredito": movimiento_ferrecredito,
+            "cantidad_cuotas_ferrecredito": cantidad_cuotas_ferrecredito,
+        },
+    )
 
 
 # ─── Dashboard Vendedor ───────────────────────────────────────────────────────

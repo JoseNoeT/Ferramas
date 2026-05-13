@@ -91,3 +91,35 @@ class CuotaCredito(models.Model):
 
 	def __str__(self):
 		return f"Cuota {self.numero_cuota}/{self.total_cuotas} - {self.cuenta}"
+
+
+class SolicitudFerreCredito(models.Model):
+	class Estado(models.TextChoices):
+		PENDIENTE = "pendiente", "Pendiente"
+		APROBADA = "aprobada", "Aprobada"
+		RECHAZADA = "rechazada", "Rechazada"
+
+	maestro = models.ForeignKey(
+		"maestros.PerfilMaestroPyme",
+		on_delete=models.CASCADE,
+		related_name="solicitudes_ferrecredito",
+	)
+	monto_solicitado = models.DecimalField(max_digits=10, decimal_places=2)
+	motivo = models.TextField(blank=True, default="")
+	estado = models.CharField(
+		max_length=20,
+		choices=Estado.choices,
+		default=Estado.PENDIENTE,
+	)
+	cupo_aprobado = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+	observacion_admin = models.TextField(blank=True, default="")
+	creado_en = models.DateTimeField(auto_now_add=True)
+	actualizado_en = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		verbose_name = "Solicitud FerreCredito"
+		verbose_name_plural = "Solicitudes FerreCredito"
+		ordering = ["-creado_en"]
+
+	def __str__(self):
+		return f"Solicitud #{self.pk} - {self.maestro.usuario.email} ({self.get_estado_display()})"
