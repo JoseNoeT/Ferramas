@@ -1,0 +1,74 @@
+<section class="franja-home" aria-labelledby="franja-servicios-title">
+    <div class="franja-home__header">
+        <div>
+            <h2 id="franja-servicios-title">Servicios destacados Maestro/PYME</h2>
+            <p>Conecta con especialistas y confirma asesorias desde FERREMAX.</p>
+        </div>
+        <a href="{% url 'servicios_maestros' %}" class="franja-home__ver-todos">Ver todos</a>
+    </div>
+
+    {% if servicios_maestro_destacados %}
+    <div class="franja-home__viewport">
+        <div class="franja-home__track">
+            <div class="franja-home__group">
+                {% for servicio in servicios_maestro_destacados %}
+                <article class="franja-home__item" tabindex="0">
+                    <p class="franja-home__meta">
+                        {{ servicio.rubro }}
+                        {% if servicio.maestro.oficio %}
+                            · {{ servicio.maestro.oficio }}
+                        {% endif %}
+                    </p>
+                    <h3 class="franja-home__titulo">{{ servicio.titulo }}</h3>
+                    <p class="franja-home__autor">
+                        {{ servicio.maestro.get_tipo_display }} · {{ servicio.maestro.usuario.email }}
+                    </p>
+                    <p class="franja-home__desc">{{ servicio.descripcion|truncatechars:120 }}</p>
+                    <p class="franja-home__cargo">Confirmacion: $5.000</p>
+                    {% if user.is_authenticated %}
+                        <a class="franja-home__cta" href="{% url 'solicitud_asesoria_maestro_detalle' servicio.id %}">Solicitar asesoria</a>
+                    {% else %}
+                        <a class="franja-home__cta" href="{% url 'login' %}?next={% url 'solicitud_asesoria_maestro_detalle' servicio.id %}">Ver servicio</a>
+                    {% endif %}
+                </article>
+                {% if forloop.counter|divisibleby:3 %}
+                <article class="franja-home__item franja-home__item--indicador" tabindex="0">
+                    {% include "components/indicadores_economicos.html" %}
+                </article>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="franja-home__group" aria-hidden="true">
+                {% for servicio in servicios_maestro_destacados %}
+                <article class="franja-home__item">
+                    <p class="franja-home__meta">
+                        {{ servicio.rubro }}
+                        {% if servicio.maestro.oficio %}
+                            · {{ servicio.maestro.oficio }}
+                        {% endif %}
+                    </p>
+                    <h3 class="franja-home__titulo">{{ servicio.titulo }}</h3>
+                    <p class="franja-home__autor">
+                        {{ servicio.maestro.get_tipo_display }} · {{ servicio.maestro.usuario.email }}
+                    </p>
+                    <p class="franja-home__desc">{{ servicio.descripcion|truncatechars:120 }}</p>
+                    <p class="franja-home__cargo">Confirmacion: $5.000</p>
+                    <span class="franja-home__cta franja-home__cta--disabled">Disponible en listado</span>
+                </article>
+                {% if forloop.counter|divisibleby:3 %}
+                <article class="franja-home__item franja-home__item--indicador">
+                    {% include "components/indicadores_economicos.html" %}
+                </article>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="franja-home__vacio">
+        <p>Aun no hay servicios Maestro/PYME publicados.</p>
+        <p>Pronto veras especialistas disponibles para solicitar asesorias.</p>
+    </div>
+    {% endif %}
+</section>

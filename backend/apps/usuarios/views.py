@@ -54,6 +54,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 
 from apps.catalogo import services as catalogo_services
 from apps.catalogo.models import Categoria, Producto
+from apps.maestros.models import PerfilMaestroPyme, ServicioMaestro
 
 from .forms import LoginForm, RegistroForm, UsuarioInternoCreateForm, UsuarioInternoUpdateForm
 from .models import Usuario
@@ -112,6 +113,14 @@ def _requiere_contador(view_func):
 def home_view(request):
     ahora = timezone.now()
     productos_destacados = catalogo_services.obtener_productos_activos()[:4]
+    servicios_maestro_destacados = (
+        ServicioMaestro.objects.filter(
+            activo=True,
+            maestro__estado=PerfilMaestroPyme.Estado.APROBADO,
+        )
+        .select_related("maestro", "maestro__usuario")
+        .order_by("-creado_en")[:9]
+    )
     productos_oferta = (
         Producto.objects.select_related("categoria")
         .filter(
@@ -129,6 +138,7 @@ def home_view(request):
         {
             "productos_destacados": productos_destacados,
             "productos_oferta": productos_oferta,
+            "servicios_maestro_destacados": servicios_maestro_destacados,
         },
     )
 
