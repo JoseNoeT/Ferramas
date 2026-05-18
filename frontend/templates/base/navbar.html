@@ -4,8 +4,8 @@
 		position: sticky;
 		top: 0;
 		z-index: 120;
-		background: #f57c00;
-		border-bottom: 1px solid #ececec;
+		background: var(--color-primary);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 	}
 
 	.site-header .navbar {
@@ -23,7 +23,7 @@
 		font-weight: 800;
 		letter-spacing: 0.02em;
 		text-decoration: none;
-		color: #111827;
+		color: #ffffff;
 		white-space: nowrap;
 	}
 
@@ -54,7 +54,7 @@
 		border-radius: 10px;
 		text-decoration: none;
 		font-weight: 600;
-		color: #1f2937;
+		color: #e2e8f0;
 		font-size: 0.93rem;
 		line-height: 1;
 		white-space: nowrap;
@@ -65,8 +65,8 @@
 	.site-header .navbar__links a:focus-visible,
 	.site-header .navbar__dropdown-toggle:hover,
 	.site-header .navbar__dropdown-toggle:focus-visible {
-		background: rgba(255, 255, 255, 0.22);
-		color: #111827;
+		background: rgba(255, 255, 255, 0.14);
+		color: #ffffff;
 		outline: none;
 	}
 
@@ -89,14 +89,14 @@
 	}
 
 	.site-header .navbar__register {
-		color: #1f2937;
-		background: rgba(255, 255, 255, 0.14);
-		border: 1px solid rgba(255, 255, 255, 0.24);
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.12);
+		border: 1px solid rgba(255, 255, 255, 0.28);
 	}
 
 	.site-header .navbar__login {
-		background: #111827;
-		color: #ffffff;
+		background: var(--color-secondary);
+		color: var(--color-text);
 	}
 
 	.site-header .navbar__dropdown {
@@ -181,8 +181,8 @@
 	.site-header .navbar__account .navbar__dropdown-toggle:hover,
 	.site-header .navbar__account .navbar__dropdown-toggle:focus-visible,
 	.site-header .navbar__dropdown.is-open .navbar__dropdown-toggle {
-		background: #ffffff;
-		color: #111827;
+		background: var(--color-secondary);
+		color: var(--color-text);
 	}
 
 	.site-header .navbar__dropdown-separator {

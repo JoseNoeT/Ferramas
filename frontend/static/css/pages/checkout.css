@@ -38,14 +38,14 @@
 .checkout-tabla th {
 	text-align: left;
 	padding: 0.6rem 0.8rem;
-	border-bottom: 2px solid #ececec;
-	color: #666;
+	border-bottom: 2px solid var(--color-border);
+	color: var(--color-muted);
 	font-weight: 600;
 }
 
 .checkout-tabla td {
 	padding: 0.6rem 0.8rem;
-	border-bottom: 1px solid #f0f0f0;
+	border-bottom: 1px solid var(--color-border);
 }
 
 .checkout-tabla__total td {
@@ -66,8 +66,8 @@
 }
 
 .checkout-form {
-	background: #ffffff;
-	border: 1px solid #ececec;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
 	border-radius: 14px;
 	padding: 1.5rem;
 	display: flex;
@@ -96,7 +96,7 @@
 	align-items: flex-start;
 	gap: 0.75rem;
 	padding: 0.8rem 1rem;
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--color-border);
 	border-radius: 10px;
 	cursor: pointer;
 	transition: border-color 0.15s;
@@ -104,7 +104,7 @@
 
 .checkout-entrega__opcion:has(input:checked) {
 	border-color: var(--color-primary);
-	background: #fff8f0;
+	background: rgba(30, 58, 138, 0.06);
 }
 
 .checkout-entrega__opcion span {
@@ -114,14 +114,14 @@
 }
 
 .checkout-entrega__opcion small {
-	color: #888;
+	color: var(--color-muted);
 	font-size: 0.82rem;
 }
 
 .checkout-empty {
 	text-align: center;
 	padding: 4rem 1rem;
-	color: #666;
+	color: var(--color-muted);
 }
 
 @media (max-width: 800px) {

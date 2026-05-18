@@ -24,7 +24,7 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
-	box-shadow: 0 12px 32px rgba(51, 51, 51, 0.16);
+	box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
 }
 
 /* <img> absolutamente posicionada: control total del recorte */
@@ -55,10 +55,10 @@
 .hero__card--primary::before {
 	background:
 		linear-gradient(to top,
-			rgba(18, 10, 2, 0.90) 0%,
-			rgba(18, 10, 2, 0.55) 42%,
-			rgba(18, 10, 2, 0.10) 100%),
-		radial-gradient(ellipse at 78% 8%, rgba(245, 124, 0, 0.36), transparent 52%);
+			rgba(15, 23, 42, 0.88) 0%,
+			rgba(15, 23, 42, 0.52) 42%,
+			rgba(15, 23, 42, 0.08) 100%),
+		radial-gradient(ellipse at 78% 8%, rgba(250, 204, 21, 0.34), transparent 52%);
 }
 
 /* ---------------------------------------------------------------
@@ -69,10 +69,10 @@
 .hero__card--secondary::before {
 	background:
 		linear-gradient(to top,
-			rgba(18, 6, 6, 0.88) 0%,
-			rgba(18, 6, 6, 0.46) 48%,
-			rgba(18, 6, 6, 0.06) 100%),
-		radial-gradient(ellipse at 22% 8%, rgba(193, 0, 0, 0.30), transparent 52%);
+			rgba(23, 37, 84, 0.9) 0%,
+			rgba(23, 37, 84, 0.5) 48%,
+			rgba(23, 37, 84, 0.08) 100%),
+		radial-gradient(ellipse at 22% 8%, rgba(250, 204, 21, 0.26), transparent 52%);
 }
 
 /* ---------------------------------------------------------------
@@ -124,13 +124,13 @@
 	font-size: 1rem;
 	text-decoration: none;
 	transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-	box-shadow: 0 4px 16px rgba(245, 124, 0, 0.42);
+	box-shadow: 0 4px 16px rgba(30, 58, 138, 0.42);
 }
 
 .hero__cta:hover {
-	background: #da6f00;
+	background: var(--color-primary-dark);
 	transform: translateY(-2px);
-	box-shadow: 0 6px 22px rgba(245, 124, 0, 0.55);
+	box-shadow: 0 6px 22px rgba(23, 37, 84, 0.5);
 }
 
 /* ---------------------------------------------------------------
@@ -138,7 +138,7 @@
    --------------------------------------------------------------- */
 
 .hero__promo {
-	background: linear-gradient(120deg, var(--color-primary), var(--color-accent));
+	background: linear-gradient(120deg, var(--color-primary), var(--color-primary-dark));
 	border-radius: 12px;
 	padding: 1.1rem 1.25rem;
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
@@ -308,8 +308,8 @@
 	display: inline-block;
 	padding: 0.34rem 0.5rem;
 	border-radius: 7px;
-	background: #ffffff;
-	color: #7f1d1d;
+	background: var(--color-secondary);
+	color: var(--color-text);
 	font-size: 0.75rem;
 	font-weight: 700;
 	text-decoration: none;
@@ -345,7 +345,7 @@
 }
 
 .hero-offers__dot.is-active {
-	background: #ffffff;
+	background: var(--color-secondary);
 }
 
 .hero-offers__empty {

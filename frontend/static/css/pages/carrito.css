@@ -20,7 +20,7 @@
 .carrito__subtitle {
 	margin: -1rem 0 0;
 	font-size: 0.98rem;
-	color: #666;
+	color: var(--color-muted);
 }
 
 .carrito-messages { margin-bottom: 1rem; }
@@ -39,29 +39,29 @@
 }
 
 .carrito-item {
-	background: #ffffff;
-	border: 1px solid #ececec;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
 	border-radius: 16px;
 	padding: 1rem;
 	display: grid;
 	grid-template-columns: 140px minmax(0, 1fr) 260px;
 	gap: 1rem;
 	align-items: stretch;
-	box-shadow: 0 10px 24px rgba(51, 51, 51, 0.06);
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
 	transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .carrito-item:hover {
-	box-shadow: 0 14px 30px rgba(51, 51, 51, 0.1);
-	border-color: rgba(245, 124, 0, 0.24);
+	box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+	border-color: rgba(30, 58, 138, 0.24);
 }
 
 .carrito-item__media {
 	height: 120px;
 	border-radius: 12px;
-	background: linear-gradient(145deg, #fafafa, #f1f1f1);
+	background: linear-gradient(145deg, #ffffff, var(--color-bg));
 	padding: 0.65rem;
-	border: 1px solid #f0f0f0;
+	border: 1px solid var(--color-border);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -83,8 +83,8 @@
 	font-size: 0.72rem;
 	font-weight: 800;
 	color: var(--color-primary);
-	background: #ffffff;
-	border: 2px dashed #f1c59b;
+	background: var(--color-surface);
+	border: 2px dashed rgba(30, 58, 138, 0.3);
 }
 
 .carrito-item__info {
@@ -119,14 +119,14 @@
 	font-size: 0.72rem;
 	font-weight: 800;
 	letter-spacing: 0.04em;
-	background: var(--color-accent);
-	color: #ffffff;
+	background: var(--color-secondary);
+	color: var(--color-text);
 }
 
 .carrito-item__price-normal {
 	margin: 0;
 	font-size: 0.85rem;
-	color: #777;
+	color: var(--color-muted);
 	text-decoration: line-through;
 }
 
@@ -141,7 +141,7 @@
 .carrito-item__price-label {
 	margin: 0;
 	font-size: 0.82rem;
-	color: #777;
+	color: var(--color-muted);
 }
 
 .carrito-item__subtotal {
@@ -157,13 +157,13 @@
 	justify-content: space-between;
 	gap: 0.6rem;
 	padding-left: 0.85rem;
-	border-left: 1px solid #efefef;
+	border-left: 1px solid var(--color-border);
 }
 
 .carrito-item__subtotal-label {
 	margin: 0;
 	font-size: 0.81rem;
-	color: #6f6f6f;
+	color: var(--color-muted);
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 }
@@ -188,7 +188,7 @@
 .carrito-item__qty-label {
 	font-size: 0.82rem;
 	font-weight: 700;
-	color: #555;
+	color: var(--color-accent);
 }
 
 .carrito-item__update input[type="number"] {
@@ -208,8 +208,8 @@
 
 /* Resumen lateral */
 .carrito-resumen {
-	background: #ffffff;
-	border: 1px solid rgba(245, 124, 0, 0.2);
+	background: var(--color-surface);
+	border: 1px solid rgba(30, 58, 138, 0.2);
 	border-radius: 14px;
 	padding: 1.4rem;
 	position: sticky;
@@ -217,7 +217,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
-	box-shadow: 0 10px 24px rgba(51, 51, 51, 0.08);
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
 .carrito-resumen__title {
@@ -227,21 +227,21 @@
 
 .carrito-resumen__line--count {
 	font-size: 0.92rem;
-	color: #5f5f5f;
+	color: var(--color-muted);
 	padding-bottom: 0.55rem;
-	border-bottom: 1px dashed #ececec;
+	border-bottom: 1px dashed var(--color-border);
 }
 
 .carrito-resumen__line {
 	display: flex;
 	justify-content: space-between;
 	font-size: 0.97rem;
-	color: #444;
+	color: var(--color-accent);
 }
 
 .carrito-resumen__line--total {
 	padding-top: 0.75rem;
-	border-top: 1px solid #ececec;
+	border-top: 1px solid var(--color-border);
 	font-size: 1.05rem;
 	color: var(--color-dark);
 }
@@ -250,18 +250,18 @@
 	min-height: 50px;
 	font-size: 1rem;
 	font-weight: 800;
-	box-shadow: 0 10px 20px rgba(245, 124, 0, 0.24);
+	box-shadow: 0 10px 20px rgba(30, 58, 138, 0.24);
 }
 
 .carrito-resumen__checkout:hover,
 .carrito-resumen__checkout:focus-visible {
-	box-shadow: 0 14px 24px rgba(245, 124, 0, 0.3);
+	box-shadow: 0 14px 24px rgba(30, 58, 138, 0.3);
 }
 
 .carrito-empty {
 	text-align: center;
 	padding: 4rem 1rem;
-	color: #666;
+	color: var(--color-muted);
 }
 
 @media (max-width: 1100px) {

@@ -17,14 +17,14 @@
 
 .franja-home__header p {
     margin: 0.15rem 0 0;
-    color: #475569;
+    color: var(--color-accent);
     font-size: 0.9rem;
 }
 
 .franja-home__ver-todos {
     text-decoration: none;
     font-weight: 700;
-    color: #1e40af;
+    color: var(--color-primary);
     white-space: nowrap;
 }
 
@@ -48,9 +48,9 @@
 .franja-home__item {
     width: 320px;
     min-height: 170px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border);
     border-radius: 12px;
-    background: #ffffff;
+    background: var(--color-surface);
     padding: 0.72rem;
     display: flex;
     flex-direction: column;
@@ -60,7 +60,7 @@
 .franja-home__meta {
     margin: 0;
     font-size: 0.78rem;
-    color: #64748b;
+    color: var(--color-muted);
     font-weight: 700;
 }
 
@@ -73,13 +73,13 @@
 .franja-home__autor {
     margin: 0;
     font-size: 0.78rem;
-    color: #334155;
+    color: var(--color-accent);
 }
 
 .franja-home__desc {
     margin: 0;
     font-size: 0.84rem;
-    color: #334155;
+    color: var(--color-accent);
     line-height: 1.35;
 }
 
@@ -87,7 +87,7 @@
     margin: auto 0 0;
     font-size: 0.82rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--color-text);
 }
 
 .franja-home__cta {
@@ -100,7 +100,7 @@
     font-weight: 700;
     border-radius: 8px;
     padding: 0.4rem 0.6rem;
-    background: #1e293b;
+    background: var(--color-primary);
     color: #ffffff;
 }
 
@@ -112,7 +112,7 @@
 .franja-home__item--indicador {
     background: transparent;
     border-style: dashed;
-    border-color: #cbd5e1;
+    border-color: var(--color-border);
     padding: 0.45rem;
 }
 
@@ -123,15 +123,35 @@
 }
 
 .franja-home__vacio {
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed var(--color-border);
     border-radius: 12px;
     padding: 0.75rem;
-    background: #f8fafc;
+    background: var(--color-bg);
 }
 
 .franja-home__vacio p {
     margin: 0;
-    color: #475569;
+    color: var(--color-accent);
+}
+
+[data-indicadores-component] {
+    border-color: var(--color-border) !important;
+    background: var(--color-bg) !important;
+    color: var(--color-text) !important;
+}
+
+[data-indicadores-component] [data-actualizar-indicadores] {
+    background: var(--color-secondary) !important;
+    color: var(--color-text) !important;
+    border: 1px solid #eab308 !important;
+}
+
+[data-indicadores-component] [data-indicadores-error] {
+    color: var(--color-danger) !important;
+}
+
+[data-indicadores-component] p[style*="color:#475569"] {
+    color: var(--color-accent) !important;
 }
 
 .franja-home__vacio p + p {

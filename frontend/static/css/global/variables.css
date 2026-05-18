@@ -1,8 +1,20 @@
 :root {
-	--color-primary: #F57C00;
-	--color-dark: #333333;
-	--color-accent: #C10000;
-	--color-light: #F5F5F5;
+	--color-primary: #1E3A8A;
+	--color-primary-dark: #172554;
+	--color-secondary: #FACC15;
+	--color-accent: #475569;
+	--color-bg: #F1F5F9;
+	--color-surface: #FFFFFF;
+	--color-text: #0F172A;
+	--color-muted: #64748B;
+	--color-border: #CBD5E1;
+	--color-success: #16A34A;
+	--color-danger: #DC2626;
+	--color-warning: #FACC15;
+
+	/* Compatibilidad con estilos existentes */
+	--color-dark: var(--color-text);
+	--color-light: var(--color-bg);
 
 	--font-base: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	--container-width: 1200px;

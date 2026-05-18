@@ -1,0 +1,65 @@
+.badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.2rem 0.55rem;
+	border-radius: 999px;
+	font-size: 0.74rem;
+	font-weight: 700;
+	line-height: 1;
+	border: 1px solid transparent;
+}
+
+.badge--primary {
+	background: rgba(30, 58, 138, 0.12);
+	color: var(--color-primary);
+	border-color: rgba(30, 58, 138, 0.24);
+}
+
+.badge--secondary {
+	background: #fef3c7;
+	color: #854d0e;
+	border-color: #facc15;
+}
+
+.badge--success {
+	background: #ecfdf3;
+	color: var(--color-success);
+	border-color: #86efac;
+}
+
+.badge--danger {
+	background: #fef2f2;
+	color: var(--color-danger);
+	border-color: #fca5a5;
+}
+
+.badge--borrador,
+.badge--entregado {
+	background: #f1f5f9;
+	color: var(--color-accent);
+	border-color: var(--color-border);
+}
+
+.badge--generado,
+.badge--en_preparacion,
+.badge--stock-bajo {
+	background: #fef9c3;
+	color: #854d0e;
+	border-color: #fde047;
+}
+
+.badge--aprobado,
+.badge--stock-ok,
+.badge--listo {
+	background: #ecfdf3;
+	color: var(--color-success);
+	border-color: #86efac;
+}
+
+.badge--rechazado,
+.badge--stock-critico {
+	background: #fef2f2;
+	color: var(--color-danger);
+	border-color: #fca5a5;
+}
