@@ -1,5 +1,7 @@
 from django.urls import path
 
+from apps.integraciones import views
+
 urlpatterns = [
-    # TODO: Agregar endpoints REST de la app integraciones.
+    path("indicadores/", views.indicadores_economicos_view, name="indicadores_economicos"),
 ]

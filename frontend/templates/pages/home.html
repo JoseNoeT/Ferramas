@@ -4,6 +4,10 @@
 {% block content %}
 	{% include "components/hero.html" %}
 
+	<div style="max-width: 520px; width: 100%; margin: 0.35rem 0 0.6rem;">
+		{% include "components/indicadores_economicos.html" %}
+	</div>
+
 	<section class="home-section" aria-labelledby="categorias-title">
 		<div class="section-heading">
 			<h2 id="categorias-title">Categorias destacadas</h2>
@@ -149,4 +153,8 @@
 		<p class="promo-banner__copy">Descubre precios especiales en productos seleccionados antes de que finalicen.</p>
 		<a href="/ofertas/" class="promo-banner__link">Ver ofertas</a>
 	</section>
+{% endblock %}
+
+{% block page_scripts %}
+	<script src="{% static 'js/components/indicadores.js' %}"></script>
 {% endblock %}

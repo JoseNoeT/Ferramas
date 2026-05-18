@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load ecommerce_tags %}
+{% load ecommerce_tags static %}
 
 {% block content %}
 <section class="dashboard-admin">
@@ -89,6 +89,8 @@
 			<strong>Cupo aprobado:</strong> ${{ total_cupo_aprobado|formato_moneda }}
 		</p>
 	</section>
+
+	{% include "components/indicadores_economicos.html" %}
 
 	<section class="dashboard-panel" style="margin-bottom: 1rem;">
 		<div class="dashboard-panel__header">
@@ -183,4 +185,8 @@
 		{% endif %}
 	</section>
 </section>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{% static 'js/components/indicadores.js' %}"></script>
 {% endblock %}
