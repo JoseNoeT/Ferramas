@@ -62,6 +62,12 @@ class Pedido(models.Model):
         RETIRO = "retiro", "Retiro en tienda"
         DESPACHO = "despacho", "Despacho a domicilio"
 
+    class PaymentStatus(models.TextChoices):
+        PENDIENTE = "pendiente", "Pendiente"
+        PAGADO = "pagado", "Pagado"
+        RECHAZADO = "rechazado", "Rechazado"
+        ERROR = "error", "Error"
+
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -73,6 +79,11 @@ class Pedido(models.Model):
     )
     tipo_entrega = models.CharField(
         max_length=20, choices=TipoEntrega.choices, default=TipoEntrega.RETIRO
+    )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PaymentStatus.choices,
+        default=PaymentStatus.PENDIENTE,
     )
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0)

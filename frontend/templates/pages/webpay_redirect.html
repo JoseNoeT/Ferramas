@@ -1,0 +1,29 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="checkout-section">
+    <div class="checkout-container" style="max-width: 680px;">
+        <h1 class="checkout__title">Redirigiendo a Webpay Plus</h1>
+        <p>Estamos conectando tu pago con Transbank. No cierres esta ventana.</p>
+
+        <form id="webpay-redirect-form" method="post" action="{{ url_webpay }}">
+            <input type="hidden" name="token_ws" value="{{ token_ws }}">
+            <noscript>
+                <p>JavaScript esta deshabilitado. Haz clic para continuar.</p>
+                <button type="submit" class="btn btn--primary">Continuar a Webpay</button>
+            </noscript>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+(function () {
+    var form = document.getElementById("webpay-redirect-form");
+    if (form) {
+        form.submit();
+    }
+})();
+</script>
+{% endblock %}

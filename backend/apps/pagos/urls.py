@@ -2,7 +2,9 @@ from django.urls import path
 
 from apps.pagos import views
 
+app_name = "pagos"
+
 urlpatterns = [
-    path("webpay/iniciar/", views.webpay_iniciar_view, name="api_webpay_iniciar"),
-    path("webpay/retorno/", views.webpay_retorno_view, name="api_webpay_retorno"),
+    path("webpay/iniciar/<int:pedido_id>/", views.iniciar_webpay_view, name="webpay_iniciar"),
+    path("webpay/retorno/", views.retorno_webpay_view, name="webpay_retorno"),
 ]

@@ -13,6 +13,7 @@ from apps.credito import services as credito_services
 from apps.credito.models import MovimientoCredito
 from apps.catalogo.models import Producto
 from apps.maestros.models import PerfilMaestroPyme, SolicitudAsesoria
+from apps.pagos.models import Pago
 from apps.pedidos import services as pedidos_services
 from apps.pedidos.models import Pedido
 from apps.puntos import services as puntos_services
@@ -174,7 +175,12 @@ def checkout_view(request):
                         cantidad_cuotas,
                     )
 
-                puntos_services.acumular_puntos_por_pedido(request.user, pedido)
+                if medio_pago != "webpay":
+                    puntos_services.acumular_puntos_por_pedido(request.user, pedido)
+
+            if medio_pago == "webpay":
+                messages.info(request, "Redirigiendo a Webpay Plus para confirmar el pago.")
+                return redirect("pagos:webpay_iniciar", pedido_id=pedido.pk)
 
             messages.success(request, f"Pedido #{pedido.pk} generado correctamente.")
             return redirect("confirmacion", pk=pedido.pk)
@@ -213,11 +219,18 @@ def pedido_confirmacion_view(request, pk):
         if match_cuotas:
             cantidad_cuotas_ferrecredito = int(match_cuotas.group(1))
 
+    pago_webpay = (
+        Pago.objects.filter(pedido=pedido, medio_pago=Pago.MedioPago.WEBPAY)
+        .order_by("-creado_en")
+        .first()
+    )
+
     return render(
         request,
         "pages/confirmacion.html",
         {
             "pedido": pedido,
+            "pago_webpay": pago_webpay,
             "movimiento_ferrecredito": movimiento_ferrecredito,
             "cantidad_cuotas_ferrecredito": cantidad_cuotas_ferrecredito,
         },

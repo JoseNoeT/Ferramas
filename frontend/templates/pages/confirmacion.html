@@ -13,6 +13,24 @@
                 Tipo de entrega: <strong>{{ pedido.get_tipo_entrega_display }}</strong>
             </p>
 
+            {% if pago_webpay %}
+                <section class="confirmacion__detalle-extra" aria-label="Estado de pago Webpay Plus">
+                    <h2>Estado de pago Webpay Plus</h2>
+                    {% if pago_webpay.estado == 'autorizado' %}
+                        <p><strong>Pago autorizado por Webpay Plus.</strong></p>
+                        {% if pago_webpay.authorization_code %}
+                            <p>Codigo de autorizacion: <strong>{{ pago_webpay.authorization_code }}</strong></p>
+                        {% endif %}
+                    {% elif pago_webpay.estado == 'rechazado' %}
+                        <p><strong>Pago rechazado por Webpay Plus.</strong></p>
+                    {% elif pago_webpay.estado == 'error' %}
+                        <p><strong>Error al confirmar pago.</strong></p>
+                    {% else %}
+                        <p><strong>Pago pendiente de confirmacion.</strong></p>
+                    {% endif %}
+                </section>
+            {% endif %}
+
             <table class="confirmacion-tabla">
                 <thead>
                     <tr>
@@ -40,7 +58,15 @@
                 </tbody>
                 <tfoot>
                     <tr class="confirmacion-tabla__total">
-                        <td colspan="3"><strong>Total pagado</strong></td>
+                        <td colspan="3">
+                            <strong>
+                                {% if pago_webpay and pago_webpay.estado != 'autorizado' %}
+                                    Total pedido
+                                {% else %}
+                                    Total pagado
+                                {% endif %}
+                            </strong>
+                        </td>
                         <td><strong>${{ pedido.total|formato_moneda }}</strong></td>
                     </tr>
                 </tfoot>
