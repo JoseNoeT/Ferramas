@@ -17,15 +17,16 @@ except ModuleNotFoundError:
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("DJANGO_SECRET_KEY", default="change-me-in-development")
-DEBUG = config("DJANGO_DEBUG", default=True, cast=bool)
-ALLOWED_HOSTS = [
-	host.strip()
-	for host in config(
-		"DJANGO_ALLOWED_HOSTS",
-		default="127.0.0.1,localhost,testserver",
-	).split(",")
-	if host.strip()
-]
+DEBUG = config(
+	"DEBUG",
+	default=config("DJANGO_DEBUG", default=True, cast=bool),
+	cast=bool,
+)
+ALLOWED_HOSTS = config(
+	"ALLOWED_HOSTS",
+	default=config("DJANGO_ALLOWED_HOSTS", default="127.0.0.1,localhost"),
+	cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
 
 INSTALLED_APPS = [
 	"django.contrib.admin",
@@ -84,10 +85,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 ASGI_APPLICATION = "core.asgi.application"
 
+SQLITE_PATH = config("SQLITE_PATH", default=str(BASE_DIR / "db.sqlite3"))
+
 DATABASES = {
 	"default": {
 		"ENGINE": "django.db.backends.sqlite3",
-		"NAME": BASE_DIR / "db.sqlite3",
+		"NAME": SQLITE_PATH,
 	}
 }
 
@@ -97,7 +100,14 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR.parent / "frontend" / "static"]
+
+CSRF_TRUSTED_ORIGINS = config(
+	"CSRF_TRUSTED_ORIGINS",
+	default="",
+	cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
 
 # CORS basico para desarrollo local.
 CORS_ALLOW_ALL_ORIGINS = True
