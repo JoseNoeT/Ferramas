@@ -830,3 +830,95 @@ def _aplicar_parche_vendedor_dashboard():
 
 _aplicar_parche_vendedor_dashboard()
 
+
+def _requiere_bodeguero(view_func):
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        if request.user.rol not in [Usuario.Rol.BODEGUERO, Usuario.Rol.ADMIN]:
+            return HttpResponseForbidden("No tienes permiso para acceder a esta sección.")
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+
+
+@_requiere_bodeguero
+def bodeguero_dashboard_operativo_view(request):
+    Pedido = apps.get_model("pedidos", "Pedido")
+
+    pedidos_aprobados = (
+        Pedido.objects.select_related("usuario")
+        .prefetch_related(
+            "items__producto",
+            "items__solicitud_asesoria",
+            "items__solicitud_asesoria__servicio",
+        )
+        .filter(estado=Pedido.Estado.APROBADO)
+        .order_by("-creado_en")
+    )
+    pedidos_en_preparacion = (
+        Pedido.objects.select_related("usuario")
+        .prefetch_related(
+            "items__producto",
+            "items__solicitud_asesoria",
+            "items__solicitud_asesoria__servicio",
+        )
+        .filter(estado=Pedido.Estado.EN_PREPARACION)
+        .order_by("-creado_en")
+    )
+
+    estados_listos = [Pedido.Estado.LISTO]
+    if hasattr(Pedido.Estado, "ENTREGADO"):
+        estados_listos.append(Pedido.Estado.ENTREGADO)
+
+    pedidos_listos = (
+        Pedido.objects.select_related("usuario")
+        .filter(estado__in=estados_listos)
+        .order_by("-creado_en")
+    )
+
+    estados_bodega = [Pedido.Estado.APROBADO, Pedido.Estado.EN_PREPARACION, Pedido.Estado.LISTO]
+    if hasattr(Pedido.Estado, "ENTREGADO"):
+        estados_bodega.append(Pedido.Estado.ENTREGADO)
+
+    pedidos_recientes_bodega = (
+        Pedido.objects.select_related("usuario")
+        .filter(estado__in=estados_bodega)
+        .order_by("-creado_en")[:10]
+    )
+
+    total_aprobados = pedidos_aprobados.count()
+    total_en_preparacion = pedidos_en_preparacion.count()
+    total_listos = pedidos_listos.count()
+
+    return render(
+        request,
+        "dashboard/bodeguero.html",
+        {
+            "pedidos_aprobados": pedidos_aprobados,
+            "pedidos_en_preparacion": pedidos_en_preparacion,
+            "pedidos_listos": pedidos_listos,
+            "total_aprobados": total_aprobados,
+            "total_en_preparacion": total_en_preparacion,
+            "total_listos": total_listos,
+            "total_pedidos_bodega": total_aprobados + total_en_preparacion + total_listos,
+            "pedidos_recientes_bodega": pedidos_recientes_bodega,
+            "estado_preparacion": Pedido.Estado.EN_PREPARACION,
+            "estado_listo": Pedido.Estado.LISTO,
+            "estado_entregado": Pedido.Estado.ENTREGADO if hasattr(Pedido.Estado, "ENTREGADO") else None,
+        },
+    )
+
+
+def _aplicar_parche_bodeguero_dashboard():
+    """Enruta el callback de bodeguero al dashboard operativo definido en esta app."""
+    try:
+        from apps.pedidos import views as pedidos_views
+
+        pedidos_views.bodeguero_dashboard_view = bodeguero_dashboard_operativo_view
+    except Exception:
+        # No interrumpe el arranque si el modulo no esta disponible en este contexto.
+        pass
+
+
+_aplicar_parche_bodeguero_dashboard()
+
