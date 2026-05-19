@@ -18,7 +18,9 @@ staticfiles/
 
 # Environment files
 .env
-.env.*
+.env.local
+.env.*.local
+!.env.example
 
 # VS Code
 .vscode/
