@@ -112,7 +112,7 @@ def _requiere_contador(view_func):
 
 def home_view(request):
     ahora = timezone.now()
-    productos_destacados = catalogo_services.obtener_productos_activos()[:4]
+    productos_destacados = catalogo_services.obtener_productos_activos()[:12]
     servicios_maestro_destacados = (
         ServicioMaestro.objects.filter(
             activo=True,

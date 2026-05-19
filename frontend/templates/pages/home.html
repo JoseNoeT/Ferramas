@@ -47,7 +47,8 @@
 		</div>
 		{% endif %}
 
-		<div class="product-grid">
+		<div class="productos-slider">
+			<div class="productos-slider__track" data-productos-track>
 			{% for producto in productos_destacados %}
 			<article class="home-product-card">
 				<div class="home-product-card__media">
@@ -109,6 +110,7 @@
 			{% empty %}
 				<p>No hay productos destacados disponibles en este momento.</p>
 			{% endfor %}
+			</div>
 		</div>
 	</section>
 
@@ -153,6 +155,3 @@
 	</section>
 {% endblock %}
 
-{% block page_scripts %}
-	<script src="{% static 'js/components/indicadores.js' %}"></script>
-{% endblock %}

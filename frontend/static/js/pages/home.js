@@ -1,4 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
+	// Productos destacados marquee — clonar cards para loop continuo CSS (-50%)
+	const prodTrack = document.querySelector("[data-productos-track]");
+	if (prodTrack && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		const cards = Array.from(prodTrack.querySelectorAll(".home-product-card"));
+		if (cards.length) {
+			cards.forEach(function (card) {
+				const clone = card.cloneNode(true);
+				clone.setAttribute("aria-hidden", "true");
+				prodTrack.appendChild(clone);
+			});
+		}
+	}
+
 	const cta = document.querySelector(".hero__cta");
 	const catalog = document.querySelector("#catalogo");
 
