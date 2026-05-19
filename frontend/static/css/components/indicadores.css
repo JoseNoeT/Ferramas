@@ -1,0 +1,65 @@
+/* =========================================================
+   Indicadores economicos — widget compacto
+   ========================================================= */
+
+.indicadores-widget {
+	margin: 0.35rem 0 0.7rem;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	background: #f8fafc;
+	padding: 0.55rem 0.7rem;
+}
+
+.indicadores-widget__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.45rem;
+	flex-wrap: wrap;
+	margin-bottom: 0.3rem;
+}
+
+.indicadores-widget__title {
+	margin: 0;
+	font-size: 0.95rem;
+	line-height: 1.15;
+}
+
+.indicadores-widget__refresh-btn {
+	padding: 0.25rem 0.55rem;
+	font-size: 0.8rem;
+	line-height: 1.1;
+}
+
+.indicadores-widget__values {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.2rem 0.65rem;
+	margin: 0.05rem 0 0.25rem;
+	font-size: 0.86rem;
+	line-height: 1.2;
+}
+
+.indicadores-widget__meta {
+	margin: 0;
+	color: #475569;
+	font-size: 0.74rem;
+	line-height: 1.25;
+}
+
+.indicadores-widget__disclaimer {
+	margin: 0.12rem 0 0;
+	color: #475569;
+	font-size: 0.72rem;
+	line-height: 1.25;
+}
+
+/* Estado inicial: ocultos hasta que el JS los muestre */
+[data-indicadores-error] {
+	display: none;
+	color: #b91c1c;
+}
+
+[data-indicadores-body] {
+	display: none;
+}

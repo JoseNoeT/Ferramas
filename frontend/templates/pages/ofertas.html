@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load ecommerce_tags %}
+{% load ecommerce_tags static %}
 
 {% block title %}Ofertas | FERREMAX{% endblock %}
 
@@ -75,7 +75,7 @@
 
                 <div class="filter-group">
                     <label for="ordenamiento">Ordenar por:</label>
-                    <select id="ordenamiento" name="ordenar" onchange="document.getElementById('ofertas-filter-form').submit();">
+                    <select id="ordenamiento" name="ordenar">
                         <option value="descuento" {% if ordenamiento_actual == 'descuento' %}selected{% endif %}>Mayor descuento</option>
                         <option value="precio_menor" {% if ordenamiento_actual == 'precio_menor' %}selected{% endif %}>Menor precio</option>
                         <option value="precio_mayor" {% if ordenamiento_actual == 'precio_mayor' %}selected{% endif %}>Mayor precio</option>
@@ -158,65 +158,8 @@
         {% endif %}
     </div>
 </section>
+{% endblock %}
 
-<!-- SCRIPT DEL SLIDER AUTOMÁTICO -->
-<script>
-    (function() {
-        const slider = document.getElementById('ofertas-slider');
-        if (!slider) return;
-
-        const slides = slider.querySelectorAll('.ofertas-slide');
-        const dots = document.querySelectorAll('.slider-dot');
-        const prevBtn = document.getElementById('slider-prev');
-        const nextBtn = document.getElementById('slider-next');
-        let currentIndex = 0;
-        let autoplayInterval;
-
-        function showSlide(index) {
-            slides.forEach((slide, i) => {
-                slide.classList.toggle('active', i === index);
-            });
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-            });
-        }
-
-        function nextSlide() {
-            currentIndex = (currentIndex + 1) % slides.length;
-            showSlide(currentIndex);
-        }
-
-        function prevSlide() {
-            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-            showSlide(currentIndex);
-        }
-
-        function startAutoplay() {
-            autoplayInterval = setInterval(nextSlide, 5000);
-        }
-
-        function resetAutoplay() {
-            clearInterval(autoplayInterval);
-            startAutoplay();
-        }
-
-        // Event listeners
-        prevBtn.addEventListener('click', () => { prevSlide(); resetAutoplay(); });
-        nextBtn.addEventListener('click', () => { nextSlide(); resetAutoplay(); });
-        dots.forEach((dot, i) => {
-            dot.addEventListener('click', () => {
-                currentIndex = i;
-                showSlide(i);
-                resetAutoplay();
-            });
-        });
-
-        // Autoplay
-        startAutoplay();
-
-        // Pausar al pasar el mouse
-        slider.addEventListener('mouseenter', () => clearInterval(autoplayInterval));
-        slider.addEventListener('mouseleave', startAutoplay);
-    })();
-</script>
+{% block page_scripts %}
+<script src="{% static 'js/pages/ofertas.js' %}"></script>
 {% endblock %}
