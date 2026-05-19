@@ -80,7 +80,7 @@ Consumir indicadores economicos externos para exponer informacion financiera de 
 
 ### Uso visual
 - Home publico.
-- Dashboard contador.
+- Panel contador.
 
 ### Nota funcional
 **Valores informativos. No modifican precios ni pagos del sistema.**

@@ -287,7 +287,7 @@
 
 		<ul class="navbar__links">
 			{% if user.is_authenticated and user.rol == 'admin' %}
-				<li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+				<li><a href="{% url 'admin_dashboard' %}">Panel</a></li>
 
 				<li class="navbar__dropdown" data-navbar-dropdown>
 					<a class="navbar__dropdown-toggle" href="#" role="button" data-navbar-dropdown-toggle aria-haspopup="true" aria-expanded="false">
@@ -321,13 +321,13 @@
 				</li>
 
 			{% elif user.is_authenticated and user.rol == 'vendedor' %}
-				<li><a href="{% url 'vendedor_dashboard' %}">Dashboard Vendedor</a></li>
+				<li><a href="{% url 'vendedor_dashboard' %}">Panel Vendedor</a></li>
 
 			{% elif user.is_authenticated and user.rol == 'bodeguero' %}
-				<li><a href="{% url 'bodeguero_dashboard' %}">Dashboard Bodeguero</a></li>
+				<li><a href="{% url 'bodeguero_dashboard' %}">Panel Bodeguero</a></li>
 
 			{% elif user.is_authenticated and user.rol == 'contador' %}
-				<li><a href="{% url 'contador_dashboard' %}">Dashboard Contador</a></li>
+				<li><a href="{% url 'contador_dashboard' %}">Panel Contador</a></li>
 
 			{% elif user.is_authenticated and user.rol == 'cliente' %}
 				<li><a href="/">Inicio</a></li>

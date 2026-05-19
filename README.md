@@ -162,12 +162,12 @@ Estas credenciales son de ejemplo para pruebas locales si ya existen en la base 
 - Catalogo de productos
 - Carrito y checkout
 - Flujo interno de pedidos
-- Dashboard admin de productos
-- Dashboard admin de categorias
-- Dashboard admin de usuarios internos
-- Dashboard vendedor
-- Dashboard bodeguero
-- Dashboard contador
+- Panel admin de productos
+- Panel admin de categorias
+- Panel admin de usuarios internos
+- Panel vendedor
+- Panel bodeguero
+- Panel contador
 
 ## Notas
 

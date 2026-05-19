@@ -45,12 +45,12 @@ Conclusion del estado general:
 1. Home publico (/): HTTP 200, contenido con texto de indicadores y referencias Maestro/PYME.
 2. Catalogo (/catalogo/): HTTP 200.
 3. API indicadores (/api/integraciones/indicadores/): HTTP 200 + payload JSON correcto.
-4. Login admin.interno@test.com / Test123456: login exitoso, redireccion a /dashboard/admin/.
+4. Login admin.interno@test.com / Test123456: login exitoso, redireccion a /Panel/admin/.
 5. Login cliente@test.com / Test123456: login exitoso, acceso correcto.
 6. Login maestro@test.com / Test123456: login exitoso, acceso correcto.
 7. Carrito (/carrito/): HTTP 200 con usuario autenticado.
 8. Checkout (/checkout/): HTTP 200 con usuario autenticado.
-9. Navbar por rol (senal funcional): tras login se detectan pistas de dashboard y logout en home.
+9. Navbar por rol (senal funcional): tras login se detectan pistas de Panel y logout en home.
 
 ### Revision manual esperada (pendiente de validacion visual final en navegador)
 

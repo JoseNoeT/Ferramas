@@ -38,9 +38,9 @@ Se definen las siguientes vistas para la capa de presentación:
 •	Proceso de compra (Checkout) 
 •	Confirmación de compra 
 5.2 Vistas para usuarios internos
-•	Dashboard de vendedor 
-•	Dashboard de bodeguero 
-•	Dashboard de contador 
+•	Panel de vendedor 
+•	Panel de bodeguero 
+•	Panel de contador 
 •	Panel de administrador 
 ________________________________________
 6. Flujo principal del sistema
@@ -72,9 +72,9 @@ ferremax-frontend/
 │── producto.html
 │── carrito.html
 │── checkout.html
-│── dashboard-vendedor.html
-│── dashboard-bodeguero.html
-│── dashboard-contador.html
+│── Panel-vendedor.html
+│── Panel-bodeguero.html
+│── Panel-contador.html
 │── /css
 │    └── styles.css
 │── /js
