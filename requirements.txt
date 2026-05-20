@@ -1,8 +1,8 @@
-django
-djangorestframework
-djangorestframework-simplejwt
-django-cors-headers
-requests
-python-decouple
-transbank-sdk
-gunicorn
+Django>=5.2,<6.0
+djangorestframework>=3.17,<4.0
+djangorestframework-simplejwt>=5.5,<6.0
+django-cors-headers>=4.9,<5.0
+requests>=2.34,<3.0
+python-decouple>=3.8,<4.0
+transbank-sdk>=6.1,<7.0
+gunicorn>=23.0,<24.0
