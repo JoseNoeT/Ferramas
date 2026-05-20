@@ -27,6 +27,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("74990.00"),
             "stock": 14,
             "categoria": "Herramientas",
+            "imagen": "/static/img/productos/taladro-percutor-650w.png",
         },
         {
             "nombre": "Sierra caladora 650W",
@@ -35,6 +36,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("46990.00"),
             "stock": 11,
             "categoria": "Herramientas",
+            "imagen": "/static/img/productos/sierra-caladora-500w.png",
         },
         {
             "nombre": "Pintura latex interior 1 galon blanca",
@@ -43,6 +45,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("17990.00"),
             "stock": 28,
             "categoria": "Pinturas",
+            "imagen": "/static/img/productos/pintura-latex-blanca.png",
         },
         {
             "nombre": "Esmalte sintetico negro 1 litro",
@@ -51,6 +54,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("9990.00"),
             "stock": 33,
             "categoria": "Pinturas",
+            "imagen": "/static/img/productos/esmalte-sintetico-blanco.png",
         },
         {
             "nombre": "Cable electrico 2.5 mm 100 metros",
@@ -59,6 +63,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("41990.00"),
             "stock": 16,
             "categoria": "Materiales Electricos",
+            "imagen": "/static/img/productos/cable-electrico-25mm.png",
         },
         {
             "nombre": "Disyuntor termomagnetico 32A",
@@ -67,6 +72,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("11990.00"),
             "stock": 25,
             "categoria": "Materiales Electricos",
+            "imagen": "/static/img/productos/automatico-10a.png",
         },
         {
             "nombre": "Cemento estructural 25 kg",
@@ -75,6 +81,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("5290.00"),
             "stock": 120,
             "categoria": "Construccion",
+            "imagen": "/static/img/productos/cemento-25kg.png",
         },
         {
             "nombre": "Malla electrosoldada 2x3 metros",
@@ -83,6 +90,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("16990.00"),
             "stock": 22,
             "categoria": "Construccion",
+            "imagen": "/static/img/productos/tornillos-acero.png",
         },
         {
             "nombre": "Casco de seguridad con ajuste",
@@ -91,6 +99,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("8490.00"),
             "stock": 38,
             "categoria": "Seguridad",
+            "imagen": "/static/img/productos/casco-seguridad.png",
         },
         {
             "nombre": "Guantes anticorte nivel 5",
@@ -99,6 +108,7 @@ class Command(BaseCommand):
             "precio_oferta": Decimal("5490.00"),
             "stock": 60,
             "categoria": "Seguridad",
+            "imagen": "/static/img/productos/guantes-seguridad.png",
         },
     ]
 
@@ -129,7 +139,7 @@ class Command(BaseCommand):
                     "descripcion": data["descripcion"],
                     "precio": data["precio"],
                     "stock": data["stock"],
-                    "imagen": f"https://picsum.photos/seed/{slug_producto}/800/600",
+                    "imagen": data.get("imagen", "/static/img/productos/producto-default.png"),
                     "activo": True,
                     "categoria": categoria,
                     "en_oferta": True,

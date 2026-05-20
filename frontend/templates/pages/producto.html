@@ -13,7 +13,7 @@
                 {% if producto.imagen %}
                 <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}">
                 {% else %}
-                <div class="producto-detail__imagen--placeholder">Sin imagen</div>
+                <img src="/static/img/productos/producto-default.png" alt="{{ producto.nombre }}" class="producto-detail__imagen--placeholder">
                 {% endif %}
             </div>
 
