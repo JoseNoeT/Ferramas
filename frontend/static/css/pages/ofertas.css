@@ -560,19 +560,34 @@
 }
 
 /* RESPONSIVIDAD */
+
+/* Tablet — apilado vertical, dimensiones razonables */
 @media (max-width: 1024px) {
     .ofertas-slider {
-        height: 320px;
+        height: auto;
+        min-height: 280px;
     }
 
     .ofertas-slide {
+        height: auto;
         padding: 1.5rem;
         flex-direction: column;
+        align-items: center;
         text-align: center;
+        gap: 1rem;
     }
 
     .ofertas-slide__image {
         flex: 0 0 auto;
+        width: min(100%, 220px);
+        aspect-ratio: 1 / 1;
+        height: auto;
+    }
+
+    .ofertas-slide__image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 
     .ofertas-slide__content h3 {
@@ -584,6 +599,7 @@
     }
 }
 
+/* Mobile — quitar altura fija, proporciones de imagen correctas */
 @media (max-width: 768px) {
     .ofertas-section {
         padding: 1rem 0.75rem;
@@ -598,24 +614,45 @@
         font-size: 1.75rem;
     }
 
+    /* Clave: sin altura fija en mobile */
     .ofertas-slider {
-        height: 280px;
+        height: auto;
     }
 
     .ofertas-slide {
+        height: auto;
         padding: 1rem;
+        gap: 0.75rem;
     }
 
+    /* Imagen proporcional y legible */
     .ofertas-slide__image {
-        flex: 0 0 30%;
+        width: 100%;
+        max-width: none;
+        aspect-ratio: 4 / 3;
+        height: auto;
+        max-height: 200px;
+    }
+
+    .ofertas-slide__discount {
+        font-size: 0.9rem;
+        padding: 0.35rem 0.6rem;
+        top: 0.5rem;
+        right: 0.5rem;
     }
 
     .ofertas-slide__content h3 {
-        font-size: 1.2rem;
+        font-size: 1.15rem;
     }
 
     .ofertas-slide__pricing .precio-oferta {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
+    }
+
+    /* Flechas y dots separados del contenido */
+    .ofertas-slider__controls {
+        margin-top: 0.75rem;
+        gap: 1rem;
     }
 
     .ofertas-categories {
@@ -658,6 +695,7 @@
     }
 }
 
+/* Móvil pequeño <=480px */
 @media (max-width: 480px) {
     .ofertas-section {
         padding: 0.75rem;
@@ -672,13 +710,19 @@
         font-size: 1.4rem;
     }
 
-    .ofertas-slider {
-        height: 240px;
-        margin-bottom: 0.75rem;
+    /* Sin height fija: heredado de 768px es correcto */
+    .ofertas-slider-wrapper {
+        margin-bottom: 1.5rem;
+    }
+
+    .ofertas-slider__title {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
     }
 
     .ofertas-slider__controls {
-        gap: 1rem;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
     }
 
     .slider-btn {
@@ -696,22 +740,14 @@
         height: 10px;
     }
 
-    .ofertas-slider-wrapper {
-        margin-bottom: 1.5rem;
-    }
-
-    .ofertas-slider__title {
-        font-size: 1.2rem;
-        margin-bottom: 0.8rem;
-    }
-
+    /* Grid 2 columnas en 480px */
     .ofertas-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
     }
 
     .oferta-card__image-container {
-        height: 160px;
+        height: 140px;
     }
 
     .oferta-card__body {
@@ -753,5 +789,31 @@
 
     .ofertas-empty p {
         font-size: 0.9rem;
+    }
+}
+
+/* Móvil muy pequeño <=360px */
+@media (max-width: 360px) {
+    .ofertas-header__content h1 {
+        font-size: 1.2rem;
+    }
+
+    /* 1 columna en pantallas muy estrechas */
+    .ofertas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ofertas-slide__content h3 {
+        font-size: 0.95rem;
+    }
+
+    .ofertas-slide__pricing .precio-oferta {
+        font-size: 1.2rem;
+    }
+
+    .slider-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
     }
 }

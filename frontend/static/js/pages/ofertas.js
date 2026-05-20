@@ -8,7 +8,6 @@
         });
     }
 
-    // Slider automatico de banners
     var slider = document.getElementById('ofertas-slider');
     if (!slider) return;
 
@@ -18,6 +17,8 @@
     var nextBtn = document.getElementById('slider-next');
     var currentIndex = 0;
     var autoplayInterval;
+
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function showSlide(index) {
         slides.forEach(function (slide, i) {
@@ -39,6 +40,7 @@
     }
 
     function startAutoplay() {
+        if (reducedMotion) return;
         autoplayInterval = setInterval(nextSlide, 5000);
     }
 
@@ -58,8 +60,24 @@
         });
     });
 
+    // Soporte swipe táctil en mobile
+    var touchStartX = 0;
+    slider.addEventListener('touchstart', function (e) {
+        touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+    slider.addEventListener('touchend', function (e) {
+        var diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) {
+            if (diff > 0) { nextSlide(); } else { prevSlide(); }
+            resetAutoplay();
+        }
+    }, { passive: true });
+
+    showSlide(currentIndex);
     startAutoplay();
 
-    slider.addEventListener('mouseenter', function () { clearInterval(autoplayInterval); });
-    slider.addEventListener('mouseleave', startAutoplay);
+    if (!reducedMotion) {
+        slider.addEventListener('mouseenter', function () { clearInterval(autoplayInterval); });
+        slider.addEventListener('mouseleave', startAutoplay);
+    }
 })();

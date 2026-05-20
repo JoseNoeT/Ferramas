@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
 	// Productos destacados marquee — clonar cards para loop continuo CSS (-50%)
+	// No clonar en mobile: la animación está desactivada por CSS, el doble de cards no aporta
 	const prodTrack = document.querySelector("[data-productos-track]");
-	if (prodTrack && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+	const isMobileSlider = window.matchMedia("(max-width: 768px)").matches;
+	if (prodTrack && !window.matchMedia("(prefers-reduced-motion: reduce)").matches && !isMobileSlider) {
 		const cards = Array.from(prodTrack.querySelectorAll(".home-product-card"));
 		if (cards.length) {
 			cards.forEach(function (card) {
