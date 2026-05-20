@@ -285,3 +285,28 @@
 		max-width: 100%;
 	}
 }
+
+@media (max-width: 430px) {
+	/* Registro oculto en mobile — accesible desde la página de login */
+	.site-header .navbar__register {
+		display: none;
+	}
+
+	.site-header .navbar {
+		padding: 0.65rem;
+	}
+
+	.site-header .navbar__brand {
+		font-size: 1.4rem;
+	}
+
+	.site-header .navbar__login {
+		padding: 0.46rem 0.72rem;
+	}
+}
+
+@media (max-width: 360px) {
+	.site-header .navbar__brand {
+		font-size: 1.25rem;
+	}
+}
