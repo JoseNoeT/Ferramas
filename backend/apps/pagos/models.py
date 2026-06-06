@@ -6,6 +6,8 @@ from apps.pedidos.models import Pedido
 class Pago(models.Model):
 	class MedioPago(models.TextChoices):
 		WEBPAY = "webpay", "Webpay Plus"
+		FERRECREDITO = "ferrecredito", "FerreCrédito"
+		TIENDA = "tienda", "Pago en tienda"
 
 	class Estado(models.TextChoices):
 		INICIADO = "iniciado", "Iniciado"

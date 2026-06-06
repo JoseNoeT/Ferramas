@@ -25,6 +25,7 @@ staticfiles/
 # VS Code
 .vscode/
 .idea/
+.claude/
 
 # Node / frontend tooling
 node_modules/

@@ -134,6 +134,108 @@
 		{% endif %}
 	</section>
 
+	<section class="dashboard-panel" style="margin-bottom: 1rem;">
+		<div class="dashboard-panel__header">
+			<h2>Pagos Webpay</h2>
+		</div>
+		{% if pagos_webpay %}
+			<div style="overflow-x:auto;">
+				<table class="checkout-tabla">
+					<thead>
+						<tr>
+							<th>Pedido</th>
+							<th>Cliente</th>
+							<th>Estado pago</th>
+							<th>Monto</th>
+							<th>Fecha</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for pago in pagos_webpay %}
+							<tr>
+								<td>#{{ pago.pedido_id }}</td>
+								<td>{{ pago.pedido.usuario.email|default:'-' }}</td>
+								<td>{{ pago.pedido.get_payment_status_display }}</td>
+								<td>${{ pago.monto|formato_moneda }}</td>
+								<td>{{ pago.creado_en|date:'d/m/Y H:i' }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% else %}
+			<p>No hay pagos Webpay para mostrar.</p>
+		{% endif %}
+	</section>
+
+	<section class="dashboard-panel" style="margin-bottom: 1rem;">
+		<div class="dashboard-panel__header">
+			<h2>Pagos FerreCrédito</h2>
+		</div>
+		{% if pagos_ferrecredito %}
+			<div style="overflow-x:auto;">
+				<table class="checkout-tabla">
+					<thead>
+						<tr>
+							<th>Pedido</th>
+							<th>Cliente</th>
+							<th>Estado pago</th>
+							<th>Monto</th>
+							<th>Fecha</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for pago in pagos_ferrecredito %}
+							<tr>
+								<td>#{{ pago.pedido_id }}</td>
+								<td>{{ pago.pedido.usuario.email|default:'-' }}</td>
+								<td>{{ pago.pedido.get_payment_status_display }}</td>
+								<td>${{ pago.monto|formato_moneda }}</td>
+								<td>{{ pago.creado_en|date:'d/m/Y H:i' }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% else %}
+			<p>No hay pagos FerreCrédito para mostrar.</p>
+		{% endif %}
+	</section>
+
+	<section class="dashboard-panel" style="margin-bottom: 1rem;">
+		<div class="dashboard-panel__header">
+			<h2>Pagos en tienda pendientes</h2>
+		</div>
+		{% if pagos_tienda_pendientes %}
+			<div style="overflow-x:auto;">
+				<table class="checkout-tabla">
+					<thead>
+						<tr>
+							<th>Pedido</th>
+							<th>Cliente</th>
+							<th>Estado pago</th>
+							<th>Monto</th>
+							<th>Fecha</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for pago in pagos_tienda_pendientes %}
+							<tr>
+								<td>#{{ pago.pedido_id }}</td>
+								<td>{{ pago.pedido.usuario.email|default:'-' }}</td>
+								<td>{{ pago.pedido.get_payment_status_display }}</td>
+								<td>${{ pago.monto|formato_moneda }}</td>
+								<td>{{ pago.creado_en|date:'d/m/Y H:i' }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% else %}
+			<p>No hay pagos en tienda pendientes para mostrar.</p>
+		{% endif %}
+	</section>
+
 	<section class="dashboard-panel">
 		<div class="dashboard-panel__header">
 			<h2>Cuotas pendientes/vencidas</h2>

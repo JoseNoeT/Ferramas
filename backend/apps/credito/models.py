@@ -48,6 +48,13 @@ class MovimientoCredito(models.Model):
 		on_delete=models.CASCADE,
 		related_name="movimientos",
 	)
+	pedido = models.ForeignKey(
+		"pedidos.Pedido",
+		on_delete=models.SET_NULL,
+		null=True,
+		blank=True,
+		related_name="movimientos_credito",
+	)
 	tipo = models.CharField(max_length=20, choices=Tipo.choices)
 	monto = models.DecimalField(max_digits=12, decimal_places=2)
 	descripcion = models.CharField(max_length=255, blank=True)
@@ -72,6 +79,13 @@ class CuotaCredito(models.Model):
 		CuentaCredito,
 		on_delete=models.CASCADE,
 		related_name="cuotas",
+	)
+	pedido = models.ForeignKey(
+		"pedidos.Pedido",
+		on_delete=models.SET_NULL,
+		null=True,
+		blank=True,
+		related_name="cuotas_credito",
 	)
 	numero_cuota = models.PositiveIntegerField()
 	total_cuotas = models.PositiveIntegerField()

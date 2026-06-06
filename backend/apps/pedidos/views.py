@@ -14,6 +14,7 @@ from apps.credito.models import MovimientoCredito
 from apps.catalogo.models import Producto
 from apps.maestros.models import PerfilMaestroPyme, SolicitudAsesoria
 from apps.pagos.models import Pago
+from apps.pagos import services as pagos_services
 from apps.pedidos import services as pedidos_services
 from apps.pedidos.models import Pedido
 from apps.puntos import services as puntos_services
@@ -168,11 +169,22 @@ def checkout_view(request):
                         request.user,
                         pedido.total_final,
                     )
-                    credito_services.registrar_compra_ferrecredito(
+                    movimiento_credito = credito_services.registrar_compra_ferrecredito(
                         cuenta_credito_post,
+                        pedido=pedido,
+                        monto=pedido.total_final,
+                        cantidad_cuotas=cantidad_cuotas,
+                    )
+                    pagos_services.registrar_pago_ferrecredito(
                         pedido,
-                        pedido.total_final,
-                        cantidad_cuotas,
+                        movimiento_credito=movimiento_credito,
+                        usuario=request.user,
+                    )
+
+                if medio_pago == "tienda":
+                    pagos_services.registrar_pago_pendiente_tienda(
+                        pedido,
+                        usuario=request.user,
                     )
 
                 if medio_pago != "webpay":
@@ -207,11 +219,23 @@ def pedido_confirmacion_view(request, pk):
         .filter(
             cuenta__maestro__usuario=request.user,
             tipo=MovimientoCredito.Tipo.COMPRA,
-            descripcion__contains=f"pedido #{pedido.pk}",
+            pedido=pedido,
         )
         .order_by("-creado_en")
         .first()
     )
+
+    if not movimiento_ferrecredito:
+        movimiento_ferrecredito = (
+            MovimientoCredito.objects.select_related("cuenta")
+            .filter(
+                cuenta__maestro__usuario=request.user,
+                tipo=MovimientoCredito.Tipo.COMPRA,
+                descripcion__contains=f"pedido #{pedido.pk}",
+            )
+            .order_by("-creado_en")
+            .first()
+        )
 
     cantidad_cuotas_ferrecredito = None
     if movimiento_ferrecredito:

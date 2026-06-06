@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(.\\\\.venv\\\\Scripts\\\\python.exe backend\\\\manage.py check)",
-      "Bash('C:/Program Files/Google/Chrome/Application/chrome.exe' --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size=430,1100 --screenshot=C:/Users/Alumno/Desktop/Projectos/Ferramas/validate_caps/hero_detail_430_tall.png --hide-scrollbars --virtual-time-budget=1500 http://127.0.0.1:8099/)"
-    ]
-  }
-}

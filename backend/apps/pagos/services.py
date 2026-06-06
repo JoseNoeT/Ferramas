@@ -5,10 +5,12 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Case, DecimalField, F, Sum, When
 from django.urls import reverse
 from django.utils import timezone
 
 from apps.pagos.models import Pago
+from apps.pedidos.models import Pedido
 from apps.puntos import services as puntos_services
 
 
@@ -51,6 +53,10 @@ def _get_amount_from_pedido(pedido):
 	return monto
 
 
+def _get_amount_for_payment_record(pedido):
+	return Decimal(getattr(pedido, "total_final", None) or getattr(pedido, "total", 0) or 0)
+
+
 def _new_buy_order(pedido_id):
 	timestamp = int(timezone.now().timestamp())
 	suffix = uuid4().hex[:4].upper()
@@ -59,6 +65,161 @@ def _new_buy_order(pedido_id):
 
 def _new_session_id(pedido_id):
 	return f"SES-{pedido_id}-{uuid4().hex[:8]}"[:64]
+
+
+def _crear_o_actualizar_pago(
+	*,
+	pedido,
+	medio_pago,
+	estado,
+	referencia=None,
+	payload=None,
+):
+	pago = (
+		Pago.objects.select_related("pedido")
+		.filter(pedido=pedido, medio_pago=medio_pago)
+		.order_by("-creado_en")
+		.first()
+	)
+	payload_data = payload if isinstance(payload, dict) else {"payload": payload}
+	monto = _get_amount_for_payment_record(pedido)
+
+	if pago:
+		pago.monto = monto
+		pago.estado = estado
+		if payload_data:
+			pago.raw_response = payload_data
+		if referencia and not pago.buy_order:
+			pago.buy_order = referencia[:64]
+		pago.save(update_fields=["monto", "estado", "raw_response", "actualizado_en"])
+		return pago
+
+	buy_order = (referencia or _new_buy_order(pedido.id))[:64]
+	session_id = _new_session_id(pedido.id)
+
+	return Pago.objects.create(
+		pedido=pedido,
+		medio_pago=medio_pago,
+		monto=monto,
+		estado=estado,
+		buy_order=buy_order,
+		session_id=session_id,
+		raw_response=payload_data,
+	)
+
+
+@transaction.atomic
+def marcar_pedido_pagado(pedido, medio_pago, usuario=None, referencia=None, payload=None):
+	if not pedido:
+		raise ValueError("Pedido invalido para marcar pago.")
+
+	pedido.payment_status = pedido.PaymentStatus.PAGADO
+	pedido.save(update_fields=["payment_status"])
+
+	return _crear_o_actualizar_pago(
+		pedido=pedido,
+		medio_pago=medio_pago,
+		estado=Pago.Estado.AUTORIZADO,
+		referencia=referencia,
+		payload=payload,
+	)
+
+
+@transaction.atomic
+def registrar_pago_pendiente_tienda(pedido, usuario=None):
+	if not pedido:
+		raise ValueError("Pedido invalido para registrar pago en tienda.")
+
+	pedido.payment_status = pedido.PaymentStatus.PENDIENTE
+	pedido.save(update_fields=["payment_status"])
+
+	return _crear_o_actualizar_pago(
+		pedido=pedido,
+		medio_pago=Pago.MedioPago.TIENDA,
+		estado=Pago.Estado.INICIADO,
+		referencia=f"TIENDA-{pedido.pk}",
+		payload={"medio": "tienda"},
+	)
+
+
+@transaction.atomic
+def registrar_pago_ferrecredito(pedido, movimiento_credito=None, usuario=None):
+	payload = {
+		"medio": "ferrecredito",
+		"movimiento_credito_id": movimiento_credito.pk if movimiento_credito else None,
+	}
+	return marcar_pedido_pagado(
+		pedido,
+		Pago.MedioPago.FERRECREDITO,
+		usuario=usuario,
+		referencia=f"FERRECREDITO-{pedido.pk}",
+		payload=payload,
+	)
+
+
+def _filtrar_pedidos_para_contador(*, fecha_desde=None, fecha_hasta=None, payment_status=""):
+	pedidos_qs = Pedido.objects.select_related("usuario")
+	if fecha_desde:
+		pedidos_qs = pedidos_qs.filter(creado_en__date__gte=fecha_desde)
+	if fecha_hasta:
+		pedidos_qs = pedidos_qs.filter(creado_en__date__lte=fecha_hasta)
+	if payment_status:
+		pedidos_qs = pedidos_qs.filter(payment_status=payment_status)
+	return pedidos_qs
+
+
+def obtener_resumen_contador_pagos(*, fecha_desde=None, fecha_hasta=None, payment_status=""):
+	hoy = timezone.localdate()
+	inicio_mes = hoy.replace(day=1)
+	pedidos_qs = _filtrar_pedidos_para_contador(
+		fecha_desde=fecha_desde,
+		fecha_hasta=fecha_hasta,
+		payment_status=payment_status,
+	)
+	pedidos_mes_qs = pedidos_qs.filter(creado_en__date__gte=inicio_mes, creado_en__date__lte=hoy)
+
+	total_ventas_expr = Case(
+		When(total_final__gt=0, then=F("total_final")),
+		default=F("total"),
+		output_field=DecimalField(max_digits=14, decimal_places=2),
+	)
+
+	return {
+		"total_pedidos": pedidos_qs.count(),
+		"total_ventas": pedidos_qs.aggregate(total=Sum(total_ventas_expr)).get("total") or 0,
+		"ventas_mes": pedidos_mes_qs.aggregate(total=Sum(total_ventas_expr)).get("total") or 0,
+		"pedidos_mes": pedidos_mes_qs.count(),
+		"ultimos_pedidos": list(pedidos_qs.order_by("-creado_en")[:10]),
+		"pedidos_qs": pedidos_qs,
+	}
+
+
+def _filtrar_pagos_para_contador(queryset, *, fecha_desde=None, fecha_hasta=None):
+	if fecha_desde:
+		queryset = queryset.filter(creado_en__date__gte=fecha_desde)
+	if fecha_hasta:
+		queryset = queryset.filter(creado_en__date__lte=fecha_hasta)
+	return queryset
+
+
+def obtener_pagos_webpay(*, fecha_desde=None, fecha_hasta=None):
+	qs = Pago.objects.select_related("pedido", "pedido__usuario").filter(medio_pago=Pago.MedioPago.WEBPAY)
+	return _filtrar_pagos_para_contador(qs, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta)
+
+
+def obtener_pagos_ferrecredito(*, fecha_desde=None, fecha_hasta=None):
+	qs = Pago.objects.select_related("pedido", "pedido__usuario").filter(
+		medio_pago=Pago.MedioPago.FERRECREDITO
+	)
+	return _filtrar_pagos_para_contador(qs, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta)
+
+
+def obtener_pagos_tienda_pendientes(*, fecha_desde=None, fecha_hasta=None):
+	qs = Pago.objects.select_related("pedido", "pedido__usuario").filter(
+		medio_pago=Pago.MedioPago.TIENDA,
+		pedido__payment_status=Pedido.PaymentStatus.PENDIENTE,
+	)
+	return _filtrar_pagos_para_contador(qs, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta)
 
 
 def _extract_field(response, field):

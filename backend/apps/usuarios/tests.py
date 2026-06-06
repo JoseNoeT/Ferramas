@@ -15,3 +15,8 @@ class PerfilTestCase(TestCase):
         url = reverse('perfil_usuario')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_cliente_no_puede_acceder_panel_contador(self):
+        url = reverse('contador_dashboard')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)

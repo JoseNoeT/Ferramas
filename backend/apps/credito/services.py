@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.utils import timezone
 
 from apps.credito.models import CuentaCredito, CuotaCredito, MovimientoCredito, SolicitudFerreCredito
@@ -71,7 +71,7 @@ def _sumar_meses(fecha_base, meses):
 
 
 @transaction.atomic
-def registrar_compra_ferrecredito(cuenta, pedido, monto, cantidad_cuotas):
+def registrar_compra_ferrecredito(cuenta, pedido=None, monto=0, cantidad_cuotas=1):
 	monto_decimal = Decimal(str(monto or 0))
 	if monto_decimal <= 0:
 		raise ValueError("El monto a registrar en FerreCrédito debe ser mayor a 0.")
@@ -84,16 +84,26 @@ def registrar_compra_ferrecredito(cuenta, pedido, monto, cantidad_cuotas):
 	if cuotas < 1:
 		raise ValueError("La cantidad de cuotas debe ser al menos 1.")
 
-	descripcion_pedido = f"Compra pedido #{pedido.pk} | cuotas={cuotas}"
-	if MovimientoCredito.objects.filter(
-		cuenta=cuenta,
-		tipo=MovimientoCredito.Tipo.COMPRA,
-		descripcion=descripcion_pedido,
-	).exists():
-		raise ValueError("La compra con FerreCrédito para este pedido ya fue registrada.")
+	movimiento_existente = None
+	if pedido is not None:
+		movimiento_existente = MovimientoCredito.objects.filter(
+			cuenta=cuenta,
+			tipo=MovimientoCredito.Tipo.COMPRA,
+			pedido=pedido,
+		).order_by("-creado_en").first()
+
+	if movimiento_existente:
+		return movimiento_existente
+
+	descripcion_pedido = (
+		f"Compra pedido #{pedido.pk} | cuotas={cuotas}"
+		if pedido is not None
+		else f"Compra FerreCrédito | cuotas={cuotas}"
+	)
 
 	movimiento = MovimientoCredito.objects.create(
 		cuenta=cuenta,
+		pedido=pedido,
 		tipo=MovimientoCredito.Tipo.COMPRA,
 		monto=monto_decimal,
 		descripcion=descripcion_pedido,
@@ -114,6 +124,7 @@ def registrar_compra_ferrecredito(cuenta, pedido, monto, cantidad_cuotas):
 
 		CuotaCredito.objects.create(
 			cuenta=cuenta,
+			pedido=pedido,
 			numero_cuota=numero,
 			total_cuotas=cuotas,
 			monto=monto_cuota,
@@ -123,6 +134,80 @@ def registrar_compra_ferrecredito(cuenta, pedido, monto, cantidad_cuotas):
 		acumulado += monto_cuota
 
 	return movimiento
+
+
+@transaction.atomic
+def marcar_cuota_pagada(cuota_id):
+	cuota = CuotaCredito.objects.select_for_update().select_related("cuenta").filter(pk=cuota_id).first()
+	if cuota is None:
+		raise ValueError("La cuota seleccionada no existe.")
+
+	if cuota.estado == CuotaCredito.Estado.PAGADA:
+		return cuota
+
+	cuota.estado = CuotaCredito.Estado.PAGADA
+	cuota.save(update_fields=["estado"])
+
+	cuenta = cuota.cuenta
+	nuevo_saldo_usado = cuenta.saldo_usado - cuota.monto
+	cuenta.saldo_usado = nuevo_saldo_usado if nuevo_saldo_usado > 0 else 0
+	cuenta.save(update_fields=["saldo_usado"])
+	return cuota
+
+
+@transaction.atomic
+def marcar_cuota_vencida(cuota_id):
+	cuota = CuotaCredito.objects.select_for_update().filter(pk=cuota_id).first()
+	if cuota is None:
+		raise ValueError("La cuota seleccionada no existe.")
+
+	if cuota.estado == CuotaCredito.Estado.PAGADA:
+		raise ValueError("No puedes marcar vencida una cuota pagada.")
+
+	if cuota.estado != CuotaCredito.Estado.VENCIDA:
+		cuota.estado = CuotaCredito.Estado.VENCIDA
+		cuota.save(update_fields=["estado"])
+
+	return cuota
+
+
+def obtener_datos_contador_credito(*, fecha_desde=None, fecha_hasta=None, estado_cuota=""):
+	hoy = timezone.localdate()
+	cuentas_qs = CuentaCredito.objects.select_related("maestro", "maestro__usuario")
+
+	cuotas_qs = CuotaCredito.objects.select_related(
+		"cuenta",
+		"cuenta__maestro",
+		"cuenta__maestro__usuario",
+	)
+	if estado_cuota:
+		cuotas_qs = cuotas_qs.filter(estado=estado_cuota)
+
+	if fecha_desde:
+		cuotas_qs = cuotas_qs.filter(fecha_vencimiento__gte=fecha_desde)
+	if fecha_hasta:
+		cuotas_qs = cuotas_qs.filter(fecha_vencimiento__lte=fecha_hasta)
+
+	total_credito_usado = cuentas_qs.aggregate(total=Sum("saldo_usado")).get("total") or 0
+	total_cupo_aprobado = cuentas_qs.aggregate(total=Sum("cupo_aprobado")).get("total") or 0
+	cuentas_credito_activas = cuentas_qs.filter(estado=CuentaCredito.Estado.ACTIVA).count()
+	total_deuda_credito = cuotas_qs.aggregate(total=Sum("monto")).get("total") or 0
+
+	cuotas_vencidas_qs = cuotas_qs.filter(
+		Q(estado=CuotaCredito.Estado.VENCIDA)
+		| Q(estado=CuotaCredito.Estado.PENDIENTE, fecha_vencimiento__lt=hoy)
+	)
+
+	return {
+		"total_credito_usado": total_credito_usado,
+		"total_cupo_aprobado": total_cupo_aprobado,
+		"cuentas_credito_activas": cuentas_credito_activas,
+		"total_deuda_credito": total_deuda_credito,
+		"cuotas_vencidas": cuotas_vencidas_qs.count(),
+		"monto_vencido": cuotas_vencidas_qs.aggregate(total=Sum("monto")).get("total") or 0,
+		"cuotas_qs": cuotas_qs,
+		"cuotas_recientes": list(cuotas_qs.order_by("-fecha_vencimiento", "-creado_en")[:10]),
+	}
 
 
 @transaction.atomic

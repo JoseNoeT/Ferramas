@@ -54,7 +54,9 @@ from django.utils.http import url_has_allowed_host_and_scheme
 
 from apps.catalogo import services as catalogo_services
 from apps.catalogo.models import Categoria, Producto
+from apps.credito import services as credito_services
 from apps.maestros.models import PerfilMaestroPyme, ServicioMaestro
+from apps.pagos import services as pagos_services
 
 from .forms import LoginForm, RegistroForm, UsuarioInternoCreateForm, UsuarioInternoUpdateForm
 from .models import Usuario
@@ -559,52 +561,24 @@ def cambiar_estado_usuario_view(request, pk):
 @_requiere_contador
 def contador_dashboard_view(request):
     Pedido = apps.get_model("pedidos", "Pedido")
-    CuentaCredito = apps.get_model("credito", "CuentaCredito")
     CuotaCredito = apps.get_model("credito", "CuotaCredito")
 
     if request.method == "POST":
         accion = (request.POST.get("accion") or "").strip()
         cuota_id = request.POST.get("cuota_id")
-        cuota = CuotaCredito.objects.select_related("cuenta").filter(pk=cuota_id).first()
-
-        if cuota is None:
-            messages.error(request, "La cuota seleccionada no existe.")
-            return redirect("contador_dashboard")
-
-        if accion == "marcar_pagada":
-            if not hasattr(CuotaCredito.Estado, "PAGADA"):
-                messages.error(request, "No es posible marcar pagada: el modelo no define estado PAGADA.")
-                return redirect("contador_dashboard")
-
-            if cuota.estado == CuotaCredito.Estado.PAGADA:
-                messages.info(request, "La cuota ya estaba pagada.")
-                return redirect("contador_dashboard")
-
-            cuota.estado = CuotaCredito.Estado.PAGADA
-            cuota.save(update_fields=["estado"])
-
-            cuenta = cuota.cuenta
-            nuevo_saldo_usado = cuenta.saldo_usado - cuota.monto
-            cuenta.saldo_usado = nuevo_saldo_usado if nuevo_saldo_usado > 0 else 0
-            cuenta.save(update_fields=["saldo_usado"])
-            messages.success(request, f"Cuota #{cuota.pk} marcada como pagada.")
-            return redirect("contador_dashboard")
-
-        if accion == "marcar_vencida":
-            if cuota.estado == CuotaCredito.Estado.PAGADA:
-                messages.error(request, "No puedes marcar vencida una cuota pagada.")
-                return redirect("contador_dashboard")
-
-            cuota.estado = CuotaCredito.Estado.VENCIDA
-            cuota.save(update_fields=["estado"])
-            messages.success(request, f"Cuota #{cuota.pk} marcada como vencida.")
-            return redirect("contador_dashboard")
-
-        messages.error(request, "Accion no valida.")
+        try:
+            if accion == "marcar_pagada":
+                cuota = credito_services.marcar_cuota_pagada(cuota_id)
+                if cuota.estado == CuotaCredito.Estado.PAGADA:
+                    messages.success(request, f"Cuota #{cuota.pk} marcada como pagada.")
+            elif accion == "marcar_vencida":
+                cuota = credito_services.marcar_cuota_vencida(cuota_id)
+                messages.success(request, f"Cuota #{cuota.pk} marcada como vencida.")
+            else:
+                messages.error(request, "Accion no valida.")
+        except ValueError as exc:
+            messages.error(request, str(exc))
         return redirect("contador_dashboard")
-
-    hoy = timezone.localdate()
-    inicio_mes = hoy.replace(day=1)
 
     fecha_desde_raw = (request.GET.get("fecha_desde") or "").strip()
     fecha_hasta_raw = (request.GET.get("fecha_hasta") or "").strip()
@@ -631,62 +605,27 @@ def contador_dashboard_view(request):
         fecha_desde = None
         fecha_hasta = None
 
-    pedidos_qs = Pedido.objects.select_related("usuario")
-    if fecha_desde:
-        pedidos_qs = pedidos_qs.filter(creado_en__date__gte=fecha_desde)
-    if fecha_hasta:
-        pedidos_qs = pedidos_qs.filter(creado_en__date__lte=fecha_hasta)
-    if estado_pedido:
-        pedidos_qs = pedidos_qs.filter(estado=estado_pedido)
-
-    pedidos_mes_qs = pedidos_qs.filter(creado_en__date__gte=inicio_mes, creado_en__date__lte=hoy)
-
-    total_ventas_expr = Case(
-        When(total_final__gt=0, then=F("total_final")),
-        default=F("total"),
-        output_field=DecimalField(max_digits=14, decimal_places=2),
+    resumen_pagos = pagos_services.obtener_resumen_contador_pagos(
+        fecha_desde=fecha_desde,
+        fecha_hasta=fecha_hasta,
+        payment_status=estado_pedido,
     )
-
-    total_pedidos = pedidos_qs.count()
-    total_ventas = pedidos_qs.aggregate(total=Sum(total_ventas_expr)).get("total") or 0
-    ventas_mes = pedidos_mes_qs.aggregate(total=Sum(total_ventas_expr)).get("total") or 0
-    pedidos_mes = pedidos_mes_qs.count()
-
-    cuentas_qs = CuentaCredito.objects.select_related("maestro", "maestro__usuario")
-    total_credito_usado = cuentas_qs.aggregate(total=Sum("saldo_usado")).get("total") or 0
-    total_cupo_aprobado = cuentas_qs.aggregate(total=Sum("cupo_aprobado")).get("total") or 0
-    cuentas_credito_activas = cuentas_qs.filter(estado=CuentaCredito.Estado.ACTIVA).count()
-
-    cuotas_qs = CuotaCredito.objects.select_related(
-        "cuenta",
-        "cuenta__maestro",
-        "cuenta__maestro__usuario",
+    datos_credito = credito_services.obtener_datos_contador_credito(
+        fecha_desde=fecha_desde,
+        fecha_hasta=fecha_hasta,
+        estado_cuota=estado_cuota,
     )
-    if estado_cuota:
-        cuotas_qs = cuotas_qs.filter(estado=estado_cuota)
-    else:
-        cuotas_qs = cuotas_qs.filter(
-            Q(estado=CuotaCredito.Estado.PENDIENTE) | Q(estado=CuotaCredito.Estado.VENCIDA)
-        )
-
-    if fecha_desde:
-        cuotas_qs = cuotas_qs.filter(fecha_vencimiento__gte=fecha_desde)
-    if fecha_hasta:
-        cuotas_qs = cuotas_qs.filter(fecha_vencimiento__lte=fecha_hasta)
-
-    cuotas_pendientes_vencidas_qs = cuotas_qs
-    total_deuda_credito = cuotas_pendientes_vencidas_qs.aggregate(total=Sum("monto")).get("total") or 0
-
-    cuotas_vencidas_qs = cuotas_pendientes_vencidas_qs.filter(
-        Q(estado=CuotaCredito.Estado.VENCIDA)
-        | Q(estado=CuotaCredito.Estado.PENDIENTE, fecha_vencimiento__lt=hoy)
+    pagos_webpay_qs = pagos_services.obtener_pagos_webpay(
+        fecha_desde=fecha_desde,
+        fecha_hasta=fecha_hasta,
     )
-    cuotas_vencidas = cuotas_vencidas_qs.count()
-    monto_vencido = cuotas_vencidas_qs.aggregate(total=Sum("monto")).get("total") or 0
-
-    ultimos_pedidos = list(pedidos_qs.order_by("-creado_en")[:10])
-    cuotas_recientes = list(
-        cuotas_pendientes_vencidas_qs.order_by("-fecha_vencimiento", "-creado_en")[:10]
+    pagos_ferrecredito_qs = pagos_services.obtener_pagos_ferrecredito(
+        fecha_desde=fecha_desde,
+        fecha_hasta=fecha_hasta,
+    )
+    pagos_tienda_pendientes_qs = pagos_services.obtener_pagos_tienda_pendientes(
+        fecha_desde=fecha_desde,
+        fecha_hasta=fecha_hasta,
     )
 
     export = (request.GET.get("export") or "").strip()
@@ -694,14 +633,15 @@ def contador_dashboard_view(request):
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="reporte_pedidos_contador.csv"'
         writer = csv.writer(response)
-        writer.writerow(["pedido_id", "cliente", "estado", "total", "fecha"])
+        writer.writerow(["pedido_id", "cliente", "estado_operativo", "payment_status", "total", "fecha"])
 
-        for pedido in pedidos_qs.order_by("-creado_en"):
+        for pedido in resumen_pagos["pedidos_qs"].order_by("-creado_en"):
             total_pedido = pedido.total_final if pedido.total_final and pedido.total_final > 0 else pedido.total
             writer.writerow([
                 pedido.pk,
                 getattr(pedido.usuario, "email", ""),
                 pedido.estado,
+                pedido.payment_status,
                 total_pedido,
                 pedido.creado_en.isoformat(),
             ])
@@ -713,7 +653,7 @@ def contador_dashboard_view(request):
         writer = csv.writer(response)
         writer.writerow(["cuota_id", "maestro_pyme", "monto", "fecha_vencimiento", "estado"])
 
-        for cuota in cuotas_pendientes_vencidas_qs.order_by("-fecha_vencimiento", "-creado_en"):
+        for cuota in datos_credito["cuotas_qs"].order_by("-fecha_vencimiento", "-creado_en"):
             writer.writerow([
                 cuota.pk,
                 getattr(cuota.cuenta.maestro.usuario, "email", ""),
@@ -727,27 +667,29 @@ def contador_dashboard_view(request):
         request,
         "dashboard/contador.html",
         {
-            "total_pedidos": total_pedidos,
-            "total_ventas": total_ventas,
-            "ventas_mes": ventas_mes,
-            "pedidos_mes": pedidos_mes,
-            "total_credito_usado": total_credito_usado,
-            "total_cupo_aprobado": total_cupo_aprobado,
-            "total_deuda_credito": total_deuda_credito,
-            "cuotas_vencidas": cuotas_vencidas,
-            "monto_vencido": monto_vencido,
-            "cuentas_credito_activas": cuentas_credito_activas,
-            "ultimos_pedidos": ultimos_pedidos,
-            "cuotas_recientes": cuotas_recientes,
+            "total_pedidos": resumen_pagos["total_pedidos"],
+            "total_ventas": resumen_pagos["total_ventas"],
+            "ventas_mes": resumen_pagos["ventas_mes"],
+            "pedidos_mes": resumen_pagos["pedidos_mes"],
+            "total_credito_usado": datos_credito["total_credito_usado"],
+            "total_cupo_aprobado": datos_credito["total_cupo_aprobado"],
+            "total_deuda_credito": datos_credito["total_deuda_credito"],
+            "cuotas_vencidas": datos_credito["cuotas_vencidas"],
+            "monto_vencido": datos_credito["monto_vencido"],
+            "cuentas_credito_activas": datos_credito["cuentas_credito_activas"],
+            "ultimos_pedidos": resumen_pagos["ultimos_pedidos"],
+            "cuotas_recientes": datos_credito["cuotas_recientes"],
+            "pagos_webpay": list(pagos_webpay_qs.order_by("-creado_en")[:10]),
+            "pagos_ferrecredito": list(pagos_ferrecredito_qs.order_by("-creado_en")[:10]),
+            "pagos_tienda_pendientes": list(pagos_tienda_pendientes_qs.order_by("-creado_en")[:10]),
             "filtros": {
                 "fecha_desde": fecha_desde_raw,
                 "fecha_hasta": fecha_hasta_raw,
                 "estado_pedido": estado_pedido,
                 "estado_cuota": estado_cuota,
             },
-            "estados_pedido": Pedido.Estado.choices,
+            "estados_pedido": Pedido.PaymentStatus.choices,
             "estados_cuota": CuotaCredito.Estado.choices,
-            "hoy": hoy,
             "soporta_estado_pagada": hasattr(CuotaCredito.Estado, "PAGADA"),
         },
     )
