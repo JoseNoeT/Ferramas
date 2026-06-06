@@ -21,4 +21,5 @@ urlpatterns = [
     path("dashboard/bodeguero/", views.bodeguero_dashboard_view, name="bodeguero_dashboard"),
     path("pedido/<int:pk>/en-preparacion/", views.poner_en_preparacion_view, name="pedido_en_preparacion"),
     path("pedido/<int:pk>/marcar-listo/", views.marcar_pedido_listo_view, name="pedido_marcar_listo"),
+    path("pedido/<int:pk>/entregado/", views.pedido_entregado_view, name="pedido_entregado"),
 ]

@@ -357,6 +357,19 @@ def poner_en_preparacion_view(request, pk):
 
 
 @_requiere_rol(Usuario.Rol.BODEGUERO, Usuario.Rol.ADMIN)
+def pedido_entregado_view(request, pk):
+    if request.method != "POST":
+        return redirect("bodeguero_dashboard")
+    pedido = get_object_or_404(Pedido, pk=pk)
+    try:
+        pedidos_services.marcar_pedido_entregado(pedido, usuario=request.user)
+        messages.success(request, f"Pedido #{pedido.pk} marcado como entregado.")
+    except ValueError as exc:
+        messages.error(request, str(exc))
+    return redirect("bodeguero_dashboard")
+
+
+@_requiere_rol(Usuario.Rol.BODEGUERO, Usuario.Rol.ADMIN)
 def marcar_pedido_listo_view(request, pk):
     if request.method != "POST":
         return redirect("bodeguero_dashboard")

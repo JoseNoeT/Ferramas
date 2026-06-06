@@ -148,6 +148,23 @@ def marcar_pedido_listo(pedido, usuario=None):
     return pedido
 
 
+@transaction.atomic
+def marcar_pedido_entregado(pedido, usuario=None):
+    """Marca un pedido como entregado. Solo válido desde estado 'listo'.
+
+    No modifica stock. Usa bloqueo de fila para evitar condiciones de carrera.
+    """
+    # Re-obtener con lock para evitar race conditions
+    pedido_lock = Pedido.objects.select_for_update().get(pk=pedido.pk)
+
+    if pedido_lock.estado != Pedido.Estado.LISTO:
+        raise ValueError("Solo se pueden marcar como entregados los pedidos en estado 'listo'.")
+
+    pedido_lock.estado = Pedido.Estado.ENTREGADO
+    pedido_lock.save(update_fields=["estado"])
+    return pedido_lock
+
+
 # ─── Creación de pedido desde carrito ────────────────────────────────────────
 
 @transaction.atomic

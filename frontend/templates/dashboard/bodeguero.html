@@ -158,6 +158,12 @@
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn--success btn--sm">Marcar listo</button>
                             </form>
+                            {% if pedido.estado == 'listo' %}
+                            <form method="post" action="{% url 'pedido_entregado' pedido.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn--primary btn--sm">Marcar entregado</button>
+                            </form>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
