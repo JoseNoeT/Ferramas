@@ -90,6 +90,8 @@ class Pedido(models.Model):
     puntos_usados = models.PositiveIntegerField(default=0)
     descuento_puntos = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_final = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    stock_reservado = models.BooleanField(default=False)
+    stock_descontado = models.BooleanField(default=False)
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:

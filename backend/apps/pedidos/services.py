@@ -2,6 +2,7 @@ from django.db import transaction
 
 from apps.catalogo.services import obtener_precio_efectivo
 from apps.catalogo.models import Producto
+from apps.inventario import services as inventario_services
 from apps.pedidos.models import Carrito, ItemCarrito, ItemPedido, Pedido
 
 
@@ -88,7 +89,7 @@ def obtener_resumen_carrito(usuario):
 
 # ─── Transiciones internas de flujo ─────────────────────────────────────────
 
-def aprobar_pedido(pedido):
+def aprobar_pedido(pedido, usuario=None):
     """Aprueba un pedido generado. Solo válido desde estado 'generado'."""
     if pedido.estado != Pedido.Estado.GENERADO:
         raise ValueError("Solo se pueden aprobar pedidos en estado 'generado'.")
@@ -97,28 +98,51 @@ def aprobar_pedido(pedido):
     return pedido
 
 
-def rechazar_pedido(pedido):
+@transaction.atomic
+def rechazar_pedido(pedido, usuario=None):
     """Rechaza un pedido generado. Solo válido desde estado 'generado'."""
     if pedido.estado != Pedido.Estado.GENERADO:
         raise ValueError("Solo se pueden rechazar pedidos en estado 'generado'.")
+
+    inventario_services.liberar_stock_pedido(pedido, usuario=usuario)
     pedido.estado = Pedido.Estado.RECHAZADO
     pedido.save(update_fields=["estado"])
     return pedido
 
 
-def poner_en_preparacion(pedido):
+@transaction.atomic
+def poner_en_preparacion(pedido, usuario=None):
     """Pasa un pedido aprobado a en preparación. Solo válido desde 'aprobado'."""
     if pedido.estado != Pedido.Estado.APROBADO:
         raise ValueError("Solo se pueden preparar pedidos en estado 'aprobado'.")
+
+    if not pedido.stock_reservado and not pedido.stock_descontado:
+        inventario_services.reservar_stock_pedido(
+            pedido,
+            usuario=usuario,
+        )
+
+    inventario_services.registrar_inicio_preparacion_pedido(
+        pedido,
+        usuario=usuario,
+    )
+
     pedido.estado = Pedido.Estado.EN_PREPARACION
     pedido.save(update_fields=["estado"])
     return pedido
 
 
-def marcar_pedido_listo(pedido):
+@transaction.atomic
+def marcar_pedido_listo(pedido, usuario=None):
     """Marca un pedido en preparación como listo. Solo válido desde 'en_preparacion'."""
     if pedido.estado != Pedido.Estado.EN_PREPARACION:
         raise ValueError("Solo se pueden marcar como listos pedidos en estado 'en_preparacion'.")
+
+    inventario_services.registrar_pedido_listo(
+        pedido,
+        usuario=usuario,
+    )
+
     pedido.estado = Pedido.Estado.LISTO
     pedido.save(update_fields=["estado"])
     return pedido
@@ -151,6 +175,10 @@ def crear_pedido_desde_carrito(usuario, tipo_entrega):
             cantidad=item.cantidad,
             precio_unitario=obtener_precio_efectivo(item.producto),
         )
+
+    inventario_services.validar_stock_pedido(pedido)
+    inventario_services.reservar_stock_pedido(pedido, usuario=usuario)
+
     carrito.items.all().delete()
     return pedido
 

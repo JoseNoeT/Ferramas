@@ -272,7 +272,7 @@ def aprobar_pedido_view(request, pk):
         return redirect("vendedor_dashboard")
     pedido = get_object_or_404(Pedido, pk=pk)
     try:
-        pedidos_services.aprobar_pedido(pedido)
+        pedidos_services.aprobar_pedido(pedido, usuario=request.user)
         messages.success(request, f"Pedido #{pedido.pk} aprobado correctamente.")
     except ValueError as exc:
         messages.error(request, str(exc))
@@ -285,7 +285,7 @@ def rechazar_pedido_view(request, pk):
         return redirect("vendedor_dashboard")
     pedido = get_object_or_404(Pedido, pk=pk)
     try:
-        pedidos_services.rechazar_pedido(pedido)
+        pedidos_services.rechazar_pedido(pedido, usuario=request.user)
         messages.warning(request, f"Pedido #{pedido.pk} rechazado.")
     except ValueError as exc:
         messages.error(request, str(exc))
@@ -299,7 +299,7 @@ def enviar_a_bodega_view(request, pk):
         return redirect("vendedor_dashboard")
     pedido = get_object_or_404(Pedido, pk=pk)
     try:
-        pedidos_services.poner_en_preparacion(pedido)
+        pedidos_services.poner_en_preparacion(pedido, usuario=request.user)
         messages.success(request, f"Pedido #{pedido.pk} enviado a bodega para preparación.")
     except ValueError as exc:
         messages.error(request, str(exc))
@@ -325,7 +325,7 @@ def poner_en_preparacion_view(request, pk):
         return redirect("bodeguero_dashboard")
     pedido = get_object_or_404(Pedido, pk=pk)
     try:
-        pedidos_services.poner_en_preparacion(pedido)
+        pedidos_services.poner_en_preparacion(pedido, usuario=request.user)
         messages.success(request, f"Pedido #{pedido.pk} en preparación.")
     except ValueError as exc:
         messages.error(request, str(exc))
@@ -338,7 +338,7 @@ def marcar_pedido_listo_view(request, pk):
         return redirect("bodeguero_dashboard")
     pedido = get_object_or_404(Pedido, pk=pk)
     try:
-        pedidos_services.marcar_pedido_listo(pedido)
+        pedidos_services.marcar_pedido_listo(pedido, usuario=request.user)
         messages.success(request, f"Pedido #{pedido.pk} marcado como listo.")
     except ValueError as exc:
         messages.error(request, str(exc))
