@@ -12,6 +12,7 @@ from django.utils import timezone
 from apps.pagos.models import Pago
 from apps.pedidos.models import Pedido
 from apps.puntos import services as puntos_services
+from apps.inventario import services as inventario_services
 
 
 def _build_transbank_options():
@@ -356,6 +357,12 @@ def confirmar_transaccion_webpay(token_ws):
 				pago.estado = Pago.Estado.AUTORIZADO
 				pago.pedido.payment_status = pago.pedido.PaymentStatus.PAGADO
 				puntos_services.acumular_puntos_por_pedido(pago.pedido.usuario, pago.pedido)
+				# Actualizar inventario: descontar stock al confirmar pago (idempotente)
+				try:
+					inventario_services.descontar_stock_pedido(pago.pedido)
+				except Exception:
+					# No interrumpir la confirmación de pago por fallas en inventario; registrar en raw_response
+					pago.raw_response = {"inventory_error": True}
 			else:
 				pago.estado = Pago.Estado.RECHAZADO
 				pago.pedido.payment_status = pago.pedido.PaymentStatus.RECHAZADO
