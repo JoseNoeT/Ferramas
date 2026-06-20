@@ -21,6 +21,7 @@ class Producto(models.Model):
     descripcion = models.TextField(verbose_name="Descripcion")
     precio      = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio")
     stock       = models.PositiveIntegerField(default=0, verbose_name="Stock")
+    stock_minimo = models.PositiveIntegerField(default=5, verbose_name="Stock mínimo")
     imagen      = models.CharField(
         max_length=255, blank=True, default="", verbose_name="Imagen (URL o ruta)"
     )

@@ -10,6 +10,18 @@
         </div>
     </header>
 
+    <!-- Navegación interna para el panel bodeguero -->
+    <nav aria-label="Navegación interna bodeguero" style="margin:0.5rem 0;">
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; justify-content:center;">
+            <a class="btn" href="#resumen-bodega" style="padding:0.35rem 0.6rem; font-size:0.9rem;">Resumen</a>
+            <a class="btn" href="#control-stock" style="padding:0.35rem 0.6rem; font-size:0.9rem;">Inventario</a>
+            <a class="btn" href="#alertas-stock" style="padding:0.35rem 0.6rem; font-size:0.9rem;">Bajo stock</a>
+            <a class="btn" href="#movimientos-inventario" style="padding:0.35rem 0.6rem; font-size:0.9rem;">Movimientos</a>
+            <a class="btn" href="#pedidos-aprobados" style="padding:0.35rem 0.6rem; font-size:0.9rem;">Pedidos</a>
+            <a class="btn" href="#pedidos-listos" style="padding:0.35rem 0.6rem; font-size:0.9rem;">Despacho</a>
+        </div>
+    </nav>
+
     {% if messages %}
     <ul class="dashboard-admin__messages">
         {% for msg in messages %}
@@ -18,7 +30,7 @@
     </ul>
     {% endif %}
 
-    <section class="dashboard-panel" style="margin-bottom: 1rem;">
+    <section id="resumen-bodega" class="dashboard-panel" style="margin-bottom: 1rem;">
         <div class="dashboard-panel__stats" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem;">
             <article style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:0.75rem;">
                 <p><strong>Pedidos aprobados</strong></p>
@@ -39,9 +51,10 @@
         </div>
     </section>
 
-    <section class="dashboard-panel" style="margin-bottom: 1rem;">
+    <section id="pedidos-aprobados" class="dashboard-panel" style="margin-bottom: 1rem;">
         <div class="dashboard-panel__header">
             <h2>Pedidos aprobados</h2>
+            <p style="margin:0.25rem 0 0; color:#6b7280;">Listado de pedidos listos para enviar a bodega</p>
         </div>
         {% if pedidos_aprobados %}
         <div style="overflow-x:auto;">
@@ -110,9 +123,154 @@
         {% endif %}
     </section>
 
-    <section class="dashboard-panel" style="margin-bottom: 1rem;">
+    <!-- BLOQUE A: Control de bodega -->
+    <section id="control-stock" class="dashboard-panel" style="margin-bottom: 1rem;">
         <div class="dashboard-panel__header">
-            <h2>Pedidos en preparación</h2>
+            <h2>Control de bodega</h2>
+            <p style="margin:0.25rem 0 0; color:#6b7280;">Inventario por categoría y ajustes manuales</p>
+        </div>
+
+        <div style="display:flex; gap:1rem; margin-bottom:1rem;">
+            <div style="flex:1; background:#f8fafc; padding:0.75rem; border-radius:8px;">
+                <strong>Total productos</strong>
+                <div>{{ resumen_stock.total }}</div>
+            </div>
+            <div style="flex:1; background:#fff7ed; padding:0.75rem; border-radius:8px;">
+                <strong>Bajo stock</strong>
+                <div>{{ resumen_stock.bajo_stock }}</div>
+            </div>
+            <div style="flex:1; background:#fee2e2; padding:0.75rem; border-radius:8px;">
+                <strong>Sin stock</strong>
+                <div>{{ resumen_stock.sin_stock }}</div>
+            </div>
+            <div style="flex:1; background:#ecfdf5; padding:0.75rem; border-radius:8px;">
+                <strong>Movimientos recientes</strong>
+                <div>{{ ultimos_movimientos|length }}</div>
+            </div>
+        </div>
+
+        <form method="get" style="display:flex; gap:0.5rem; margin-bottom:0.75rem; align-items:center;">
+            <input type="text" name="q" placeholder="Buscar producto" value="{{ filtro_busqueda|default:'' }}">
+            <select name="categoria">
+                <option value="">Todas las categorías</option>
+                {% for c in categorias %}
+                    <option value="{{ c.pk }}" {% if filtro_categoria|stringformat:'s' == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.nombre }}</option>
+                {% endfor %}
+            </select>
+            <select name="estado">
+                <option value="">Todos</option>
+                <option value="ok" {% if filtro_estado == 'ok' %}selected{% endif %}>OK</option>
+                <option value="bajo_stock" {% if filtro_estado == 'bajo_stock' %}selected{% endif %}>Bajo stock</option>
+                <option value="sin_stock" {% if filtro_estado == 'sin_stock' %}selected{% endif %}>Sin stock</option>
+            </select>
+            <button class="btn" type="submit">Filtrar</button>
+        </form>
+
+        <div style="overflow-x:auto; margin-bottom:1rem;">
+            <table class="checkout-tabla">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoria</th>
+                        <th>Stock</th>
+                        <th>Stock mínimo</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in productos_stock %}
+                    <tr>
+                        <td>{{ p.producto.nombre }}</td>
+                        <td>{{ p.categoria.nombre|default:'-' }}</td>
+                        <td>{{ p.stock }}</td>
+                        <td>{{ p.stock_minimo|default:'-' }}</td>
+                        <td>
+                            {% if p.estado == 'OK' %}
+                                <span style="color:green;">OK</span>
+                            {% elif p.estado == 'Bajo stock' %}
+                                <span style="color:orange;">Bajo stock</span>
+                            {% else %}
+                                <span style="color:red;">Sin stock</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'ajustar_stock' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="producto_id" value="{{ p.producto.pk }}">
+                                <input type="number" name="cantidad" value="0" min="0" required>
+                                <select name="tipo_movimiento">
+                                    <option value="entrada">Entrada</option>
+                                    <option value="salida">Salida</option>
+                                    <option value="ajuste">Ajuste</option>
+                                </select>
+                                <input type="text" name="motivo" placeholder="Motivo" required>
+                                <button type="submit" class="btn btn--primary btn--sm">Ajustar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="alertas-stock" style="margin-bottom:1rem;">
+            <h3>Alertas de stock</h3>
+            {% if productos_bajos %}
+            <ul>
+                {% for b in productos_bajos %}
+                <li>{{ b.producto.nombre }} — stock: {{ b.stock }} — mínimo: {{ b.stock_minimo|default:'-' }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No hay productos bajo stock.</p>
+            {% endif %}
+        </div>
+
+        <div id="movimientos-inventario" style="margin-bottom:1rem;">
+            <h3>Historial de movimientos</h3>
+            {% if ultimos_movimientos %}
+            <table class="checkout-tabla">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Producto</th>
+                        <th>Tipo</th>
+                        <th>Cantidad</th>
+                        <th>Stock anterior</th>
+                        <th>Stock nuevo</th>
+                        <th>Usuario</th>
+                        <th>Motivo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in ultimos_movimientos %}
+                    <tr>
+                        <td>{{ m.fecha_creacion|date:'d/m/Y H:i' }}</td>
+                        <td>{{ m.producto.nombre }}</td>
+                        <td>{{ m.get_tipo_movimiento_display }}</td>
+                        <td>{{ m.cantidad }}</td>
+                        <td>{{ m.stock_anterior }}</td>
+                        <td>{{ m.stock_nuevo }}</td>
+                        <td>{{ m.usuario.email|default:'-' }}</td>
+                        <td>{{ m.motivo }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No hay movimientos recientes.</p>
+            {% endif %}
+        </div>
+    </section>
+    <!-- BLOQUE B: Preparación y despacho de pedidos -->
+    <section id="pedidos-preparacion" class="dashboard-panel" style="margin-bottom: 1rem;">
+        <div class="dashboard-panel__header">
+            <h2>Preparación y despacho de pedidos</h2>
+            <p style="margin:0.25rem 0 0; color:#6b7280;">Acciones para preparar, marcar listos y despachar pedidos</p>
+        </div>
+        <div id="pedidos-en-preparacion" style="margin-top:0.5rem;">
+            <h3 style="margin:0 0 0.5rem 0;">Pedidos en preparación</h3>
         </div>
         {% if pedidos_en_preparacion %}
         <div style="overflow-x:auto;">
@@ -173,11 +331,10 @@
         {% else %}
         <p>No hay pedidos en preparación actualmente.</p>
         {% endif %}
-    </section>
-
-    <section class="dashboard-panel" style="margin-bottom: 1rem;">
+    <section id="pedidos-listos" class="dashboard-panel" style="margin-bottom: 1rem;">
         <div class="dashboard-panel__header">
             <h2>Pedidos listos</h2>
+            <p style="margin:0.25rem 0 0; color:#6b7280;">Pedidos preparados y listos para entrega o retiro</p>
         </div>
         {% if pedidos_listos %}
         <div style="overflow-x:auto;">
@@ -209,7 +366,7 @@
         {% endif %}
     </section>
 
-    <section class="dashboard-panel">
+    <section id="pedidos-recientes" class="dashboard-panel">
         <div class="dashboard-panel__header">
             <h2>Pedidos recientes de bodega</h2>
         </div>

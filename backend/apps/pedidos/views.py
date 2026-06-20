@@ -16,6 +16,8 @@ from apps.maestros.models import PerfilMaestroPyme, SolicitudAsesoria
 from apps.pagos.models import Pago
 from apps.pagos import services as pagos_services
 from apps.pedidos import services as pedidos_services
+from apps.inventario import services as inventario_services
+from apps.catalogo.models import Categoria
 from apps.pedidos.models import Pedido
 from apps.puntos import services as puntos_services
 from apps.pedidos.serializers import (
@@ -334,13 +336,59 @@ def enviar_a_bodega_view(request, pk):
 
 @_requiere_rol(Usuario.Rol.BODEGUERO, Usuario.Rol.ADMIN)
 def bodeguero_dashboard_view(request):
-    pedidos = (
-        Pedido.objects
-        .select_related("usuario")
-        .filter(estado__in=[Pedido.Estado.APROBADO, Pedido.Estado.EN_PREPARACION])
-        .order_by("-creado_en")
+    # Pedidos por estado para el panel de bodeguero
+    pedidos_aprobados = (
+        Pedido.objects.select_related("usuario").filter(estado=Pedido.Estado.APROBADO).order_by("-creado_en")
     )
-    return render(request, "dashboard/bodeguero.html", {"pedidos": pedidos})
+    pedidos_en_preparacion = (
+        Pedido.objects.select_related("usuario").filter(estado=Pedido.Estado.EN_PREPARACION).order_by("-creado_en")
+    )
+    pedidos_listos = (
+        Pedido.objects.select_related("usuario").filter(estado=Pedido.Estado.LISTO).order_by("-creado_en")
+    )
+    pedidos_recientes_bodega = (
+        Pedido.objects.select_related("usuario").filter(estado__in=[Pedido.Estado.APROBADO, Pedido.Estado.EN_PREPARACION, Pedido.Estado.LISTO]).order_by("-creado_en")[:10]
+    )
+
+    # filtros desde query params
+    categoria_id = request.GET.get("categoria")
+    estado = request.GET.get("estado")
+    busqueda = request.GET.get("q")
+
+    productos_stock = inventario_services.obtener_productos_stock_bodega(
+        categoria_id=categoria_id, estado=estado, busqueda=busqueda
+    )
+    productos_bajos = inventario_services.obtener_productos_bajo_stock()
+    productos_sin_stock = inventario_services.obtener_productos_sin_stock()
+    ultimos_mov = inventario_services.obtener_ultimos_movimientos()
+    resumen_stock = inventario_services.obtener_resumen_stock_bodega()
+    categorias = Categoria.objects.filter(activa=True)
+
+    return render(
+        request,
+        "dashboard/bodeguero.html",
+        {
+            "pedidos_aprobados": pedidos_aprobados,
+            "pedidos_en_preparacion": pedidos_en_preparacion,
+            "pedidos_listos": pedidos_listos,
+            "pedidos_recientes_bodega": pedidos_recientes_bodega,
+            "total_aprobados": pedidos_aprobados.count(),
+            "total_en_preparacion": pedidos_en_preparacion.count(),
+            "total_listos": pedidos_listos.count(),
+            "total_pedidos_bodega": (
+                pedidos_aprobados.count() + pedidos_en_preparacion.count() + pedidos_listos.count()
+            ),
+            "productos_stock": productos_stock,
+            "productos_bajos": productos_bajos,
+            "productos_sin_stock": productos_sin_stock,
+            "ultimos_movimientos": ultimos_mov,
+            "resumen_stock": resumen_stock,
+            "categorias": categorias,
+            "filtro_categoria": categoria_id,
+            "filtro_estado": estado,
+            "filtro_busqueda": busqueda,
+        },
+    )
 
 
 @_requiere_rol(Usuario.Rol.BODEGUERO, Usuario.Rol.ADMIN)
