@@ -1,6 +1,7 @@
 from decimal import Decimal
 
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils.text import slugify
 
@@ -13,6 +14,14 @@ from apps.usuarios.models import Usuario
 
 class Command(BaseCommand):
     help = "Crea/actualiza datos demo idempotentes para desarrollo y despliegue."
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--force-demo",
+            action="store_true",
+            dest="force_demo",
+            help="Forzar ejecución de seed_demo aun cuando settings.DEBUG == False (usar con precaución).",
+        )
 
     DEMO_USERS = [
         {
@@ -463,6 +472,12 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
+        # Protección: en entornos no DEBUG exigir flag explícito
+        force = options.get("force_demo", False)
+        if not settings.DEBUG and not force:
+            raise CommandError(
+                "Seed demo bloqueado: settings.DEBUG es False. Para forzar la ejecución use --force-demo (no recomendado en producción)."
+            )
         summary = {
             "usuarios_creados": 0,
             "usuarios_actualizados": 0,
