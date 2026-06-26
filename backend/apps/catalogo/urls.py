@@ -26,6 +26,11 @@ urlpatterns = [
         name="admin_producto_estado",
     ),
     path(
+        "dashboard/admin/productos/<int:pk>/desactivar-oferta/",
+        views.desactivar_oferta_producto_view,
+        name="admin_producto_desactivar_oferta",
+    ),
+    path(
         "dashboard/admin/categorias/",
         views.admin_categorias_dashboard_view,
         name="admin_categorias_dashboard",

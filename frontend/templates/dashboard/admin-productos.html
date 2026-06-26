@@ -26,7 +26,9 @@
                     <th>Nombre</th>
                     <th>Categoria</th>
                     <th>Precio</th>
-                    <th>Stock</th>
+                    <th>En oferta</th>
+                    <th>Precio oferta</th>
+                    <th>Vigencia</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -37,12 +39,26 @@
                     <td>{{ producto.nombre }}</td>
                     <td>{{ producto.categoria.nombre }}</td>
                     <td>${{ producto.precio|formato_moneda }}</td>
-                    <td>{{ producto.stock }}</td>
+                    <td>{% if producto.en_oferta %}<span class="badge badge--offer">Sí</span>{% else %}No{% endif %}</td>
+                    <td>{% if producto.precio_oferta %}${{ producto.precio_oferta|formato_moneda }}{% else %}-{% endif %}</td>
                     <td>
-                        {% if producto.activo %}
-                        <span class="badge badge--activo">Activo</span>
+                        {% if producto.en_oferta and producto.fecha_inicio_oferta and producto.fecha_fin_oferta %}
+                            {{ producto.fecha_inicio_oferta|date:"Y-m-d" }} → {{ producto.fecha_fin_oferta|date:"Y-m-d" }}
                         {% else %}
-                        <span class="badge badge--inactivo">Inactivo</span>
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if producto.en_oferta and producto.fecha_inicio_oferta and producto.fecha_fin_oferta %}
+                            {% if product_now >= producto.fecha_inicio_oferta and product_now <= producto.fecha_fin_oferta %}
+                                <span class="badge badge--activo">Vigente</span>
+                            {% elif product_now < producto.fecha_inicio_oferta %}
+                                <span class="badge badge--info">Programada</span>
+                            {% else %}
+                                <span class="badge badge--inactivo">Vencida</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge">Sin oferta</span>
                         {% endif %}
                     </td>
                     <td class="dashboard-admin__actions">
@@ -57,6 +73,12 @@
                             <button type="submit" class="btn btn--success">Activar</button>
                             {% endif %}
                         </form>
+                        {% if producto.en_oferta %}
+                        <form method="post" action="{% url 'admin_producto_desactivar_oferta' producto.pk %}" style="display:inline-block; margin-left:6px;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn--warning">Desactivar oferta</button>
+                        </form>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}

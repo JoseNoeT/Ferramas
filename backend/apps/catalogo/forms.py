@@ -110,3 +110,32 @@ class ProductoForm(forms.ModelForm):
                 queryset = queryset.exclude(pk=self.instance.pk)
 
         return slug_final
+
+    def clean(self):
+        cleaned = super().clean()
+        en_oferta = cleaned.get("en_oferta")
+        precio = cleaned.get("precio")
+        precio_oferta = cleaned.get("precio_oferta")
+        fecha_inicio = cleaned.get("fecha_inicio_oferta")
+        fecha_fin = cleaned.get("fecha_fin_oferta")
+
+        if en_oferta:
+            if precio_oferta is None:
+                self.add_error("precio_oferta", "Precio de oferta obligatorio cuando el producto está en oferta.")
+            else:
+                try:
+                    if precio_oferta >= precio:
+                        self.add_error("precio_oferta", "El precio de oferta debe ser menor que el precio normal.")
+                except Exception:
+                    pass
+
+            if fecha_inicio is None:
+                self.add_error("fecha_inicio_oferta", "Fecha de inicio de oferta obligatoria cuando el producto está en oferta.")
+            if fecha_fin is None:
+                self.add_error("fecha_fin_oferta", "Fecha de fin de oferta obligatoria cuando el producto está en oferta.")
+
+            if fecha_inicio and fecha_fin:
+                if fecha_inicio > fecha_fin:
+                    self.add_error("fecha_fin_oferta", "La fecha de fin debe ser posterior o igual a la fecha de inicio.")
+
+        return cleaned

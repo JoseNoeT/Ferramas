@@ -107,7 +107,8 @@ def ofertas_view(request):
 @_requiere_admin
 def admin_productos_dashboard_view(request):
     productos = catalogo_services.listar_productos_admin()
-    return render(request, "dashboard/admin-productos.html", {"productos": productos})
+    product_now = timezone.now()
+    return render(request, "dashboard/admin-productos.html", {"productos": productos, "product_now": product_now})
 
 
 @_requiere_admin
@@ -177,6 +178,20 @@ def cambiar_estado_producto_view(request, pk):
     else:
         messages.warning(request, f"Producto '{producto.nombre}' desactivado.")
 
+    return redirect("admin_productos_dashboard")
+
+
+@_requiere_admin
+def desactivar_oferta_producto_view(request, pk):
+    """Desactiva la oferta de un producto (en_oferta=False) desde el panel admin interno."""
+    if request.method != "POST":
+        return redirect("admin_productos_dashboard")
+
+    producto = get_object_or_404(Producto, pk=pk)
+    producto.en_oferta = False
+    producto.save(update_fields=["en_oferta"]) 
+
+    messages.success(request, f"Oferta desactivada para '{producto.nombre}'.")
     return redirect("admin_productos_dashboard")
 
 
