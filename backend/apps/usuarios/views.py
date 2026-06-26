@@ -277,6 +277,13 @@ def admin_usuarios_dashboard_view(request):
 
 
 @_requiere_admin
+def admin_clientes_dashboard_view(request):
+    from .admin_views import admin_clientes_dashboard_view as _admin_clientes_dashboard_view
+
+    return _admin_clientes_dashboard_view(request)
+
+
+@_requiere_admin
 def crear_usuario_interno_view(request):
     from .admin_views import crear_usuario_interno_view as _crear_usuario_interno_view
 

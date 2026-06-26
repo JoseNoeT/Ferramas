@@ -143,11 +143,18 @@ def obtener_dashboard_indicadores():
             "url": "admin_categorias_dashboard",
         },
         {
-            "titulo": "Usuarios",
+            "titulo": "Usuarios internos",
             "descripcion": "Administra accesos internos, credenciales y roles del sistema.",
-            "cantidad": total_usuarios,
+            "cantidad": Usuario.objects.exclude(rol=Usuario.Rol.CLIENTE).count(),
             "meta": f"{usuarios_por_rol['admins']} admins · {usuarios_por_rol['vendedores']} vendedores",
             "url": "admin_usuarios_dashboard",
+        },
+        {
+            "titulo": "Clientes",
+            "descripcion": "Lista de clientes registrados en la plataforma.",
+            "cantidad": Usuario.objects.filter(rol=Usuario.Rol.CLIENTE).count(),
+            "meta": f"{usuarios_por_rol['clientes']} clientes",
+            "url": "admin_clientes",
         },
     ]
 
@@ -159,6 +166,27 @@ def obtener_dashboard_indicadores():
                 "cantidad": total_pedidos,
                 "meta": "Acceso a información estratégica",
                 "url": "reportes_dashboard",
+            }
+        )
+
+    # Añadir tarjeta Maestros/PYME si la ruta admin_maestros está disponible
+    maestros_disponibles = True
+    try:
+        reverse("admin_maestros")
+    except NoReverseMatch:
+        maestros_disponibles = False
+
+    if maestros_disponibles:
+        from apps.maestros.models import PerfilMaestroPyme
+
+        total_maestros = PerfilMaestroPyme.objects.count()
+        modulos_admin.append(
+            {
+                "titulo": "Maestros/PYME",
+                "descripcion": "Gestiona perfiles Maestro/PYME y solicitudes.",
+                "cantidad": total_maestros,
+                "meta": f"{total_maestros} perfiles",
+                "url": "admin_maestros",
             }
         )
 

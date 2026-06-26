@@ -18,6 +18,11 @@ urlpatterns = [
         name="admin_usuarios_dashboard",
     ),
     path(
+        "dashboard/admin/clientes/",
+        views.admin_clientes_dashboard_view,
+        name="admin_clientes",
+    ),
+    path(
         "dashboard/admin/usuarios/crear/",
         views.crear_usuario_interno_view,
         name="admin_usuario_crear",

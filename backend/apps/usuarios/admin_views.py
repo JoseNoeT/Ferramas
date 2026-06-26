@@ -21,6 +21,13 @@ def admin_usuarios_dashboard_view(request):
     return render(request, "dashboard/admin-usuarios.html", {"usuarios": usuarios})
 
 
+def admin_clientes_dashboard_view(request):
+    from .services import listar_clientes
+
+    clientes = listar_clientes()
+    return render(request, "dashboard/admin-clientes.html", {"clientes": clientes})
+
+
 def crear_usuario_interno_view(request):
     if request.method == "POST":
         usuario, form = crear_usuario_interno(request.POST)

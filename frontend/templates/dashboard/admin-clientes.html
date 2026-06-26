@@ -1,0 +1,59 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<section class="admin-clientes dashboard-admin">
+    <header class="dashboard-admin__header">
+        <div>
+            <h1>Panel de Clientes</h1>
+            <p>Listado de clientes registrados (solo lectura).</p>
+        </div>
+    </header>
+
+    <div class="dashboard-admin__table-wrap">
+        <table class="dashboard-admin__table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Perfil Maestro/PYME</th>
+                    <th>Estado Perfil Maestro/PYME</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.email }}</td>
+                    <td>{{ cliente.get_rol_display }}</td>
+                    <td>
+                        {% if cliente.activo %}
+                        <span class="badge badge--activo">Activo</span>
+                        {% else %}
+                        <span class="badge badge--inactivo">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if cliente.perfil_maestro_pyme %}
+                            Sí
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if cliente.perfil_maestro_pyme %}
+                            {{ cliente.perfil_maestro_pyme.get_estado_display }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="dashboard-admin__empty">No hay clientes registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

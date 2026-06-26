@@ -79,3 +79,8 @@ def cambiar_estado_usuario(usuario, activo):
     usuario.is_active = bool(activo)
     usuario.save(update_fields=["activo", "is_active"])
     return usuario
+
+
+def listar_clientes():
+    """Lista usuarios con rol CLIENTE, ordenados por email."""
+    return Usuario.objects.filter(rol=Usuario.Rol.CLIENTE).order_by("email")
